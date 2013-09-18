@@ -39,10 +39,10 @@ public abstract class HouseholdDataManager
     public static final String        READ_PRE_AO_RESULTS_FILE               = "read.pre.ao.results";
     public static final String        READ_PRE_AO_RESULTS_FILENAME           = "read.pre.ao.filename";
 
-    //HHID,household_serial_no,TAZ,MGRA,VEH,PERSONS,HWORKERS,HINCCAT1,HINC,UNITTYPE,HHT,BLDGSZ
+    //HHID,household_serial_no,TAZ,MAZ,VEH,PERSONS,HWORKERS,HINCCAT1,HINC,UNITTYPE,HHT,BLDGSZ
     public static final String        HH_ID_FIELD_NAME                       = "HHID";
     public static final String        HH_HOME_TAZ_FIELD_NAME                 = "TAZ";
-    public static final String        HH_HOME_MGRA_FIELD_NAME                = "MGRA";
+    public static final String        HH_HOME_MGRA_FIELD_NAME                = "MAZ";
     public static final String        HH_INCOME_CATEGORY_FIELD_NAME          = "HINCCAT1";
     public static final String        HH_INCOME_DOLLARS_FIELD_NAME           = "HINC";
     public static final String        HH_WORKERS_FIELD_NAME                  = "HWORKERS";
