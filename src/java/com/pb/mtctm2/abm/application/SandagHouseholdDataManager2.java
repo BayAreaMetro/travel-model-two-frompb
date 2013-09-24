@@ -595,7 +595,7 @@ public class SandagHouseholdDataManager2
 
         ItemServer.bind(hhDataManager, HH_DATA_SERVER_NAME);
 
-        System.out.println(String.format( "SERPM Household Data Manager server started on: %s:%d", serverAddress, serverPort) );
+        System.out.println(String.format( "MTCTM2 Household Data Manager server started on: %s:%d", serverAddress, serverPort) );
 
     }
 
