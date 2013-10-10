@@ -200,14 +200,6 @@ public class VisitorModel {
 
 	        MatrixDataServerRmi matrixServer = new MatrixDataServerRmi( serverAddress, serverPort, MatrixDataServer.MATRIX_DATA_SERVER_NAME );
 
-	        try {
-	            // create the concrete data server object
-	            matrixServer.start32BitMatrixIoServer( mt );
-	        }
-	        catch (RuntimeException e) {
-	            matrixServer.stop32BitMatrixIoServer();
-	            logger.error( "RuntimeException caught making remote method call to start 32 bit mitrix in remote MatrixDataServer.", e);
-	        }
 
 	        // bind this concrete object with the cajo library objects for managing RMI
 	        try
@@ -218,7 +210,6 @@ public class VisitorModel {
 	            logger.error(String.format(
 	                    "UnknownHostException. serverAddress = %s, serverPort = %d -- exiting.",
 	                    serverAddress, serverPort), e);
-	            matrixServer.stop32BitMatrixIoServer();
 	            throw new RuntimeException();
 	        }
 
@@ -230,7 +221,6 @@ public class VisitorModel {
 	            logger.error(String.format(
 	                    "RemoteException. serverAddress = %s, serverPort = %d -- exiting.",
 	                    serverAddress, serverPort), e);
-	            matrixServer.stop32BitMatrixIoServer();
 	            throw new RuntimeException();
 	        }
 
@@ -258,10 +248,9 @@ public class VisitorModel {
 	public static void main(String[] args) {
 		
 		String propertiesFile = null;
-		boolean is64bit = false;
         HashMap<String,String> pMap;
 		
-		logger.info(String.format("SERPM Activity Based Model using CT-RAMP version %s",
+		logger.info(String.format("MTCTM2 Activity Based Model using CT-RAMP version %s",
 	                CtrampApplication.VERSION));
 
 		logger.info(String.format("Running Visitor Model"));
@@ -281,10 +270,6 @@ public class VisitorModel {
 			if (args[i].equalsIgnoreCase("-sampleRate"))
 			{
 				sampleRate = Float.parseFloat(args[i + 1]);
-			}
-			if (args[i].equalsIgnoreCase("-is64bit"))
-			{
-				is64bit = Boolean.parseBoolean(args[i + 1]);
 			}
 		}
         logger.info(String.format("-sampleRate %.4f.", sampleRate));
@@ -323,50 +308,22 @@ public class VisitorModel {
 
             if (!matrixServerAddress.equalsIgnoreCase("none"))
             {
-
-                if (matrixServerAddress.equalsIgnoreCase("localhost") && !is64bit) {
-                    matrixServer = visitorModel.startMatrixServerProcess(matrixServerAddress, serverPort, mt);
-                    visitorModel.ms = matrixServer;
-                }
-                else {
-                	visitorModel.ms = new MatrixDataServerRmi( matrixServerAddress, serverPort, MatrixDataServer.MATRIX_DATA_SERVER_NAME );
-                	visitorModel.ms.testRemote( "VisitorModel" );
-                	if(!is64bit)
-                		visitorModel.ms.start32BitMatrixIoServer( mt );
-                    
-                	//these methods need to be called to set the matrix data manager in the matrix data server
-                    MatrixDataManager mdm = MatrixDataManager.getInstance();
-                    mdm.setMatrixDataServerObject(visitorModel.ms);
-                }
-
+            	visitorModel.ms = new MatrixDataServerRmi( matrixServerAddress, serverPort, MatrixDataServer.MATRIX_DATA_SERVER_NAME );
+            	visitorModel.ms.testRemote( "VisitorModel" );
+                
+            	//these methods need to be called to set the matrix data manager in the matrix data server
+                MatrixDataManager mdm = MatrixDataManager.getInstance();
+                mdm.setMatrixDataServerObject(visitorModel.ms);
             }
 
         } catch (Exception e)
         {
-
-            if (matrixServerAddress.equalsIgnoreCase("localhost") && !is64bit)
-            {
-                matrixServer.stop32BitMatrixIoServer();
-            }
             logger.error(String
                     .format("exception caught running ctramp model components -- exiting."), e);
             throw new RuntimeException();
 
         }
-
-
 		visitorModel.runModel();
-	       
-		// if a separate process for running matrix data mnager was started, we're
-        // done with it, so close it.
-        if (matrixServerAddress.equalsIgnoreCase("localhost") && !is64bit) {
-            matrixServer.stop32BitMatrixIoServer();
-        }
-        else {
-            if (!matrixServerAddress.equalsIgnoreCase("none") && !is64bit)
-                visitorModel.ms.stop32BitMatrixIoServer();
-        }
-       
 	}
 
 }

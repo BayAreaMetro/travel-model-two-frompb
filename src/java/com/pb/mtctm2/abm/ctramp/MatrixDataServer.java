@@ -9,7 +9,6 @@ import java.util.HashMap;
 import com.pb.common.calculator.DataEntry;
 import com.pb.common.calculator.MatrixDataServerIf;
 import com.pb.common.matrix.Matrix;
-import com.pb.common.matrix.MatrixIO32BitJvm;
 import com.pb.common.matrix.MatrixType;
 import com.pb.common.matrix.MatrixReader;
 import com.pb.common.matrix.MatrixWriter;
@@ -39,24 +38,19 @@ public class MatrixDataServer
     public static final String         MATRIX_DATA_SERVER_NAME    = MatrixDataServer.class.getCanonicalName();
     private static final String        MATRIX_DATA_SERVER_LABEL   = "matrix server";
 
-    private MatrixIO32BitJvm           ioVm32Bit                  = null;
-
     private HashMap<String, DataEntry> matrixEntryMap;
     private HashMap<String, Matrix>    matrixMap;
-    
-    private int ramFor32BitProcess;
 
+
+    
     public MatrixDataServer()
     {
-
-        // start the 32 bit JVM used specifically for running matrix io classes
-        ioVm32Bit = MatrixIO32BitJvm.getInstance();
-
         // create the HashMap objects to keep track of matrix data read by the server
         matrixEntryMap = new HashMap<String, DataEntry>();
         matrixMap = new HashMap<String, Matrix>();
         
-        objectLock = new Object();
+        objectLock = new Object();		
+    
     }
 
     public String testRemote( String remoteObjectName )
@@ -89,31 +83,12 @@ public class MatrixDataServer
                 matrix = matrixMap.get( name );
             }
             else {
+            	
+            	//create 64bit matrix reader
                 String fileName = matrixEntry.fileName;
-                if (matrixEntry.format.equalsIgnoreCase("emme2")) {
-                    MatrixReader mr = MatrixReader.createReader(MatrixType.EMME2, new File(fileName));
-                    matrix = mr.readMatrix(matrixEntry.matrixName);
-                }
-                else if (matrixEntry.format.equalsIgnoreCase("binary")) {
-                    MatrixReader mr = MatrixReader.createReader(MatrixType.BINARY, new File(fileName));
-                    matrix = mr.readMatrix();
-                }
-                else if (matrixEntry.format.equalsIgnoreCase("zip") || matrixEntry.format.equalsIgnoreCase("zmx")) {
-                    MatrixReader mr = MatrixReader.createReader(MatrixType.ZIP, new File(fileName));
-                    matrix = mr.readMatrix();
-                }
-                else if (matrixEntry.format.equalsIgnoreCase("tpplus")) {
-                    MatrixReader mr = MatrixReader.createReader(MatrixType.TPPLUS, new File(fileName));
-                    matrix = mr.readMatrix(matrixEntry.matrixName);
-                }
-                else if (matrixEntry.format.equalsIgnoreCase("transcad")) {
-                    MatrixReader mr = MatrixReader.createReader(MatrixType.TRANSCAD, new File(fileName));
-                    matrix = mr.readMatrix(matrixEntry.matrixName);
-                }
-                else {
-                    throw new RuntimeException("unsupported matrix type: " + matrixEntry.format);
-                }
-
+                MatrixReader mr = MatrixReader.createReader(MatrixType.TPPLUS, new File(fileName));
+                matrix = mr.readMatrix(matrixEntry.matrixName);
+                
                 // Use token name from control file for matrix name (not name from underlying matrix)
                 matrix.setName(matrixEntry.name);
 
@@ -135,7 +110,7 @@ public class MatrixDataServer
     public void writeMatrixFile(String fileName, Matrix[] m){
              
         File outFile = new File(fileName); 
-        MatrixWriter writer = MatrixWriter.createWriter(MatrixType.TPPLUS, outFile ); 
+        MatrixWriter writer = MatrixWriter.createWriter(MatrixType.TPPLUS, outFile); //64bit
         String[] names = new String[m.length];
         
         for (int i=0; i<m.length; i++) {
@@ -153,35 +128,10 @@ public class MatrixDataServer
         if (matrixEntryMap != null) matrixEntryMap.clear();
     }
 
-    public void start32BitMatrixIoServer(MatrixType mType)
-    {
-
-        // start the matrix I/O server process
-    	ioVm32Bit.setSizeInMegaBytes( ramFor32BitProcess );
-        ioVm32Bit.startJVM32();
-
-        // establish that matrix reader and writer classes will use the RMI versions
-        // for TPPLUS format matrices
-        ioVm32Bit.startMatrixDataServer(mType);
-        logger.info("matrix data server 32 bit process started.");
-
-    }
-
-    public void stop32BitMatrixIoServer()
-    {
-
-        // stop the matrix I/O server process
-        ioVm32Bit.stopMatrixDataServer();
-
-        // close the JVM in which the RMI reader/writer classes were running
-        ioVm32Bit.stopJVM32();
-        logger.info("matrix data server 32 bit process stopped.");
-
-    }
-    
-    public void setRam( int ram ){
-        ramFor32BitProcess = ram;
-    }
+    //Empty methods to maintain compatibility
+    public void start32BitMatrixIoServer(MatrixType mType){}
+    public void stop32BitMatrixIoServer(){}
+    public void setRam( int ram ){}
 
     
 
@@ -203,20 +153,6 @@ public class MatrixDataServer
         }
 
         MatrixDataServer matrixServer = new MatrixDataServer();
-        matrixServer.setRam( ram );
-
-        try
-        {
-
-            // create the concrete data server object
-            matrixServer.start32BitMatrixIoServer(MatrixType.TPPLUS);
-
-        } catch (RuntimeException e)
-        {
-            matrixServer.stop32BitMatrixIoServer();
-            System.out.println(  "RuntimeException caught in com.pb.models.ctramp.MatrixDataServer.main() -- exiting." );
-            e.printStackTrace();
-        }
 
         // bind this concrete object with the cajo library objects for managing RMI
         Remote.config(serverAddress, serverPort, null, 0);
