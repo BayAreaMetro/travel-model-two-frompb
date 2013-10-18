@@ -79,8 +79,7 @@ public final class SubtourTodEstimationMcLogsumsAppender
 
         if (outputFileName == null)
         {
-            logger
-                    .info("no output file name was specified in the properties file.  Nothing to do.");
+            logger.info("no output file name was specified in the properties file.  Nothing to do.");
             return;
         }
 

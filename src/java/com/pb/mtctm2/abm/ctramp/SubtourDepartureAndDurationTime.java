@@ -1,13 +1,14 @@
 package com.pb.mtctm2.abm.ctramp;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.*;
-
 
 import com.pb.common.calculator.MatrixDataServerIf;
 import com.pb.common.calculator.VariableTable;
@@ -713,10 +714,8 @@ public class SubtourDepartureAndDurationTime implements Serializable {
             {
     
                 // output data
-                String projectDirectory = propertyMap
-                        .get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-                String accFileName = projectDirectory
-                        + Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file");
+                String projectDirectory = Util.getStringValueFromPropertyMap(propertyMap,CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
+                String accFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file")).toString();
     
                 aggAcc.readAccessibilityTableFromFile(accFileName);
     

@@ -2,11 +2,12 @@ package com.pb.mtctm2.abm.visitor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.ctramp.Util;
 
+import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.common.datafile.OLD_CSVFileReader;
 import com.pb.common.datafile.TableDataSet;
 
@@ -31,8 +32,7 @@ public class VisitorTourTimeOfDayChoiceModel {
 	public VisitorTourTimeOfDayChoiceModel(HashMap<String,String> rbMap ){
 
 		String directory = Util.getStringValueFromPropertyMap(rbMap,"Project.Directory");
-        String stationDiurnalFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.tour.tod.file");
-        stationDiurnalFile = directory + stationDiurnalFile;
+        String stationDiurnalFile = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.tour.tod.file")).toString();
         
 		modelStructure = new VisitorModelStructure();
 		

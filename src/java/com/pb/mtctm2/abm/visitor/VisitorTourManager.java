@@ -5,16 +5,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.application.SandagModelStructure;
 import com.pb.mtctm2.abm.application.SandagSummitFile;
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.Util;
-
 import com.pb.common.datafile.OLD_CSVFileReader;
 import com.pb.common.datafile.TableDataSet;
 import com.pb.common.math.MersenneTwister;
@@ -64,29 +65,23 @@ public class VisitorTourManager {
 		sandagStructure = new SandagModelStructure();
 		
 		String directory = Util.getStringValueFromPropertyMap(rbMap,"Project.Directory");
-        String mgraFile =  Util.getStringValueFromPropertyMap(rbMap,"mgra.socec.file");
-        mgraFile = directory + mgraFile;
+        String mgraFile =  Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"mgra.socec.file")).toString();
         
-        occupancyRate = new Float(Util.getStringValueFromPropertyMap(rbMap, "visitor.hotel.occupancyRate"));
-        householdRate = new Float(Util.getStringValueFromPropertyMap(rbMap, "visitor.household.occupancyRate"));
+        occupancyRate = Util.getFloatValueFromPropertyMap(rbMap, "visitor.hotel.occupancyRate");
+        householdRate = Util.getFloatValueFromPropertyMap(rbMap, "visitor.household.occupancyRate");
         
-        businessHotelPercent = new Float(Util.getStringValueFromPropertyMap(rbMap, "visitor.hotel.businessPercent"));
-        businessHouseholdPercent = new Float(Util.getStringValueFromPropertyMap(rbMap, "visitor.household.businessPercent"));
+        businessHotelPercent = Util.getFloatValueFromPropertyMap(rbMap, "visitor.hotel.businessPercent");
+        businessHouseholdPercent = Util.getFloatValueFromPropertyMap(rbMap, "visitor.household.businessPercent");
 
-        String businessTourFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.business.tour.file");
-        businessTourFile = directory + businessTourFile;
+        String businessTourFile = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.business.tour.file")).toString();
         
-        String personalTourFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.personal.tour.file");
-        personalTourFile = directory + personalTourFile;
+        String personalTourFile = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.personal.tour.file")).toString();
       
-        String partySizeFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.partySize.file");
-        partySizeFile = directory + partySizeFile;
+        String partySizeFile = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.partySize.file")).toString();
 
-        String autoAvailableFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.autoAvailable.file");
-        autoAvailableFile = directory + autoAvailableFile;
+        String autoAvailableFile = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.autoAvailable.file")).toString();
 
-        String incomeFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.income.file");
-        incomeFile = directory + incomeFile;
+        String incomeFile = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.income.file")).toString();
 
         businessTourFrequency = readFile(businessTourFile);
         personalTourFrequency = readFile(personalTourFile);
@@ -96,8 +91,8 @@ public class VisitorTourManager {
               
         mgraData = readFile(mgraFile);
         
-        seek = new Boolean(Util.getStringValueFromPropertyMap(rbMap,"visitor.seek"));
-        traceId = new Integer(Util.getStringValueFromPropertyMap(rbMap,"visitor.trace"));
+        seek = Util.getBooleanValueFromPropertyMap(rbMap,"visitor.seek");
+        traceId = Util.getIntegerValueFromPropertyMap(rbMap,"visitor.trace");
         
         random = new MersenneTwister(1000001);
 
@@ -365,8 +360,8 @@ public class VisitorTourManager {
 		//Open file and print header
 		
 		String directory = Util.getStringValueFromPropertyMap(rbMap,"Project.Directory");
-        String tourFileName = directory+Util.getStringValueFromPropertyMap(rbMap,"visitor.tour.output.file");
-        String tripFileName = directory+Util.getStringValueFromPropertyMap(rbMap,"visitor.trip.output.file");
+        String tourFileName = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.tour.output.file")).toString();
+        String tripFileName = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.trip.output.file")).toString();
 
 		logger.info("Writing visitor tours to file "+tourFileName);
 		logger.info("Writing visitor trips to file "+tripFileName);

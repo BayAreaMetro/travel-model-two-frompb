@@ -1,14 +1,15 @@
 package com.pb.mtctm2.abm.visitor;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.accessibilities.AutoAndNonMotorizedSkimsCalculator;
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
-
 import com.pb.common.calculator.VariableTable;
 import com.pb.common.newmodel.ChoiceModelApplication;
 
@@ -68,12 +69,11 @@ public class VisitorTripModeChoiceModel {
                 
         dmu = dmuFactory.getVisitorTripModeChoiceDMU();
 
-        int dataPage = new Integer(Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_UEC_DATA_SHEET));
-        int modelPage = new Integer(Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_UEC_MODEL_SHEET));
+        int dataPage = Util.getIntegerValueFromPropertyMap(propertyMap,PROPERTIES_UEC_DATA_SHEET);
+        int modelPage = Util.getIntegerValueFromPropertyMap(propertyMap,PROPERTIES_UEC_MODEL_SHEET);
         
-        String uecPath = propertyMap.get(CtrampApplication.PROPERTIES_UEC_PATH);
-        String tripModeUecFile = propertyMap.get(PROPERTIES_UEC_FILE);
-        tripModeUecFile = uecPath + tripModeUecFile;
+        String uecPath = Util.getStringValueFromPropertyMap(propertyMap,CtrampApplication.PROPERTIES_UEC_PATH);
+        String tripModeUecFile = Paths.get(uecPath,Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_UEC_FILE)).toString();
         
        tripModeChoiceModel = new ChoiceModelApplication(tripModeUecFile, modelPage, dataPage, propertyMap, (VariableTable) dmu);
 

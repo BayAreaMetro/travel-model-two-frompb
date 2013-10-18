@@ -1,11 +1,14 @@
 package com.pb.mtctm2.abm.visitor;
 
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.HashMap;
+
 import com.pb.common.calculator.VariableTable;
 import com.pb.common.newmodel.ChoiceModelApplication;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
@@ -102,12 +105,11 @@ public class VisitorTourModeChoiceModel
 
         // locate the individual mandatory tour mode choice model UEC
         String uecPath = propertyMap.get(CtrampApplication.PROPERTIES_UEC_PATH);
-        String mcUecFile = Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_UEC_TOUR_MODE_CHOICE);
-        mcUecFile = uecPath + mcUecFile;
+        String mcUecFile = Paths.get(uecPath,Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_UEC_TOUR_MODE_CHOICE)).toString();
 
         logger.info("Will read mcUECFile "+mcUecFile);
-        int dataPage = new Integer(Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_UEC_TOUR_DATA_SHEET));
-        int modelPage = new Integer(Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_UEC_TOUR_MODEL_SHEET));
+        int dataPage = Util.getIntegerValueFromPropertyMap(propertyMap,PROPERTIES_UEC_TOUR_DATA_SHEET);
+        int modelPage = Util.getIntegerValueFromPropertyMap(propertyMap,PROPERTIES_UEC_TOUR_MODEL_SHEET);
        
        // default is to not save the tour mode choice utils and probs for each tour
         String saveUtilsProbsString = propertyMap.get(CtrampApplication.PROPERTIES_SAVE_TOUR_MODE_CHOICE_UTILS);

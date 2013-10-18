@@ -17,11 +17,13 @@ import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.accessibilities.DriveTransitWalkSkimsCalculator;
 
+import org.apache.log4j.Logger;
+
+import com.pb.mtctm2.abm.accessibilities.DriveTransitWalkSkimsCalculator;
 import com.pb.mtctm2.abm.ctramp.Modes;
 
 /**
@@ -107,12 +109,9 @@ public class DriveTransitWalkSkimsCalculator
         bestPathUEC = myBestPathUEC;
 
         // Create the skim UECs
-        String uecPath = Util.getStringValueFromPropertyMap(rbMap,
-                CtrampApplication.PROPERTIES_UEC_PATH);
-        String uecFileName = uecPath
-                + Util.getStringValueFromPropertyMap(rbMap, "skim.drive.transit.walk.uec.file");
-        int dataPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "skim.drive.transit.walk.data.page");
+        String uecPath = Util.getStringValueFromPropertyMap(rbMap,CtrampApplication.PROPERTIES_UEC_PATH);
+        String uecFileName = Paths.get(uecPath,Util.getStringValueFromPropertyMap(rbMap, "skim.drive.transit.walk.uec.file")).toString();
+        int dataPage = Util.getIntegerValueFromPropertyMap(rbMap,"skim.drive.transit.walk.data.page");
 
         int dtwLocSkimEaPage = Util.getIntegerValueFromPropertyMap(rbMap, "skim.drive.local.walk.ea.page");
         int dtwLocSkimAmPage = Util.getIntegerValueFromPropertyMap(rbMap, "skim.drive.local.walk.am.page");

@@ -486,8 +486,7 @@ public class NonTransitUtilities
         boolean os64bit = false;
         MatrixDataServer matrixServer = null;
 
-        os64bit = Boolean.parseBoolean(Util.getStringValueFromPropertyMap(rbMap,
-                "operatingsystem.64bit"));
+        os64bit = Boolean.parseBoolean(Util.getStringValueFromPropertyMap(rbMap,"operatingsystem.64bit"));
         if (os64bit)
         {
 

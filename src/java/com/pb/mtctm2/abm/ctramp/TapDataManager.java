@@ -1,5 +1,7 @@
 package com.pb.mtctm2.abm.ctramp;
 
+import com.pb.common.datafile.TableDataFileReader;
+import com.pb.common.datafile.TableDataSet;
 import com.pb.common.util.ResourceUtil;
 
 import java.io.BufferedReader;
@@ -7,19 +9,31 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 
 public final class TapDataManager
         implements Serializable
 {
+    
+    public static final String TAP_DATA_FILE_PROPERTY = "tap.data.file";
+    public static final String TAP_DATA_TAP_COLUMN_PROPERTY = "tap.data.tap.column";
+    public static final String TAP_DATA_LOTID_COLUMN_PROPERTY = "tap.data.lotid.column";
+    public static final String TAP_DATA_TAZ_COLUMN_PROPERTY = "tap.data.taz.column";
+    public static final String TAP_DATA_CAPACITY_COLUMN_PROPERTY = "tap.data.capacity.column";
 
     protected transient Logger       logger = Logger.getLogger(TapDataManager.class);
     private static TapDataManager instance;
@@ -79,46 +93,40 @@ public final class TapDataManager
      * //TODO: Test this and see if there is only a single lot associated // TODO
      * with each tap.
      * 
-     * The file has 5 columns - tap, lotId, parking type, taz, and capacity
+     * The file has 4 columns - tap, lotid, taz, and capacity
      * 
      * @param rb - the resource bundle that lists the tap.ptype file and
      *            scenario.path.
      */
-    private void readTap(HashMap<String, String> rbMap)
-    {
+    private void readTap(HashMap<String, String> rbMap) {
 
-        File tazTdzCorresFile = new File(Util.getStringValueFromPropertyMap(rbMap, "scenario.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "tap.ptype.file"));
-        String s;
-        TreeMap<Integer, List<float[]>> map = new TreeMap<Integer, List<float[]>>();
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(tazTdzCorresFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                float[] tapList = new float[3];
-                int key = Integer.parseInt(st.nextToken()); // tap number
-                tapList[0] = Float.parseFloat(st.nextToken()); // lot id
-                st.nextToken(); // skip column not used
-                tapList[1] = Float.parseFloat(st.nextToken()); // taz
-                tapList[2] = (Math.max(Float.parseFloat(st.nextToken()), 15)) * 2.5f; // lot
-                // capacity
-                if (map.get(key) == null)
-                {
-                    List<float[]> newList = new ArrayList<float[]>();
-                    newList.add(tapList);
-                    map.put(key, newList);
-                } else
-                {
-                    map.get(key).add(tapList);
-                }
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
+        File tapDataFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+        		                     Util.getStringValueFromPropertyMap(rbMap, TAP_DATA_FILE_PROPERTY)).toFile();    	
+        TableDataFileReader reader = TableDataFileReader.createReader(tapDataFile);
+        TableDataSet data;
+        try {
+        	data = reader.readFile(tapDataFile);
+        } catch (IOException e) {
+        	throw new RuntimeException(e);
+        } finally {
+        	reader.close();
+        }
+
+        TreeMap<Integer,List<float[]>> map = new TreeMap<Integer, List<float[]>>();
+        String tapColumn = Util.getStringValueFromPropertyMap(rbMap,TAP_DATA_TAP_COLUMN_PROPERTY);
+        String lotidColumn = Util.getStringValueFromPropertyMap(rbMap,TAP_DATA_LOTID_COLUMN_PROPERTY);
+        String tazColumn = Util.getStringValueFromPropertyMap(rbMap,TAP_DATA_TAZ_COLUMN_PROPERTY);
+        String capacityColumn = Util.getStringValueFromPropertyMap(rbMap,TAP_DATA_CAPACITY_COLUMN_PROPERTY);
+        for (int row = 1; row <= data.getRowCount(); row++) {
+
+        	int tap = (int) data.getValueAt(row,tapColumn);
+        	float lotId = data.getValueAt(row,lotidColumn);
+        	float taz = data.getValueAt(row,tazColumn);
+        	float capacity = data.getValueAt(row,capacityColumn);
+        	capacity = Math.max(capacity,15.0f)*2.5f; //todo: inherited formula, may need to be revised
+        	if (!map.containsKey(tap))
+        		map.put(tap,new LinkedList<float[]>());
+        	map.get(tap).add(new float[] {lotId,taz,capacity});
         }
         populateTap(map);
     }
@@ -179,44 +187,31 @@ public final class TapDataManager
      * @param rb A Resourcebundle with skims.path and tap.skim.file properties.
      */
     public void getTapList(HashMap<String, String> rbMap)
-    {
+    {File mgraWlkTapCorresFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+            Util.getStringValueFromPropertyMap(rbMap, "maz.tap.distance.file")).toFile();
 
-        File mgraWlkTapCorresFile = new File(
-                Util.getStringValueFromPropertyMap(rbMap, "scenario.path") +
-                Util.getStringValueFromPropertyMap(rbMap, "mgra.wlkacc.taps.and.distance.file")
-                );
-        ArrayList<Integer> tapList = new ArrayList<Integer>();
-        String s;
-
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(mgraWlkTapCorresFile));
-
-            // read the first data file line containing column names
-            s = br.readLine();
-                
-            // read the data records
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, ", ");
-                st.nextToken();
-                int tap = Integer.parseInt(st.nextToken());
-                if (tap > maxTap) maxTap = tap;
-                if (!tapList.contains(tap)) tapList.add(tap);
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        Collections.sort(tapList);
-        // now go thru the array of ArrayLists and convert the lists to arrays and
-        taps = new int[tapList.size() + 1];
-
-        for (int i = 0; i < tapList.size(); ++i)
-            taps[i + 1] = tapList.get(i);
+		Set<Integer> tapSet = new TreeSet<>();
+		try (BufferedReader reader = new BufferedReader(new FileReader(mgraWlkTapCorresFile))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				line = line.trim();
+				if (line.length() == 0)
+					continue;
+				String[] data = line.split(",");
+				//10001,90002,90002,43053.39,11689.23
+				//maz,tap,tap,generalized cost,distance in feet
+				int tap = Integer.parseInt(data[1]);
+				tapSet.add(tap);
+				if (tap > maxTap) 
+					maxTap = tap;
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		taps = new int[tapSet.size() + 1];
+		int counter = 1;
+		for (int tap : tapSet)
+			taps[counter++] = tap;
 
     }
 

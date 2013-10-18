@@ -10,6 +10,7 @@ import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -606,8 +608,8 @@ public final class BuildAccessibilities
 
         
         // output data
-        String projectDirectory = rbMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-        String accFileName = projectDirectory + Util.getStringValueFromPropertyMap(rbMap, "acc.output.file");
+        String projectDirectory = Util.getStringValueFromPropertyMap(rbMap,CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
+        String accFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(rbMap, "acc.output.file")).toString();
 
         accessibilitiesTableObject.writeAccessibilityTableToFile( accFileName, mgraNumbers, "mgra" );
         

@@ -17,11 +17,13 @@ import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.accessibilities.WalkTransitDriveSkimsCalculator;
 
+import org.apache.log4j.Logger;
+
+import com.pb.mtctm2.abm.accessibilities.WalkTransitDriveSkimsCalculator;
 import com.pb.mtctm2.abm.ctramp.Modes;
 
 /**
@@ -108,7 +110,7 @@ public class WalkTransitDriveSkimsCalculator
 
      // Create the skim UECs
         String uecPath = Util.getStringValueFromPropertyMap(rbMap, CtrampApplication.PROPERTIES_UEC_PATH);
-        String uecFileName = uecPath + Util.getStringValueFromPropertyMap(rbMap, "skim.walk.transit.drive.uec.file");
+        String uecFileName = Paths.get(uecPath,Util.getStringValueFromPropertyMap(rbMap, "skim.walk.transit.drive.uec.file")).toString();
         int dataPage = Util.getIntegerValueFromPropertyMap(rbMap, "skim.walk.transit.drive.data.page");
 
         int wtdLocSkimEaPage = Util.getIntegerValueFromPropertyMap(rbMap, "skim.walk.local.drive.ea.page");

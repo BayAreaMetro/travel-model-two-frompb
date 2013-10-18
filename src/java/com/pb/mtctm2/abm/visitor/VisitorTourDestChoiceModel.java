@@ -1,15 +1,16 @@
 package com.pb.mtctm2.abm.visitor;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
-
 import com.pb.common.calculator.IndexValues;
 import com.pb.common.calculator.VariableTable;
 import com.pb.common.datafile.TableDataSet;
@@ -70,11 +71,10 @@ public class VisitorTourDestChoiceModel {
 		mgraManager = MgraDataManager.getInstance(rbMap);
 
         String uecFileDirectory = Util.getStringValueFromPropertyMap(rbMap, CtrampApplication.PROPERTIES_UEC_PATH );
-        String visitorDCSoaFileName = Util.getStringValueFromPropertyMap(rbMap, "visitor.dc.soa.uec.file");
-        visitorDCSoaFileName = uecFileDirectory + visitorDCSoaFileName;
+        String visitorDCSoaFileName = Paths.get(uecFileDirectory,Util.getStringValueFromPropertyMap(rbMap, "visitor.dc.soa.uec.file")).toString();
        
-        int dataPage = Integer.parseInt( Util.getStringValueFromPropertyMap(rbMap, "visitor.dc.soa.data.page" ) );
-        int sizePage = Integer.parseInt( Util.getStringValueFromPropertyMap(rbMap, "visitor.dc.soa.size.page" ) );
+        int dataPage = Util.getIntegerValueFromPropertyMap(rbMap, "visitor.dc.soa.data.page" );
+        int sizePage = Util.getIntegerValueFromPropertyMap(rbMap, "visitor.dc.soa.size.page" );
 
         //initiate a DMU 
         dcDmu = dmuFactory.getVisitorTourDestChoiceDMU();

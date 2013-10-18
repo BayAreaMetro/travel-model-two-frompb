@@ -1,13 +1,14 @@
 package com.pb.mtctm2.abm.visitor;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
-
 import com.pb.common.calculator.VariableTable;
 import com.pb.common.datafile.TableDataSet;
 import com.pb.common.newmodel.ConcreteAlternative;
@@ -97,17 +98,17 @@ public class VisitorStopLocationChoiceModel {
         dmu = dmuFactory.getVisitorStopLocationChoiceDMU();
 
         String uecFileDirectory = Util.getStringValueFromPropertyMap(rbMap, CtrampApplication.PROPERTIES_UEC_PATH );
-        String visitorStopLocationSoaFileName = Util.getStringValueFromPropertyMap(rbMap, "visitor.slc.soa.uec.file");
-        visitorStopLocationSoaFileName = uecFileDirectory + visitorStopLocationSoaFileName;
+        String visitorStopLocationSoaFileName = Paths.get(uecFileDirectory,
+        		Util.getStringValueFromPropertyMap(rbMap, "visitor.slc.soa.uec.file")).toString();
         
-        int soaDataPage = Integer.parseInt( Util.getStringValueFromPropertyMap(rbMap, "visitor.slc.soa.data.page" ) );
-        int soaModelPage = Integer.parseInt( Util.getStringValueFromPropertyMap(rbMap,  "visitor.slc.soa.model.page" ) );
+        int soaDataPage = Util.getIntegerValueFromPropertyMap(rbMap, "visitor.slc.soa.data.page" );
+        int soaModelPage = Util.getIntegerValueFromPropertyMap(rbMap,  "visitor.slc.soa.model.page" );
         
-        String visitorStopLocationFileName = Util.getStringValueFromPropertyMap(rbMap, "visitor.slc.uec.file");
-        visitorStopLocationFileName = uecFileDirectory + visitorStopLocationFileName;
+        String visitorStopLocationFileName = Paths.get(uecFileDirectory,
+        		Util.getStringValueFromPropertyMap(rbMap, "visitor.slc.uec.file")).toString();
         
-        int dataPage = Integer.parseInt( Util.getStringValueFromPropertyMap(rbMap, "visitor.slc.data.page" ) );
-        int modelPage = Integer.parseInt( Util.getStringValueFromPropertyMap(rbMap,  "visitor.slc.model.page" ) );
+        int dataPage = Util.getIntegerValueFromPropertyMap(rbMap, "visitor.slc.data.page" );
+        int modelPage = Util.getIntegerValueFromPropertyMap(rbMap,  "visitor.slc.model.page" );
         
         // create a ChoiceModelApplication object for the SOA model.
         soaModel = new ChoiceModelApplication( visitorStopLocationSoaFileName, soaModelPage, soaDataPage, rbMap, (VariableTable)dmu );

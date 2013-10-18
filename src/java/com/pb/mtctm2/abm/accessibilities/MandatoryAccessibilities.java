@@ -89,34 +89,25 @@ public class MandatoryAccessibilities
         String uecFileName = Util.getStringValueFromPropertyMap(rbMap, "acc.mandatory.uec.file");
         int dataPage = Util.getIntegerValueFromPropertyMap(rbMap, "acc.mandatory.data.page");
         int autoSkimPage = Util.getIntegerValueFromPropertyMap(rbMap, "acc.mandatory.auto.page");
-        int bestWalkTransitPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "acc.mandatory.bestWalkTransit.page");
-        int bestDriveTransitPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "acc.mandatory.bestDriveTransit.page");
-        int autoLogsumPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "acc.mandatory.autoLogsum.page");
-        int transitLogsumPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "acc.mandatory.transitLogsum.page");
+        int bestWalkTransitPage = Util.getIntegerValueFromPropertyMap(rbMap,"acc.mandatory.bestWalkTransit.page");
+        int bestDriveTransitPage = Util.getIntegerValueFromPropertyMap(rbMap,"acc.mandatory.bestDriveTransit.page");
+        int autoLogsumPage = Util.getIntegerValueFromPropertyMap(rbMap,"acc.mandatory.autoLogsum.page");
+        int transitLogsumPage = Util.getIntegerValueFromPropertyMap(rbMap,"acc.mandatory.transitLogsum.page");
         int constantsPage = Util.getIntegerValueFromPropertyMap(rbMap, "acc.constants.page");
 
         dmu = new MandatoryAccessibilitiesDMU();
 
         File uecFile = new File(uecFileName);
         autoSkimUEC = new UtilityExpressionCalculator(uecFile, autoSkimPage, dataPage, rbMap, dmu);
-        bestWalkTransitUEC = new UtilityExpressionCalculator(uecFile, bestWalkTransitPage,
-                dataPage, rbMap, dmu);
-        bestDriveTransitUEC = new UtilityExpressionCalculator(uecFile, bestDriveTransitPage,
-                dataPage, rbMap, dmu);
-        autoLogsumUEC = new UtilityExpressionCalculator(uecFile, autoLogsumPage, dataPage, rbMap,
-                dmu);
-        transitLogsumUEC = new UtilityExpressionCalculator(uecFile, transitLogsumPage, dataPage,
-                rbMap, dmu);
+        bestWalkTransitUEC = new UtilityExpressionCalculator(uecFile, bestWalkTransitPage,dataPage, rbMap, dmu);
+        bestDriveTransitUEC = new UtilityExpressionCalculator(uecFile, bestDriveTransitPage,dataPage, rbMap, dmu);
+        autoLogsumUEC = new UtilityExpressionCalculator(uecFile, autoLogsumPage, dataPage, rbMap,dmu);
+        transitLogsumUEC = new UtilityExpressionCalculator(uecFile, transitLogsumPage, dataPage,rbMap, dmu);
 
         String accUECFileName = Util.getStringValueFromPropertyMap(rbMap, "acc.uec.file");
         File accUECFile = new File(accUECFileName);
         int accDataPage = Util.getIntegerValueFromPropertyMap(rbMap, "acc.data.page");
-        constantsUEC = new UtilityExpressionCalculator(accUECFile, constantsPage, accDataPage,
-                rbMap, dmu);
+        constantsUEC = new UtilityExpressionCalculator(accUECFile, constantsPage, accDataPage,rbMap, dmu);
 
         mgraManager = MgraDataManager.getInstance(rbMap);
         tapManager = TapDataManager.getInstance(rbMap);
@@ -151,8 +142,7 @@ public class MandatoryAccessibilities
     public void readData(HashMap<String, String> rbMap)
     {
 
-        File surveyDataFile = new File(Util.getStringValueFromPropertyMap(rbMap,
-                "survey.input.file"));
+        File surveyDataFile = new File(Util.getStringValueFromPropertyMap(rbMap,"survey.input.file"));
         OLD_CSVFileReader csvReader = new OLD_CSVFileReader();
 
         try
@@ -348,8 +338,7 @@ public class MandatoryAccessibilities
         for (col = 0; col < accNames.length * purposes.length; ++col)
             surveyData.appendColumn(accessibilities[col], columnNames[col]);
 
-        File surveyDataFile = new File(Util.getStringValueFromPropertyMap(rbMap,
-                "survey.output.file"));
+        File surveyDataFile = new File(Util.getStringValueFromPropertyMap(rbMap,"survey.output.file"));
         CSVFileWriter csvWriter = new CSVFileWriter();
 
         try

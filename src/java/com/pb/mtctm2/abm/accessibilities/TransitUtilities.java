@@ -82,13 +82,10 @@ public class TransitUtilities
         // Create the peak and off-peak UECs
         String uecFileName = Util.getStringValueFromPropertyMap(rbMap, "acc.uec.file");
         int dataPage = Util.getIntegerValueFromPropertyMap(rbMap, "acc.data.page");
-        int offpeakModelPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "acc.transit.offpeak.page");
+        int offpeakModelPage = Util.getIntegerValueFromPropertyMap(rbMap,"acc.transit.offpeak.page");
         int peakModelPage = Util.getIntegerValueFromPropertyMap(rbMap, "acc.transit.peak.page");
-        int walkTransitModelPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "acc.transit.walkaccess.page");
-        int driveTransitModelPage = Util.getIntegerValueFromPropertyMap(rbMap,
-                "acc.transit.driveaccess.page");
+        int walkTransitModelPage = Util.getIntegerValueFromPropertyMap(rbMap,"acc.transit.walkaccess.page");
+        int driveTransitModelPage = Util.getIntegerValueFromPropertyMap(rbMap,"acc.transit.driveaccess.page");
 
         // check this code if adding more periods
         walkUEC = new TransitWalkAccessUEC[TAPPERIODS.length];

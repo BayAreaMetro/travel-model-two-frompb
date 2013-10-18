@@ -9,6 +9,7 @@ import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;                                                                                            
 import java.io.Serializable;                                                                                    
+import java.nio.file.Paths;
 import java.util.HashMap;                                                                                       
 
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
@@ -48,8 +49,8 @@ public class AutoTazSkimsCalculator
     {                                                                                                           
                                                                                                                 
     	// Create the UECs                                                                                      
-        String uecPath = Util.getStringValueFromPropertyMap(rbMap, CtrampApplication.PROPERTIES_UEC_PATH);      
-        String uecFileName = uecPath + Util.getStringValueFromPropertyMap(rbMap, "taz.distance.uec.file");      
+        String uecPath = Util.getStringValueFromPropertyMap(rbMap,CtrampApplication.PROPERTIES_UEC_PATH);      
+        String uecFileName = Paths.get(uecPath, Util.getStringValueFromPropertyMap(rbMap,"taz.distance.uec.file")).toString();      
         int dataPage = Util.getIntegerValueFromPropertyMap(rbMap, "taz.distance.data.page");                    
         int autoSkimEaOdPage = Util.getIntegerValueFromPropertyMap(rbMap, "taz.od.distance.ea.page");           
         int autoSkimAmOdPage = Util.getIntegerValueFromPropertyMap(rbMap, "taz.od.distance.am.page");           

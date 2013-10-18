@@ -1,6 +1,7 @@
 package com.pb.mtctm2.abm.ctramp;
 
 import com.pb.common.datafile.OLD_CSVFileReader;
+import com.pb.common.datafile.TableDataFileReader;
 import com.pb.common.datafile.TableDataSet;
 import com.pb.common.util.ResourceUtil;
 
@@ -9,15 +10,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.Modes.AccessMode;
 
 /**
@@ -31,6 +37,26 @@ import com.pb.mtctm2.abm.ctramp.Modes.AccessMode;
 public class TazDataManager
         implements Serializable
 {
+	
+	public static final String TAZ_DATA_FILE_PROPERTY = "taz.data.file";
+	public static final String TAZ_DATA_FILE_TAZ_COLUMN_PROPERTY = "taz.data.taz.column";
+	public static final String TAZ_DATA_FILE_AVGTT_COLUMN_PROPERTY = "taz.data.avgttd.column";
+	public static final String TAZ_DATA_FILE_DIST_COLUMN_PROPERTY = "taz.data.dist.column";
+	public static final String TAZ_DATA_FILE_PCTDETOUR_COLUMN_PROPERTY = "taz.data.pctdetour.column";
+	public static final String TAZ_DATA_FILE_TERMINAL_COLUMN_PROPERTY = "taz.data.terminal.column";
+
+	public static final String TAZ_TAP_ACCESS_FILE_PROPERTY = "taz.tap.access.file";
+	public static final String TAZ_TAP_ACCESS_FILE_FTAZ_COLUMN_PROPERTY = "taz.tap.access.ftaz.column";
+	public static final String TAZ_TAP_ACCESS_FILE_MODE_COLUMN_PROPERTY = "taz.tap.access.mode.column";
+	public static final String TAZ_TAP_ACCESS_FILE_PERIOD_COLUMN_PROPERTY = "taz.tap.access.period.column";
+	public static final String TAZ_TAP_ACCESS_FILE_TTAP_COLUMN_PROPERTY = "taz.tap.access.ttap.column";
+	public static final String TAZ_TAP_ACCESS_FILE_TMAZ_COLUMN_PROPERTY = "taz.tap.access.tmaz.column";
+	public static final String TAZ_TAP_ACCESS_FILE_TTAZ_COLUMN_PROPERTY = "taz.tap.access.ttaz.column";
+	public static final String TAZ_TAP_ACCESS_FILE_DTIME_COLUMN_PROPERTY = "taz.tap.access.dtime.column";
+	public static final String TAZ_TAP_ACCESS_FILE_DDIST_COLUMN_PROPERTY = "taz.tap.access.ddist.column";
+	public static final String TAZ_TAP_ACCESS_FILE_DTOLL_COLUMN_PROPERTY = "taz.tap.access.dtoll.column";
+	public static final String TAZ_TAP_ACCESS_FILE_WDIST_COLUMN_PROPERTY = "taz.tap.access.wdist.column";
+			
 
     protected transient Logger       logger = Logger.getLogger(TazDataManager.class);
     private static TazDataManager instance;
@@ -65,6 +91,10 @@ public class TazDataManager
     // added from tdz manager
     private int[]                 tazParkingType;
     
+    private double[] avgtts;
+    private double[] transpDist;
+    private double[] pctDetour;
+    
     /**
      * Get an array of tazs, indexed sequentially from 0
      * @return Taz array indexed from 0
@@ -87,64 +117,120 @@ public class TazDataManager
         System.out.println("TazDataManager Started");
 
         // read the MGRA data file into a TableDataSet and get the MGRA and TAZ fields from it for setting TAZ correspondence.
-        readMgraTableData( rbMap ); 
+        readMgraTableData(rbMap); 
         setTazMgraCorrespondence();
+        readTazData(rbMap);
         
-        //readTazDistrictCorrespondence(rbMap);
-        readTazTerminalTimeCorrespondence(rbMap);
-        //readTazProductionTerminalTimeCorrespondence(rbMap);
-        //readZonePMSA(rbMap);
-        //readZoneCMSA(rbMap);
-        //readZoneAvrZoneCorrespondence(rbMap);
-        //readTAZParkingTypeCorrespondence(rbMap);
-        readPnRTapsInfo(rbMap);
+        readTazTapAccessData(rbMap);
 
         printTazStats();
     }
+    
+    private void readTazData(HashMap<String,String> rbMap) {
+        File dataFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+                        Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_PROPERTY)).toFile();
+        TableDataSet tazData;
+    	try {
+			tazData = TableDataFileReader.createReader(dataFile).readFile(dataFile);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
-    /**
-     * This method reads in the taz.tdz file which has 2 columns. The first column is
-     * the taz and the second column is corresponding tdz. The correspondence will be
-     * stored in the tdz class. The only data captured here is the list of TAZs.
-     * 
-     * This method will also set the maxTaz value.
-     * 
-     * @param rb the properties file that lists the taz.tdz file and the
-     *            generic.path.
-     */
-    private void readTazs(HashMap<String, String> rbMap)
-    {
-        File tazTdzCorresFile = new File(Util.getStringValueFromPropertyMap(rbMap, "generic.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.tdz.correspondence.file"));
-        String s;
-        int taz;
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(tazTdzCorresFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                tazSet.add(taz);
-                st.nextToken();
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        maxTaz = tazSet.last();
-        tazs = new int[tazSet.size()];
-        tazsOneBased =  new int[tazSet.size()+1];
-        int i = 0;
-        for (Integer tazNumber : tazSet)
-        {
-            tazs[i] = tazNumber;
-            tazsOneBased[i+1] = tazNumber;
-            ++i;
-        }
+        tazOriginTerminalTime = new float[maxTaz+1];
+    	tazDestinationTerminalTime = new float[maxTaz+1];
+        avgtts = new double[maxTaz+1];
+        transpDist = new double[maxTaz+1];
+        pctDetour = new double[maxTaz+1];
+        String tazColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_TAZ_COLUMN_PROPERTY);
+        String avgttColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_AVGTT_COLUMN_PROPERTY);
+        String pctdetourColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_PCTDETOUR_COLUMN_PROPERTY);
+        String distColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_DIST_COLUMN_PROPERTY);
+        String terminalColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_TERMINAL_COLUMN_PROPERTY);
+        
+    	for (int row = 1; row <= tazData.getRowCount(); row++) {
+    		int taz = (int) tazData.getValueAt(row,tazColumn);
+    		float avgtt = tazData.getValueAt(row,avgttColumn);
+    		float pctdetour = tazData.getValueAt(row,pctdetourColumn);
+    		float dist = tazData.getValueAt(row,distColumn);
+    		float terminalTime = tazData.getValueAt(row,terminalColumn);
+    		
+    		tazOriginTerminalTime[taz] = terminalTime;
+    		tazDestinationTerminalTime[taz] = terminalTime;
+    		avgtts[taz] = avgtt;
+    		pctDetour[taz] = pctdetour;
+    		transpDist[taz] = dist;
+    	}
+    }
+    
+    private void readTazTapAccessData(HashMap<String,String> rbMap) {
+        File dataFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+                                  Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_PROPERTY)).toFile();
+        
+        String ftazColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_FTAZ_COLUMN_PROPERTY);
+        String modeColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_MODE_COLUMN_PROPERTY);
+        String periodColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_PERIOD_COLUMN_PROPERTY);
+        String ttapColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_TTAP_COLUMN_PROPERTY);
+        String tmazColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_TMAZ_COLUMN_PROPERTY);
+        String ttazColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_TTAZ_COLUMN_PROPERTY);
+        String dtimeColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_DTIME_COLUMN_PROPERTY);
+        String ddistColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_DDIST_COLUMN_PROPERTY);
+        String dtollColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_DTOLL_COLUMN_PROPERTY);
+        String wdistColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_WDIST_COLUMN_PROPERTY);
+        List<String> columnNames = Arrays.asList(ftazColumn,modeColumn,periodColumn,ttapColumn,tmazColumn,ttazColumn,
+        		                                 dtimeColumn,ddistColumn,dtollColumn,wdistColumn);
 
+        Map<Integer,Map<Integer,float[]>> tazTap = new HashMap<>(); //maz -> tap -> [time,distance] 
+        try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
+        	String line;
+        	Map<String,Integer> columns = new HashMap<>();
+        	while ((line = reader.readLine()) != null) {
+        		line = line.trim();
+        		if (line.length() == 0)
+        			continue;
+        		String[] data = line.split(",");
+        		if (columns.size() == 0) {
+        			for (int s = 0; s < data.length; s++) {
+        				String column = data[s];
+        				for (String columnName : columnNames)
+        					if (column.equalsIgnoreCase(columnName))
+        						columns.put(columnName,s);
+        			}
+        			continue;
+        		}
+        		int taz = Integer.parseInt(data[columns.get(ftazColumn)]);
+        		if (!tazTap.containsKey(taz))
+        			tazTap.put(taz,new TreeMap<Integer,float[]>());
+        		int tap = Integer.parseInt(data[columns.get(ttapColumn)]);
+        		float wdist = Float.parseFloat(data[columns.get(wdistColumn)]);
+        		float time = Float.parseFloat(data[columns.get(dtimeColumn)]) + wdist / 5280 / 3 * 60; //walk @ 3 mph
+        		float dist = Float.parseFloat(data[columns.get(ddistColumn)]) * 5280 + wdist;
+        		tazTap.get(taz).put(tap,new float[] {time,dist});
+        	}
+        } catch (IOException e) {
+        	throw new RuntimeException(e);
+        }
+        tazParkNRideTaps = new float[maxTaz + 1][3][]; // tapId, time, distance
+        tazKissNRideTaps = new float[maxTaz + 1][3][]; // tapId, time, distance
+        for (int taz : tazTap.keySet()) {
+        	Map<Integer,float[]> data = tazTap.get(taz);
+        	float[] taps = new float[data.size()];
+        	float[] time = new float[taps.length];
+        	float[] dist = new float[taps.length];
+        	int counter = 0;
+        	for (int tap : data.keySet()) {
+        		float[] d = data.get(tap);
+        		taps[counter] = tap;
+        		time[counter] = d[0];
+        		dist[counter] = d[1];
+        		counter++;
+        	}
+        	tazParkNRideTaps[taz][0] = taps;
+        	tazParkNRideTaps[taz][1] = time;
+        	tazParkNRideTaps[taz][2] = dist;
+        	tazKissNRideTaps[taz][0] = taps;
+        	tazKissNRideTaps[taz][1] = time;
+        	tazKissNRideTaps[taz][2] = dist;
+        }
     }
 
     /**
@@ -202,374 +288,10 @@ public class TazDataManager
         
         tazsOneBased =  new int[tazSet.size()+1];
         int i = 0;
-        for (Integer tazNumber : tazSet)
-        {
-            tazs[i] = tazNumber;
-            tazsOneBased[i+1] = tazNumber;
-            ++i;
+        for (Integer tazNumber : tazSet) {
+            tazs[i++] = tazNumber;
+            tazsOneBased[i] = tazNumber;
         }
-    }
-
-    /**
-     * This method will initialize the class variable tazSuperDistrict. The
-     * taz.district file has 2 columns, the first is the taz and the second is the
-     * superdistrict
-     * 
-     * @param rb the resource bundle that specifies the taz.district file and the
-     *            generic.path
-    public void readTazDistrictCorrespondence(HashMap<String, String> rbMap)
-    {
-        tazSuperDistrict = new int[maxTaz + 1];
-        File tazTdzCorresFile = new File(Util.getStringValueFromPropertyMap(rbMap, "generic.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.district.correspondence.file"));
-        String s;
-        int taz;
-        int sd;
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(tazTdzCorresFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                sd = Integer.parseInt(st.nextToken());
-                tazSuperDistrict[taz] = sd;
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-     */
-
-    
-    /**
-     * This method will read the zone.avrzone file and store the location area (0-3)
-     * for each taz.
-     * 
-     * 
-     * @param rb - resourceBundle That specifies the zone.avrzone file and the
-     *            generic.path
-    private void readZoneAvrZoneCorrespondence(HashMap<String, String> rbMap)
-    {
-        File zoneAvrZoneCorresFile = new File(Util.getStringValueFromPropertyMap(rbMap,
-                "generic.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.avrzone.correspondence.file"));
-        tazAreaType = new int[maxTaz + 1];
-
-        // read the file to get the location area (0 - 3) for each TDZ
-        String s;
-        int taz;
-        StringTokenizer st;
-        int location;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(zoneAvrZoneCorresFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                location = Integer.parseInt(st.nextToken());
-                tazAreaType[taz] = location;
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-     */
-
-    
-    /**
-     * This method reads in the zone.pmsa file which has 2 columns. The first column
-     * is the taz and the second column is corresponding pmsa. The correspondence
-     * will be stored in the pmsa list. The only data captured here is the list of
-     * pmsas.
-     * 
-     * This method will also set the maxTaz value.
-     * 
-     * @param rb the properties file that lists the taz.tdz file and the generic.path
-    private void readZonePMSA(HashMap<String, String> rbMap)
-    {
-
-        pmsa = new int[maxTaz + 1];
-        File zonePmsaFileName = new File(Util.getStringValueFromPropertyMap(rbMap, "generic.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.pmsa.file"));
-        String s;
-        int taz;
-        int tazPmsa;
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(zonePmsaFileName));
-            // BufferedReader br = new BufferedReader(new
-            // FileReader("/Users/michalis/Documents/Fortran2Java/data/zone.pmsa"));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                tazPmsa = Integer.parseInt(st.nextToken());
-                pmsa[taz] = tazPmsa;
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-     */
-
-    
-    /**
-     * This method reads in the zone.cmsa file which has 2 columns. The first column
-     * is the taz and the second column is corresponding cmsa. The correspondence
-     * will be stored in the cmsa list. The only data captured here is the list of
-     * cmsas.
-     * 
-     * This method will also set the maxTaz value.
-     * 
-     * @param rb the properties file that lists the zone.cmsa file and the
-     *            generic.path
-     * 
-    private void readZoneCMSA(HashMap<String, String> rbMap)
-    {
-
-        cmsa = new int[maxTaz + 1];
-        File zoneCmsaFile = new File(Util.getStringValueFromPropertyMap(rbMap, "generic.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.cmsa.file"));
-        String s;
-        int taz;
-        int tazCmsa;
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(zoneCmsaFile));
-            // BufferedReader br = new BufferedReader(new
-            // FileReader("/Users/michalis/Documents/Fortran2Java/data/zone.cmsa"));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                tazCmsa = Integer.parseInt(st.nextToken());
-                cmsa[taz] = tazCmsa;
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-     * */
-
-    
-    /**
-     * This method will read the zone.term file and store the terminal time for each
-     * taz.
-     * 
-     * @param rb the properties file that lists the zone.term file and the
-     *            scenario.path
-     */
-    private void readTazTerminalTimeCorrespondence(HashMap<String, String> rbMap)
-    {
-        File tdzTerminalTimeCorresFile = new File(Util.getStringValueFromPropertyMap(rbMap,
-                "scenario.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.terminal.time.file"));
-        
-        tazDestinationTerminalTime = new float[maxTaz + 1];
-        tazOriginTerminalTime = new float[maxTaz + 1];
-        
-        // read the file to get the terminal time for each TDZ
-        String s;
-        int taz;
-        StringTokenizer st;
-        float terminalTime;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(tdzTerminalTimeCorresFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                terminalTime = Float.parseFloat(st.nextToken());
-                tazDestinationTerminalTime[taz] = terminalTime;
-                tazOriginTerminalTime[taz] = terminalTime;
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * This method will read the zone.pterm file and store the production terminal
-     * time for each tdz.
-     * 
-     * @param rb the properties file that lists the zone.pterm file and the
-     *            scenario.path
-     * 
-     * 
-    private void readTazProductionTerminalTimeCorrespondence(HashMap<String, String> rbMap)
-    {
-        File tdzProductionTerminalTimeCorresFile = new File(Util.getStringValueFromPropertyMap(
-                rbMap, "scenario.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.prod.terminal.time.file"));
-
-        tazOriginTerminalTime = new float[maxTaz + 1];
-
-        // read the file to get the production terminal time for each TDZ
-        String s;
-        int taz;
-        StringTokenizer st;
-        float productionTerminalTime;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(
-                    tdzProductionTerminalTimeCorresFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                productionTerminalTime = Float.parseFloat(st.nextToken());
-                tazOriginTerminalTime[taz] = productionTerminalTime;
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-     */
-
-    
-    /**
-     * This method will read the zone.park file and store the parking type for each
-     * taz. Only types 2 - 5 are given. Rest assumed to be type 1.
-     * 
-     * @param rb the properties file that lists the taz.parkingtype.file and the
-     *            scenario.path
-    private void readTAZParkingTypeCorrespondence(HashMap<String, String> rbMap)
-    {
-        File tazParkingTypeCorresFile = new File(Util.getStringValueFromPropertyMap(rbMap,
-                "scenario.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.parkingtype.file"));
-
-        tazParkingType = new int[maxTaz + 1];
-        Arrays.fill(tazParkingType, 1);
-
-        // read the file to get the parking type (2 - 5) for each TAZ
-        String s;
-        int taz;
-        StringTokenizer st;
-        int parkingType;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(tazParkingTypeCorresFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                taz = Integer.parseInt(st.nextToken());
-                parkingType = Integer.parseInt(st.nextToken());
-                tazParkingType[taz] = parkingType;
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-     */
-
-    
-    /**
-     * This method read in the access061.prp file that lists the taz and the # of
-     * taps that have drive access. Then the taps are listed along with the time and
-     * the distance to those taps from the taz.
-     * 
-     * @param rb the properties file that lists the taz.driveaccess.taps.file and the
-     *            scenario.path
-     */
-    public void readPnRTapsInfo(HashMap<String, String> rbMap)
-    {
-        File tdzDATapFile = new File(Util.getStringValueFromPropertyMap(rbMap, "scenario.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "taz.driveaccess.taps.file"));
-        tazParkNRideTaps = new float[maxTaz + 1][3][]; // tapId, time, distance
-        tazKissNRideTaps = new float[maxTaz + 1][3][]; // tapId, time, distance
-
-        String s, s1;
-        StringTokenizer st, st1;
-        int taz;
-        int nTaps;
-        float tapId;
-        float tapTime;
-        float tapDist;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(tdzDATapFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                if (st.countTokens() != 2) System.out.println(s);
-                taz = Integer.parseInt(st.nextToken());
-                nTaps = Integer.parseInt(st.nextToken());
-                
-                //only build for tazs in the taz set (i.e. skip zones (like external stations) in the input file)
-                if (tazSet.contains(taz)) {
-	                
-	                tazParkNRideTaps[taz][0] = new float[nTaps];
-	                tazParkNRideTaps[taz][1] = new float[nTaps];
-	                tazParkNRideTaps[taz][2] = new float[nTaps];
-	                tazKissNRideTaps[taz][0] = new float[nTaps];
-	                tazKissNRideTaps[taz][1] = new float[nTaps];
-	                tazKissNRideTaps[taz][2] = new float[nTaps];
-	                for (int i = 0; i < nTaps; i++)
-	                {
-	                    s1 = br.readLine();
-	                    st1 = new StringTokenizer(s1, " ");
-	                    if (st1.countTokens() != 3)
-	                    { // some of the lines run together
-	                        tapId = Float.parseFloat(s1.substring(0, 5));
-	                        tapTime = Float.parseFloat(s1.substring(5, 10));
-	                        tapDist = Float.parseFloat(s1.substring(10, s1.length()));
-	                    } else
-	                    {
-	                        tapId = Float.parseFloat(st1.nextToken());
-	                        tapTime = Float.parseFloat(st1.nextToken());
-	                        tapDist = Float.parseFloat(st1.nextToken());
-	                    }
-	                    tazParkNRideTaps[taz][0][i] = tapId;
-	                    tazParkNRideTaps[taz][1][i] = tapTime;
-	                    tazParkNRideTaps[taz][2][i] = tapDist;
-	                    tazKissNRideTaps[taz][0][i] = tapId;
-	                    tazKissNRideTaps[taz][1][i] = tapTime;
-	                    tazKissNRideTaps[taz][2][i] = tapDist;
-	                }
-                
-                }  else {
-                	
-                	//skip lines
-                	for (int i = 0; i < nTaps; i++) {
-	                    s1 = br.readLine();
-                	}
-                }
-                               
-            }
-
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
     }
 
     /**
@@ -926,6 +648,45 @@ public class TazDataManager
     public float getDestinationTazTerminalTime(int taz)
     {
         return tazDestinationTerminalTime[taz];
+    }
+    
+    /**
+     * Get the average travel time to a taz from the network (that is the average from the "real" streets to the taz via a connector).
+     * 
+     * @param taz
+     *        The TAZ.
+     *        
+     * @return the average connector travel time to TAZ.
+     */
+    public double getAvgTravelTime(int taz) {
+    	return avgtts[taz];
+    }
+    
+    /**
+     * Get array holding the average travel distance to a taz from the network (that is the average from the "real" streets to the taz via a connector).
+     * 
+     * @return the average connector travel distance to TAZ data array.
+     */
+    public double[] getAvgTravelDistanceData() {
+    	return transpDist;
+    }
+    
+    /**
+     * Get array holding the average travel time to a taz from the network (that is the average from the "real" streets to the taz via a connector).
+     * 
+     * @return the average connector travel time to TAZ data array.
+     */
+    public double[] getAvgTravelTimeData() {
+    	return avgtts;
+    }
+    
+    /**
+     * Get array holding the percent detour for a taz.
+     * 
+     * @return the percent detour TAZ data array.
+     */
+    public double[] getPctDetourData() {
+    	return pctDetour;
     }
 
 }

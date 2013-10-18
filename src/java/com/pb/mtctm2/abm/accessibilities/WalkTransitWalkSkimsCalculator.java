@@ -16,11 +16,13 @@ import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.accessibilities.WalkTransitWalkSkimsCalculator;
 
+import org.apache.log4j.Logger;
+
+import com.pb.mtctm2.abm.accessibilities.WalkTransitWalkSkimsCalculator;
 import com.pb.mtctm2.abm.ctramp.Modes;
 
 /**
@@ -122,7 +124,7 @@ public class WalkTransitWalkSkimsCalculator
         int wtwPremSkimEvPage = Util.getIntegerValueFromPropertyMap(rbMap, "skim.walk.premium.walk.ev.page");
 
         String uecPath = Util.getStringValueFromPropertyMap(rbMap, CtrampApplication.PROPERTIES_UEC_PATH);
-        String uecFileName = uecPath + Util.getStringValueFromPropertyMap(rbMap, "skim.walk.transit.walk.uec.file");
+        String uecFileName = Paths.get(uecPath,Util.getStringValueFromPropertyMap(rbMap, "skim.walk.transit.walk.uec.file")).toString();
         File uecFile = new File(uecFileName);
         
         walkLocalWalkSkimUECs = new UtilityExpressionCalculator[NUM_PERIODS];

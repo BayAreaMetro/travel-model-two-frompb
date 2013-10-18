@@ -7,21 +7,27 @@ import com.pb.common.util.ResourceUtil;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 
+import org.apache.log4j.Logger;
+
+import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.Constants;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
 import com.pb.mtctm2.abm.ctramp.Modes.AccessMode;
@@ -52,7 +58,7 @@ public final class MgraDataManager
     public static final String          MGRA_4DDENSITY_TOT_INT_FIELD     = "TotInt";
 
     //public static final String          MGRA_FIELD_NAME                                  = "MGRASR10";
-    public static final String          MGRA_FIELD_NAME                                  = "mgra";
+    public static final String          MGRA_FIELD_NAME                                  = "MAZ";
     public static final String          MGRA_TAZ_FIELD_NAME                              = "TAZ";
     private static final String         MGRA_POPULATION_FIELD_NAME                       = "pop";
     private static final String         MGRA_HOUSEHOLDS_FIELD_NAME                       = "hh";
@@ -143,7 +149,7 @@ public final class MgraDataManager
         System.out.println("MgraDataManager Started");
         readMgraTableData(rbMap);
         readMgraWlkTaps(rbMap);
-        readMgraWlkDist(rbMap);
+        readMazMazWalkDistance(rbMap);
 
         // pre-process the list of TAPS reachable by drive access for each MGRA 
         mapDriveAccessTapsToMgras( TazDataManager.getInstance(rbMap) );
@@ -200,140 +206,85 @@ public final class MgraDataManager
      * @param rb The resourcebundle with the scenario.path and
      *            mgra.wlkacc.taps.and.distance.file properties.
      */
-    public void readMgraWlkTaps(HashMap<String, String> rbMap)
-    {
-        File mgraWlkTapCorresFile = new File(
-                Util.getStringValueFromPropertyMap(rbMap, "scenario.path") +
-                Util.getStringValueFromPropertyMap(rbMap, "mgra.wlkacc.taps.and.distance.file")
-                );
-        ArrayList<Integer>[] mgraWlkTapList = new ArrayList[maxMgra + 1];
-        ArrayList<Integer>[] mgraWlkTapDistList = new ArrayList[maxMgra + 1];
-        String s;
-        int mgra;
-        int tap;
-        int dist;
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(mgraWlkTapCorresFile));
-            
-            // read the first data file line containing column names
-            //s = br.readLine();
-                
-            // read the data records
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-                //st = new StringTokenizer(s, ", ");
-                mgra = Integer.parseInt(st.nextToken());
-                tap = Integer.parseInt(st.nextToken());
-                if (tap > maxTap) maxTap = tap;
-                dist = (int)(Float.parseFloat(st.nextToken()) + 0.5);
-                if (mgraWlkTapList[mgra] == null)
-                {
-                    mgraWlkTapList[mgra] = new ArrayList<Integer>();
-                    mgraWlkTapList[mgra].add(tap);
+    public void readMgraWlkTaps(HashMap<String, String> rbMap) {
+        File mgraWlkTapCorresFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+                		                      Util.getStringValueFromPropertyMap(rbMap, "maz.tap.distance.file")).toFile();
 
-                    mgraWlkTapDistList[mgra] = new ArrayList<Integer>();
-                    mgraWlkTapDistList[mgra].add(dist);
-                } else
-                {
-                    mgraWlkTapList[mgra].add(tap);
-                    mgraWlkTapDistList[mgra].add(dist);
-                }
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        Map<Integer,Map<Integer,Integer>> mgraToTapToDistance = new TreeMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(mgraWlkTapCorresFile))) {
+        	String line;
+        	while ((line = reader.readLine()) != null) {
+				line = line.trim();
+				if (line.length() == 0)
+					continue;
+				String[] data = line.split(",");
+        		//10001,90002,90002,43053.39,11689.23
+        		//maz,tap,tap,generalized cost,distance in feet
+        		int maz = Integer.parseInt(data[0]);
+        		int tap = Integer.parseInt(data[1]);
+        		int distance = new Double(data[4]).intValue();
+        		if (!mgraToTapToDistance.containsKey(maz)) 
+        			mgraToTapToDistance.put(maz,new TreeMap<Integer,Integer>());
+        		mgraToTapToDistance.get(maz).put(tap,distance);
+        		if (tap > maxTap) 
+        			maxTap = tap;
+        	}
+        } catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        // now go thru the array of ArrayLists and convert the lists to arrays and
-        // store in the class variable mgraWlkTapsDistArrays.
+        nMgrasWithWlkTaps = mgraToTapToDistance.size();
         mgraWlkTapsDistArray = new int[maxMgra + 1][2][];
-        for (int i = 0; i < mgraWlkTapList.length; i++)
-        { // elements in the array of arraylists
-            ArrayList<Integer> aMgraTapList = mgraWlkTapList[i]; // get the Tap
-            // ArrayList
-            ArrayList<Integer> aMgraDistList = mgraWlkTapDistList[i]; // get the
-            // Distance
-            // ArrayList
-            if (aMgraTapList != null)
-            { // if the list isn't null
-                mgraWlkTapsDistArray[i][0] = new int[aMgraTapList.size()]; // initialize
-                // the
-                // class
-                // variable
-                mgraWlkTapsDistArray[i][1] = new int[aMgraDistList.size()]; // both
-                // arrays
-                // should
-                // be the
-                // same
-                // size
-                for (int j = 0; j < aMgraTapList.size(); j++)
-                {
-                    mgraWlkTapsDistArray[i][0][j] = (Integer) aMgraTapList.get(j);
-                    mgraWlkTapsDistArray[i][1][j] = (Integer) aMgraDistList.get(j);
-                }
-                nMgrasWithWlkTaps++;
-            }
+        for (int maz : mgraToTapToDistance.keySet()) {
+        	Map<Integer,Integer> tapToDistance = mgraToTapToDistance.get(maz);
+        	int[] taps = new int[tapToDistance.size()];
+        	int[] distances = new int[taps.length];
+        	mgraWlkTapsDistArray[maz][0] = taps;
+        	mgraWlkTapsDistArray[maz][1] = distances;
+        	int counter = 0;
+        	for (int tap : tapToDistance.keySet()) {
+        		taps[counter] = tap;
+        		distances[counter++] = tapToDistance.get(tap);
+        	}
         }
     }
 
+    
     /**
-     * Read the walk-transit taps for mgras.
+     * Read the walk distance skim for mazs.
      * 
-     * @param rb ResourceBundle with scenario.path and mgra.walkdistance.file
-     *            property.
+     * @param rb The resourcebundle with the scenario.path and
+     *            mgra.wlkacc.taps.and.distance.file properties.
      */
-    public void readMgraWlkDist(HashMap<String, String> rbMap)
-    {
-        File mgraWlkDistFile = new File(Util.getStringValueFromPropertyMap(rbMap, "scenario.path")
-                + Util.getStringValueFromPropertyMap(rbMap, "mgra.walkdistance.file"));
+    public void readMazMazWalkDistance(HashMap<String, String> rbMap) {
+        File mgraWlkTapCorresFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+                		                      Util.getStringValueFromPropertyMap(rbMap, "maz.maz.distance.file")).toFile();
+
         oMgraWalkDistance = new HashMap[maxMgra + 1];
         dMgraWalkDistance = new HashMap[maxMgra + 1];
-        String s;
-        int oMgra, dMgra;
-        int dist;
-        StringTokenizer st;
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(mgraWlkDistFile));
-            while ((s = br.readLine()) != null)
-            {
-                st = new StringTokenizer(s, " ");
-
-                // skip lines if zone, number of mgra-pairs exists in file
-                if (st.countTokens() < 3) continue;
-
-                oMgra = Integer.parseInt(st.nextToken());
-                dMgra = Integer.parseInt(st.nextToken());
-                dist = Integer.parseInt(st.nextToken());
-
-                if (oMgraWalkDistance[oMgra] == null)
-                {
-                    oMgraWalkDistance[oMgra] = new HashMap<Integer, Integer>();
-                    oMgraWalkDistance[oMgra].put(dMgra, dist);
-                } else
-                {
-                    oMgraWalkDistance[oMgra].put(dMgra, dist);
-                }
-
-                if (dMgraWalkDistance[dMgra] == null)
-                {
-                    dMgraWalkDistance[dMgra] = new HashMap<Integer, Integer>();
-                    dMgraWalkDistance[dMgra].put(oMgra, dist);
-                } else
-                {
-                    dMgraWalkDistance[dMgra].put(oMgra, dist);
-                }
-            }
-            br.close();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
+        Map<Integer,Map<Integer,Integer>> mgraToTapToDistance = new TreeMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(mgraWlkTapCorresFile))) {
+        	String line;
+        	while ((line = reader.readLine()) != null) {
+				line = line.trim();
+				if (line.length() == 0)
+					continue;
+				String[] data = line.split(",");
+        		//10001,90002,90002,43053.39,11689.23
+        		//maz,maz,maz,generalized cost,distance in feet
+        		int fmaz = Integer.parseInt(data[0]);
+        		int tmaz = Integer.parseInt(data[1]);
+        		int distance = new Double(data[4]).intValue();
+        		if (oMgraWalkDistance[fmaz] == null)
+        			oMgraWalkDistance[fmaz] = new HashMap();
+        		oMgraWalkDistance[fmaz].put(tmaz,distance);
+        		if (dMgraWalkDistance[tmaz] == null)
+        			dMgraWalkDistance[tmaz] = new HashMap();
+        		dMgraWalkDistance[tmaz].put(fmaz,distance);
+        	}
+        } catch (IOException e) {
+			throw new RuntimeException(e);
+		}
     }
 
     /**

@@ -2,11 +2,12 @@ package com.pb.mtctm2.abm.visitor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.ctramp.Util;
 
+import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.common.datafile.OLD_CSVFileReader;
 import com.pb.common.datafile.TableDataSet;
 
@@ -35,7 +36,7 @@ public class VisitorStopFrequencyModel {
 
 		String directory = Util.getStringValueFromPropertyMap(rbMap,"Project.Directory");
         String stopFrequencyFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.stop.frequency.file");
-        stopFrequencyFile = directory + stopFrequencyFile;
+        stopFrequencyFile = Paths.get(directory,stopFrequencyFile).toString();
         
 		modelStructure = new VisitorModelStructure();
 		

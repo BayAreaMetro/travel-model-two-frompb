@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.MissingResourceException;
@@ -14,6 +15,7 @@ import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.application.SandagModelStructure;
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.MatrixDataServer;
@@ -23,7 +25,6 @@ import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
 import com.pb.mtctm2.abm.ctramp.TapDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
-
 import com.pb.common.calculator.MatrixDataManager;
 import com.pb.common.datafile.CSVFileReader;
 import com.pb.common.datafile.OLD_CSVFileReader;
@@ -183,8 +184,7 @@ public class VisitorTripTables {
 		String directory = Util.getStringValueFromPropertyMap(rbMap,"Project.Directory");
 
 		//Open the individual trip file 
-		String tripFile = Util.getStringValueFromPropertyMap(rbMap,"visitor.trip.output.file");
-		tripData = openTripFile(directory+tripFile);
+		String tripFile = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.trip.output.file")).toString();
 		
 		//Iterate through periods so that we don't have to keep
 		//trip tables for all periods in memory.
@@ -330,16 +330,15 @@ public class VisitorTripTables {
 	public void writeTrips(int period, MatrixType mt){
 		
 
-		String directory = Util.getStringValueFromPropertyMap(rbMap,
-        "scenario.path");
+		String directory = Util.getStringValueFromPropertyMap(rbMap,"scenario.path");
 		//String per = modelStructure.getModelPeriodLabel(period);
 		String end = ".mat";
 		String[] fileName = new String[4];
 		
-		fileName[0] =directory+Util.getStringValueFromPropertyMap(rbMap,"visitor.results.autoTripMatrix");
-		fileName[1] =directory+Util.getStringValueFromPropertyMap(rbMap,"visitor.results.nMotTripMatrix");
-		fileName[2] =directory+Util.getStringValueFromPropertyMap(rbMap,"visitor.results.tranTripMatrix"); 
-		fileName[3] =directory+Util.getStringValueFromPropertyMap(rbMap,"visitor.results.othrTripMatrix"); 
+		fileName[0] = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.results.autoTripMatrix")).toString();
+		fileName[1] = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.results.nMotTripMatrix")).toString();
+		fileName[2] = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.results.tranTripMatrix")).toString(); 
+		fileName[3] = Paths.get(directory,Util.getStringValueFromPropertyMap(rbMap,"visitor.results.othrTripMatrix")).toString(); 
 		
 		for(int i=0;i<4;++i)
 		{

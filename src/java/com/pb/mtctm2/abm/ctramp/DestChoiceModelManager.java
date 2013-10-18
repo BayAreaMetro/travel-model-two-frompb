@@ -1,12 +1,14 @@
 package com.pb.mtctm2.abm.ctramp;
 
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.ctramp.TazDataManager;
 
+import org.apache.log4j.Logger;
+
+import com.pb.mtctm2.abm.ctramp.TazDataManager;
 import com.pb.common.calculator.MatrixDataServerIf;
 import com.pb.mtctm2.abm.accessibilities.AutoTazSkimsCalculator;
 import com.pb.mtctm2.abm.accessibilities.BuildAccessibilities;
@@ -187,7 +189,7 @@ public class DestChoiceModelManager
     
                 // output data
                 String projectDirectory = propertyMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-                String accFileName = projectDirectory + Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file");
+                String accFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file")).toString();
     
                 aggAcc.readAccessibilityTableFromFile(accFileName);
     

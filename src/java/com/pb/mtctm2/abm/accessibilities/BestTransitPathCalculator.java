@@ -11,14 +11,16 @@ package com.pb.mtctm2.abm.accessibilities;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.Modes;
 import com.pb.mtctm2.abm.ctramp.TapDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
 import com.pb.mtctm2.abm.ctramp.Modes.AccessMode;
-
 import com.pb.common.calculator.IndexValues;
 import com.pb.common.calculator.VariableTable;
 import com.pb.common.util.Tracer;
@@ -142,10 +144,8 @@ public class BestTransitPathCalculator implements Serializable
         bestAccessTime = new double[tm.length];
         bestEgressTime = new double[tm.length];
 
-        String uecPath = Util.getStringValueFromPropertyMap(rbMap,
-                CtrampApplication.PROPERTIES_UEC_PATH);
-        String uecFileName = uecPath
-                + Util.getStringValueFromPropertyMap(rbMap, "utility.bestTransitPath.uec.file");
+        String uecPath = Util.getStringValueFromPropertyMap(rbMap,CtrampApplication.PROPERTIES_UEC_PATH);
+        String uecFileName = Paths.get(uecPath,rbMap.get("utility.bestTransitPath.uec.file")).toString();
 
         int dataPage = Util.getIntegerValueFromPropertyMap(rbMap,
                 "utility.bestTransitPath.data.page");

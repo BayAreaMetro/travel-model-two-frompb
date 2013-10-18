@@ -118,8 +118,7 @@ public final class StopLocationEstimationMcLogsumsAppender
             outStream = new PrintWriter(new BufferedWriter(new FileWriter(new File(outputName))));
         } catch (IOException e)
         {
-            logger.fatal(String.format("Exception occurred opening output skims file: %s.",
-                    outputFileName));
+            logger.fatal(String.format("Exception occurred opening output skims file: %s.",outputFileName));
             throw new RuntimeException(e);
         }
 

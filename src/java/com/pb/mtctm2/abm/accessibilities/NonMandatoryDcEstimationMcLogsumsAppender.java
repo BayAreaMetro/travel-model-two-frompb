@@ -105,8 +105,7 @@ public final class NonMandatoryDcEstimationMcLogsumsAppender
 
         String outputAllKey = Util.getStringValueFromPropertyMap(rbMap, OUTPUT_SAMPLE_DEST_LOGSUMS);
 
-        String outputFileName = Util.getStringValueFromPropertyMap(rbMap,
-                "dc.est.skims.output.file");
+        String outputFileName = Util.getStringValueFromPropertyMap(rbMap,"dc.est.skims.output.file");
         if (outputFileName == null)
         {
             logger

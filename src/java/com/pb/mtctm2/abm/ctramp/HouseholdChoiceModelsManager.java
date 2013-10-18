@@ -2,12 +2,14 @@ package com.pb.mtctm2.abm.ctramp;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-import org.apache.log4j.Logger;
-import com.pb.mtctm2.abm.ctramp.TazDataManager;
 
+import org.apache.log4j.Logger;
+
+import com.pb.mtctm2.abm.ctramp.TazDataManager;
 import com.pb.common.calculator.MatrixDataServerIf;
 import com.pb.common.datafile.OLD_CSVFileReader;
 import com.pb.common.datafile.TableDataSet;
@@ -68,11 +70,7 @@ public class HouseholdChoiceModelsManager
 
     private double[]                            pctHighIncome;
     private double[]                            pctMedHighPlusIncome;
-    private double[]                            pctMultipleAutos;
-
-    private double[]                            avgtts;    
-    private double[]                            transpDist;    
-    private double[]                            pctDetour;    
+    private double[]                            pctMultipleAutos;   
 
     private double[][][]                        nonMandatorySizeProbs;
     private double[][][]                        nonMandatoryTazDistProbs;
@@ -131,7 +129,6 @@ public class HouseholdChoiceModelsManager
         pctHighIncome = hhDataManager.getPercentHhsIncome100Kplus();
         pctMedHighPlusIncome = hhDataManager.getPercentHhsIncome75Kplus();
         pctMultipleAutos = hhDataManager.getPercentHhsMultipleAutos();
-        readTpChoiceAvgTtsFile();
         
         MatrixDataManager mdm = MatrixDataManager.getInstance();
         mdm.setMatrixDataServerObject(ms);
@@ -152,8 +149,8 @@ public class HouseholdChoiceModelsManager
             {
     
                 // output data
-                String projectDirectory = propertyMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-                String accFileName = projectDirectory + Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file");
+                String projectDirectory = Util.getStringValueFromPropertyMap(propertyMap,CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
+                String accFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(propertyMap,"acc.output.file")).toString();
     
                 logger.info("filling Accessibilities Object by reading file: " + accFileName + ".");
                 aggAcc.readAccessibilityTableFromFile(accFileName);
@@ -217,7 +214,7 @@ public class HouseholdChoiceModelsManager
 
             // create choice model object
             hhChoiceModels = new HouseholdChoiceModels(++modelIndex, restartModelString, propertyMap, modelStructure, dmuFactory, aggAcc, logsumHelper, mandAcc,
-                    pctHighIncome, pctMedHighPlusIncome, pctMultipleAutos, avgtts, transpDist, pctDetour,
+                    pctHighIncome, pctMedHighPlusIncome, pctMultipleAutos,tdm.getAvgTravelTimeData(),tdm.getAvgTravelDistanceData(),tdm.getPctDetourData(),
                     nonMandatoryTazDistProbs, nonMandatorySizeProbs,
                     subTourTazDistProbs, subTourSizeProbs );
             
@@ -267,51 +264,6 @@ public class HouseholdChoiceModelsManager
 
         modelQueue = null;
 
-    }
-
-    private void readTpChoiceAvgTtsFile()
-    {
-
-        // construct input household file name from properties file values
-        String projectDirectory = propertyMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-        
-        String inputFileName = propertyMap.get( TP_CHOICE_AVG_TTS_FILE );
-        String fileName = projectDirectory + inputFileName;
-
-        TableDataSet table;
-        try
-        {
-            OLD_CSVFileReader reader = new OLD_CSVFileReader();
-            reader.setDelimSet("," + reader.getDelimSet());
-            table = reader.readFile(new File(fileName));
-        } catch (Exception e)
-        {
-            logger.fatal(String.format(
-                "Exception occurred reading tp choice avgtts data file: %s into TableDataSet object.", fileName));
-            throw new RuntimeException(e);
-        }
-        
-        int[] tazField = table.getColumnAsInt( TAZ_FIELD_NAME );
-        double[] avgttsField = table.getColumnAsDouble( AVGTTS_COLUMN_NAME );
-        double[] transpDistField = table.getColumnAsDouble( TRANSP_DIST_COLUMN_NAME );
-        double[] pctDetourField = table.getColumnAsDouble( PCT_DETOUR_COLUMN_NAME );
-
-        avgtts = new double[tdm.getMaxTaz() + 1];
-        transpDist = new double[tdm.getMaxTaz() + 1];
-        pctDetour = new double[tdm.getMaxTaz() + 1];
-        
-        // loop over the number of mgra records in the TableDataSet.
-        for (int k=0; k < tdm.getTazs().length; k++ ) {
-            
-            // get the mgra value for TableDataSet row k from the mgra field.
-            int taz = tazField[k];
-            
-            avgtts[taz] = avgttsField[k];
-            transpDist[taz] = transpDistField[k];
-            pctDetour[taz] = pctDetourField[k];
-
-        }
-        
     }
 
 

@@ -1,10 +1,12 @@
 package com.pb.mtctm2.abm.ctramp;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
 
 import org.apache.log4j.Logger;
+
 import com.pb.common.datafile.CSVFileWriter;
 import com.pb.common.datafile.OLD_CSVFileReader;
 import com.pb.common.datafile.TableDataSet;
@@ -75,7 +77,7 @@ public class DestChoiceSize
         maxShadowPriceIterations = maxIterations;
 
         String projectDirectory = Util.getStringValueFromPropertyMap(propertyMap, CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-        dcShadowOutputFileName = projectDirectory + propertyMap.get(PROPERTIES_DC_SHADOW_OUTPUT);
+        dcShadowOutputFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(propertyMap,PROPERTIES_DC_SHADOW_OUTPUT)).toString();
 
         mgraManager = MgraDataManager.getInstance();
 

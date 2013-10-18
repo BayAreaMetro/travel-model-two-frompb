@@ -2,6 +2,7 @@ package com.pb.mtctm2.abm.ctramp;
 
 import gnu.cajo.invoke.Remote;
 import gnu.cajo.utils.ItemServer;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,8 +20,11 @@ import java.io.NotSerializableException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
+
 import org.apache.log4j.Logger;
 import org.jppf.client.JPPFClient;
+
 import com.pb.common.matrix.MatrixType;
 import com.pb.common.util.ObjectUtil;
 import com.pb.common.util.ResourceUtil;
@@ -610,8 +614,7 @@ public class CtrampApplication implements Serializable
         {
 
             // output data
-            String accFileName = projectDirectory
-                    + Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file");
+            String accFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file")).toString();
 
             aggAcc.readAccessibilityTableFromFile(accFileName);
 

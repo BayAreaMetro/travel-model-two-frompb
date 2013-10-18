@@ -105,10 +105,8 @@ public final class SkimsAppender
         Logger dtwLogger = Logger.getLogger("dtw");
 
 
-        String outputFileNameObs = Util.getStringValueFromPropertyMap(rbMap,
-                "obs.skims.output.file");
-        String outputFileNameHis = Util.getStringValueFromPropertyMap(rbMap,
-                "his.skims.output.file");
+        String outputFileNameObs = Util.getStringValueFromPropertyMap(rbMap,"obs.skims.output.file");
+        String outputFileNameHis = Util.getStringValueFromPropertyMap(rbMap,"his.skims.output.file");
 
         FileWriter writer;
         PrintWriter outStreamObs = null;

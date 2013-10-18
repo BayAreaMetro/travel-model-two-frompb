@@ -11,8 +11,10 @@ import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;                                                                                                             
 import java.io.Serializable;                                                                                                     
+import java.nio.file.Paths;
 import java.util.Arrays;                                                                                                         
 import java.util.HashMap;                                                                                                        
+
 import org.apache.log4j.Logger;                                                                                                  
                                                                                                                                  
 /**                                                                                                                              
@@ -130,8 +132,8 @@ public class AutoAndNonMotorizedSkimsCalculator
     {                                                                                                                            
                                                                                                                                  
     	// Create the UECs                                                                                                       
-        String uecPath = Util.getStringValueFromPropertyMap(rbMap, CtrampApplication.PROPERTIES_UEC_PATH);                       
-        String uecFileName = uecPath + Util.getStringValueFromPropertyMap(rbMap, "skims.auto.uec.file");                         
+        String uecPath = Util.getStringValueFromPropertyMap(rbMap,CtrampApplication.PROPERTIES_UEC_PATH);                       
+        String uecFileName = Paths.get(uecPath, Util.getStringValueFromPropertyMap(rbMap,"skims.auto.uec.file")).toString();                         
         int dataPage = Util.getIntegerValueFromPropertyMap(rbMap, "skims.auto.data.page");                                       
         int autoSkimEaPage = Util.getIntegerValueFromPropertyMap(rbMap, "skims.auto.ea.page");                                   
         int autoSkimAmPage = Util.getIntegerValueFromPropertyMap(rbMap, "skims.auto.am.page");                                   

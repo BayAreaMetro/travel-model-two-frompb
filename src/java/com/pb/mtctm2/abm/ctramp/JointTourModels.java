@@ -1,14 +1,17 @@
 package com.pb.mtctm2.abm.ctramp;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
 
 import java.io.Serializable;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
 import com.pb.common.calculator.IndexValues;
 import com.pb.common.calculator.MatrixDataServerIf;
 import com.pb.common.calculator.VariableTable;
@@ -755,8 +758,8 @@ public class JointTourModels implements Serializable
  
                 
         
-        String projectDirectory = propertyMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-        String accFileName = projectDirectory + Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file");      
+        String projectDirectory = Util.getStringValueFromPropertyMap(propertyMap,CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
+        String accFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(propertyMap, "acc.output.file")).toString();      
         AccessibilitiesTable accTable = new AccessibilitiesTable(accFileName);
     
         

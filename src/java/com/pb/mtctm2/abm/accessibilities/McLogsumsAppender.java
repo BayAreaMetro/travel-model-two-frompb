@@ -218,8 +218,7 @@ public class McLogsumsAppender implements Serializable
     protected TableDataSet getEstimationDataTableDataSet(HashMap<String, String> rbMap)
     {
 
-        String estFileName = Util.getStringValueFromPropertyMap(rbMap,
-                ESTIMATION_DATA_RECORDS_FILE_KEY);
+        String estFileName = Util.getStringValueFromPropertyMap(rbMap,ESTIMATION_DATA_RECORDS_FILE_KEY);
         if (estFileName == null)
         {
             logger
