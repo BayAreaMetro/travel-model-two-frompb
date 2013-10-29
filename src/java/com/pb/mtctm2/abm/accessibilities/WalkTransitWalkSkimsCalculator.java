@@ -55,7 +55,7 @@ public class WalkTransitWalkSkimsCalculator
     private double[]                      defaultLocalSkims             = new double[NUM_LOCAL_SKIMS];
 
     private static final String[]         PREM_SKIM_NAMES               = {"AccTime", "EgrTime",
-            "WalkAuxTime", "LB_ivt", "EB_ivt", "BRT_ivt", "LRT_ivt", "CR_ivt", "fwait", "xwait",
+            "WalkAuxTime", "LB_ivt", "EB_ivt", "FRY_ivt", "HR_ivt", "LRT_ivt", "CR_ivt", "fwait", "xwait",
             "fare", "Main_Mode", "xfers"                                };
     private static final int              NUM_PREMIUM_SKIMS             = PREM_SKIM_NAMES.length;
     private double[]                      defaultPremiumSkims           = new double[NUM_PREMIUM_SKIMS];

@@ -14,7 +14,8 @@ public class TourModeChoiceDMU
 
     public static final int                LB  = McLogsumsCalculator.LB;
     public static final int                EB  = McLogsumsCalculator.EB;
-    public static final int                BRT = McLogsumsCalculator.BRT;
+    public static final int                FRY = McLogsumsCalculator.FRY;
+    public static final int                HR = McLogsumsCalculator.HR;
     public static final int                LR  = McLogsumsCalculator.LR;
     public static final int                CR  = McLogsumsCalculator.CR;
     protected static final int                NUM_LOC_PREM = McLogsumsCalculator.NUM_LOC_PREM;
@@ -26,7 +27,8 @@ public class TourModeChoiceDMU
     
     public static final int                LB_IVT = McLogsumsCalculator.LB_IVT;
     public static final int                EB_IVT = McLogsumsCalculator.EB_IVT;
-    public static final int                BRT_IVT = McLogsumsCalculator.BRT_IVT;
+    public static final int                FRY_IVT = McLogsumsCalculator.FRY_IVT;
+    public static final int                HR_IVT = McLogsumsCalculator.HR_IVT;
     public static final int                LR_IVT = McLogsumsCalculator.LR_IVT;
     public static final int                CR_IVT = McLogsumsCalculator.CR_IVT;
     public static final int                ACC = McLogsumsCalculator.ACC;
