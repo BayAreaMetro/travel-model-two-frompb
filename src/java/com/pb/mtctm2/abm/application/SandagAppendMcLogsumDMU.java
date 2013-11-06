@@ -390,56 +390,32 @@ public class SandagAppendMcLogsumDMU
         methodIndexMap.put("getWtw_eb_fare_in", 131);
         methodIndexMap.put("getWtw_eb_xfers_out", 132);
         methodIndexMap.put("getWtw_eb_xfers_in", 133);
-        methodIndexMap.put("getWtw_fry_LB_ivt_out", 134);
-        methodIndexMap.put("getWtw_fry_LB_ivt_in", 135);
-        methodIndexMap.put("getWtw_fry_EB_ivt_out", 136);
-        methodIndexMap.put("getWtw_fry_EB_ivt_in", 137);
-        methodIndexMap.put("getWtw_fry_FRY_ivt_out", 138);
-        methodIndexMap.put("getWtw_fry_FRY_ivt_in", 139);
-        methodIndexMap.put("getWtw_fry_fwait_out", 140);
-        methodIndexMap.put("getWtw_fry_fwait_in", 141);
-        methodIndexMap.put("getWtw_fry_xwait_out", 142);
-        methodIndexMap.put("getWtw_fry_xwait_in", 143);
-        methodIndexMap.put("getWtw_fry_AccTime_out", 144);
-        methodIndexMap.put("getWtw_fry_AccTime_in", 145);
-        methodIndexMap.put("getWtw_fry_EgrTime_out", 146);
-        methodIndexMap.put("getWtw_fry_EgrTime_in", 147);
-        methodIndexMap.put("getWtw_fry_WalkAuxTime_out", 148);
-        methodIndexMap.put("getWtw_fry_WalkAuxTime_in", 149);
-        methodIndexMap.put("getWtw_fry_fare_out", 150);
-        methodIndexMap.put("getWtw_fry_fare_in", 151);
-        methodIndexMap.put("getWtw_fry_xfers_out", 152);
-        methodIndexMap.put("getWtw_fry_xfers_in", 153);
-        methodIndexMap.put("getWtw_hr_LB_ivt_out", 134);
-        methodIndexMap.put("getWtw_hr_LB_ivt_in", 135);
-        methodIndexMap.put("getWtw_hr_EB_ivt_out", 136);
-        methodIndexMap.put("getWtw_hr_EB_ivt_in", 137);
-        methodIndexMap.put("getWtw_hr_FRY_ivt_out", 138);
-        methodIndexMap.put("getWtw_hr_FRY_ivt_in", 139);
-        methodIndexMap.put("getWtw_hr_HR_ivt_out", 138);
-        methodIndexMap.put("getWtw_hr_HR_ivt_in", 139);
-        methodIndexMap.put("getWtw_hr_fwait_out", 140);
-        methodIndexMap.put("getWtw_hr_fwait_in", 141);
-        methodIndexMap.put("getWtw_hr_xwait_out", 142);
-        methodIndexMap.put("getWtw_hr_xwait_in", 143);
-        methodIndexMap.put("getWtw_hr_AccTime_out", 144);
-        methodIndexMap.put("getWtw_hr_AccTime_in", 145);
-        methodIndexMap.put("getWtw_hr_EgrTime_out", 146);
-        methodIndexMap.put("getWtw_hr_EgrTime_in", 147);
-        methodIndexMap.put("getWtw_hr_WalkAuxTime_out", 148);
-        methodIndexMap.put("getWtw_hr_WalkAuxTime_in", 149);
-        methodIndexMap.put("getWtw_hr_fare_out", 150);
-        methodIndexMap.put("getWtw_hr_fare_in", 151);
-        methodIndexMap.put("getWtw_hr_xfers_out", 152);
-        methodIndexMap.put("getWtw_hr_xfers_in", 153);
+        methodIndexMap.put("getWtw_brt_LB_ivt_out", 134);
+        methodIndexMap.put("getWtw_brt_LB_ivt_in", 135);
+        methodIndexMap.put("getWtw_brt_EB_ivt_out", 136);
+        methodIndexMap.put("getWtw_brt_EB_ivt_in", 137);
+        methodIndexMap.put("getWtw_brt_BRT_ivt_out", 138);
+        methodIndexMap.put("getWtw_brt_BRT_ivt_in", 139);
+        methodIndexMap.put("getWtw_brt_fwait_out", 140);
+        methodIndexMap.put("getWtw_brt_fwait_in", 141);
+        methodIndexMap.put("getWtw_brt_xwait_out", 142);
+        methodIndexMap.put("getWtw_brt_xwait_in", 143);
+        methodIndexMap.put("getWtw_brt_AccTime_out", 144);
+        methodIndexMap.put("getWtw_brt_AccTime_in", 145);
+        methodIndexMap.put("getWtw_brt_EgrTime_out", 146);
+        methodIndexMap.put("getWtw_brt_EgrTime_in", 147);
+        methodIndexMap.put("getWtw_brt_WalkAuxTime_out", 148);
+        methodIndexMap.put("getWtw_brt_WalkAuxTime_in", 149);
+        methodIndexMap.put("getWtw_brt_fare_out", 150);
+        methodIndexMap.put("getWtw_brt_fare_in", 151);
+        methodIndexMap.put("getWtw_brt_xfers_out", 152);
+        methodIndexMap.put("getWtw_brt_xfers_in", 153);
         methodIndexMap.put("getWtw_lr_LB_ivt_out", 154);
         methodIndexMap.put("getWtw_lr_LB_ivt_in", 155);
         methodIndexMap.put("getWtw_lr_EB_ivt_out", 156);
         methodIndexMap.put("getWtw_lr_EB_ivt_in", 157);
-        methodIndexMap.put("getWtw_lr_FRY_ivt_out", 158);
-        methodIndexMap.put("getWtw_lr_FRY_ivt_in", 159);
-        methodIndexMap.put("getWtw_lr_HR_ivt_out", 138);
-        methodIndexMap.put("getWtw_lr_HR_ivt_in", 139);
+        methodIndexMap.put("getWtw_lr_BRT_ivt_out", 158);
+        methodIndexMap.put("getWtw_lr_BRT_ivt_in", 159);
         methodIndexMap.put("getWtw_lr_LRT_ivt_out", 160);
         methodIndexMap.put("getWtw_lr_LRT_ivt_in", 161);
         methodIndexMap.put("getWtw_lr_fwait_out", 162);
@@ -460,10 +436,8 @@ public class SandagAppendMcLogsumDMU
         methodIndexMap.put("getWtw_cr_LB_ivt_in", 177);
         methodIndexMap.put("getWtw_cr_EB_ivt_out", 178);
         methodIndexMap.put("getWtw_cr_EB_ivt_in", 179);
-        methodIndexMap.put("getWtw_cr_FRY_ivt_out", 180);
-        methodIndexMap.put("getWtw_cr_FRY_ivt_in", 181);
-        methodIndexMap.put("getWtw_cr_HR_ivt_out", 138);
-        methodIndexMap.put("getWtw_cr_HR_ivt_in", 139);
+        methodIndexMap.put("getWtw_cr_BRT_ivt_out", 180);
+        methodIndexMap.put("getWtw_cr_BRT_ivt_in", 181);
         methodIndexMap.put("getWtw_cr_LRT_ivt_out", 182);
         methodIndexMap.put("getWtw_cr_LRT_ivt_in", 183);
         methodIndexMap.put("getWtw_cr_CR_ivt_out", 184);
@@ -517,56 +491,32 @@ public class SandagAppendMcLogsumDMU
         methodIndexMap.put("getWtd_eb_fare_in", 231);
         methodIndexMap.put("getWtd_eb_xfers_out", 232);
         methodIndexMap.put("getWtd_eb_xfers_in", 233);
-        methodIndexMap.put("getWtd_fry_LB_ivt_out", 234);
-        methodIndexMap.put("getWtd_fry_LB_ivt_in", 235);
-        methodIndexMap.put("getWtd_fry_EB_ivt_out", 236);
-        methodIndexMap.put("getWtd_fry_EB_ivt_in", 237);
-        methodIndexMap.put("getWtd_fry_FRY_ivt_out", 238);
-        methodIndexMap.put("getWtd_fry_FRY_ivt_in", 239);
-        methodIndexMap.put("getWtd_fry_fwait_out", 240);
-        methodIndexMap.put("getWtd_fry_fwait_in", 241);
-        methodIndexMap.put("getWtd_fry_xwait_out", 242);
-        methodIndexMap.put("getWtd_fry_xwait_in", 243);
-        methodIndexMap.put("getWtd_fry_AccTime_out", 244);
-        methodIndexMap.put("getWtd_fry_AccTime_in", 245);
-        methodIndexMap.put("getWtd_fry_EgrTime_out", 246);
-        methodIndexMap.put("getWtd_fry_EgrTime_in", 247);
-        methodIndexMap.put("getWtd_fry_WalkAuxTime_out", 248);
-        methodIndexMap.put("getWtd_fry_WalkAuxTime_in", 249);
-        methodIndexMap.put("getWtd_fry_fare_out", 250);
-        methodIndexMap.put("getWtd_fry_fare_in", 251);
-        methodIndexMap.put("getWtd_fry_xfers_out", 252);
-        methodIndexMap.put("getWtd_fry_xfers_in", 253);
-        methodIndexMap.put("getWtd_hr_LB_ivt_out", 234);
-        methodIndexMap.put("getWtd_hr_LB_ivt_in", 235);
-        methodIndexMap.put("getWtd_hr_EB_ivt_out", 236);
-        methodIndexMap.put("getWtd_hr_EB_ivt_in", 237);
-        methodIndexMap.put("getWtd_hr_FRY_ivt_out", 238);
-        methodIndexMap.put("getWtd_hr_FRY_ivt_in", 239);
-        methodIndexMap.put("getWtd_hr_HR_ivt_out", 238);
-        methodIndexMap.put("getWtd_hr_HR_ivt_in", 239);
-        methodIndexMap.put("getWtd_hr_fwait_out", 240);
-        methodIndexMap.put("getWtd_hr_fwait_in", 241);
-        methodIndexMap.put("getWtd_hr_xwait_out", 242);
-        methodIndexMap.put("getWtd_hr_xwait_in", 243);
-        methodIndexMap.put("getWtd_hr_AccTime_out", 244);
-        methodIndexMap.put("getWtd_hr_AccTime_in", 245);
-        methodIndexMap.put("getWtd_hr_EgrTime_out", 246);
-        methodIndexMap.put("getWtd_hr_EgrTime_in", 247);
-        methodIndexMap.put("getWtd_hr_WalkAuxTime_out", 248);
-        methodIndexMap.put("getWtd_hr_WalkAuxTime_in", 249);
-        methodIndexMap.put("getWtd_hr_fare_out", 250);
-        methodIndexMap.put("getWtd_hr_fare_in", 251);
-        methodIndexMap.put("getWtd_hr_xfers_out", 252);
-        methodIndexMap.put("getWtd_hr_xfers_in", 253);
+        methodIndexMap.put("getWtd_brt_LB_ivt_out", 234);
+        methodIndexMap.put("getWtd_brt_LB_ivt_in", 235);
+        methodIndexMap.put("getWtd_brt_EB_ivt_out", 236);
+        methodIndexMap.put("getWtd_brt_EB_ivt_in", 237);
+        methodIndexMap.put("getWtd_brt_BRT_ivt_out", 238);
+        methodIndexMap.put("getWtd_brt_BRT_ivt_in", 239);
+        methodIndexMap.put("getWtd_brt_fwait_out", 240);
+        methodIndexMap.put("getWtd_brt_fwait_in", 241);
+        methodIndexMap.put("getWtd_brt_xwait_out", 242);
+        methodIndexMap.put("getWtd_brt_xwait_in", 243);
+        methodIndexMap.put("getWtd_brt_AccTime_out", 244);
+        methodIndexMap.put("getWtd_brt_AccTime_in", 245);
+        methodIndexMap.put("getWtd_brt_EgrTime_out", 246);
+        methodIndexMap.put("getWtd_brt_EgrTime_in", 247);
+        methodIndexMap.put("getWtd_brt_WalkAuxTime_out", 248);
+        methodIndexMap.put("getWtd_brt_WalkAuxTime_in", 249);
+        methodIndexMap.put("getWtd_brt_fare_out", 250);
+        methodIndexMap.put("getWtd_brt_fare_in", 251);
+        methodIndexMap.put("getWtd_brt_xfers_out", 252);
+        methodIndexMap.put("getWtd_brt_xfers_in", 253);
         methodIndexMap.put("getWtd_lr_LB_ivt_out", 254);
         methodIndexMap.put("getWtd_lr_LB_ivt_in", 255);
         methodIndexMap.put("getWtd_lr_EB_ivt_out", 256);
         methodIndexMap.put("getWtd_lr_EB_ivt_in", 257);
-        methodIndexMap.put("getWtd_lr_FRY_ivt_out", 258);
-        methodIndexMap.put("getWtd_lr_FRY_ivt_in", 259);
-        methodIndexMap.put("getWtd_lr_HR_ivt_out", 238);
-        methodIndexMap.put("getWtd_lr_HR_ivt_in", 239);
+        methodIndexMap.put("getWtd_lr_BRT_ivt_out", 258);
+        methodIndexMap.put("getWtd_lr_BRT_ivt_in", 259);
         methodIndexMap.put("getWtd_lr_LRT_ivt_out", 260);
         methodIndexMap.put("getWtd_lr_LRT_ivt_in", 261);
         methodIndexMap.put("getWtd_lr_fwait_out", 262);
@@ -587,10 +537,8 @@ public class SandagAppendMcLogsumDMU
         methodIndexMap.put("getWtd_cr_LB_ivt_in", 277);
         methodIndexMap.put("getWtd_cr_EB_ivt_out", 278);
         methodIndexMap.put("getWtd_cr_EB_ivt_in", 279);
-        methodIndexMap.put("getWtd_cr_FRY_ivt_out", 280);
-        methodIndexMap.put("getWtd_cr_FRY_ivt_in", 281);
-        methodIndexMap.put("getWtd_cr_HR_ivt_out", 238);
-        methodIndexMap.put("getWtd_cr_HR_ivt_in", 239);
+        methodIndexMap.put("getWtd_cr_BRT_ivt_out", 280);
+        methodIndexMap.put("getWtd_cr_BRT_ivt_in", 281);
         methodIndexMap.put("getWtd_cr_LRT_ivt_out", 282);
         methodIndexMap.put("getWtd_cr_LRT_ivt_in", 283);
         methodIndexMap.put("getWtd_cr_CR_ivt_out", 284);
@@ -644,56 +592,32 @@ public class SandagAppendMcLogsumDMU
         methodIndexMap.put("getDtw_eb_fare_in", 331);
         methodIndexMap.put("getDtw_eb_xfers_out", 332);
         methodIndexMap.put("getDtw_eb_xfers_in", 333);
-        methodIndexMap.put("getDtw_fry_LB_ivt_out", 334);
-        methodIndexMap.put("getDtw_fry_LB_ivt_in", 335);
-        methodIndexMap.put("getDtw_fry_EB_ivt_out", 336);
-        methodIndexMap.put("getDtw_fry_EB_ivt_in", 337);
-        methodIndexMap.put("getDtw_fry_FRY_ivt_out", 338);
-        methodIndexMap.put("getDtw_fry_FRY_ivt_in", 339);
-        methodIndexMap.put("getDtw_fry_fwait_out", 340);
-        methodIndexMap.put("getDtw_fry_fwait_in", 341);
-        methodIndexMap.put("getDtw_fry_xwait_out", 342);
-        methodIndexMap.put("getDtw_fry_xwait_in", 343);
-        methodIndexMap.put("getDtw_fry_AccTime_out", 344);
-        methodIndexMap.put("getDtw_fry_AccTime_in", 345);
-        methodIndexMap.put("getDtw_fry_EgrTime_out", 346);
-        methodIndexMap.put("getDtw_fry_EgrTime_in", 347);
-        methodIndexMap.put("getDtw_fry_WalkAuxTime_out", 348);
-        methodIndexMap.put("getDtw_fry_WalkAuxTime_in", 349);
-        methodIndexMap.put("getDtw_fry_fare_out", 350);
-        methodIndexMap.put("getDtw_fry_fare_in", 351);
-        methodIndexMap.put("getDtw_fry_xfers_out", 352);
-        methodIndexMap.put("getDtw_fry_xfers_in", 353);
-        methodIndexMap.put("getDtw_hr_LB_ivt_out", 334);
-        methodIndexMap.put("getDtw_hr_LB_ivt_in", 335);
-        methodIndexMap.put("getDtw_hr_EB_ivt_out", 336);
-        methodIndexMap.put("getDtw_hr_EB_ivt_in", 337);
-        methodIndexMap.put("getDtw_hr_FRY_ivt_out", 338);
-        methodIndexMap.put("getDtw_hr_HR_ivt_in", 339);
-        methodIndexMap.put("getDtw_hr_HR_ivt_out", 338);
-        methodIndexMap.put("getDtw_hr_FRY_ivt_in", 339);
-        methodIndexMap.put("getDtw_hr_fwait_out", 340);
-        methodIndexMap.put("getDtw_hr_fwait_in", 341);
-        methodIndexMap.put("getDtw_hr_xwait_out", 342);
-        methodIndexMap.put("getDtw_hr_xwait_in", 343);
-        methodIndexMap.put("getDtw_hr_AccTime_out", 344);
-        methodIndexMap.put("getDtw_hr_AccTime_in", 345);
-        methodIndexMap.put("getDtw_hr_EgrTime_out", 346);
-        methodIndexMap.put("getDtw_hr_EgrTime_in", 347);
-        methodIndexMap.put("getDtw_hr_WalkAuxTime_out", 348);
-        methodIndexMap.put("getDtw_hr_WalkAuxTime_in", 349);
-        methodIndexMap.put("getDtw_hr_fare_out", 350);
-        methodIndexMap.put("getDtw_hr_fare_in", 351);
-        methodIndexMap.put("getDtw_hr_xfers_out", 352);
-        methodIndexMap.put("getDtw_hr_xfers_in", 353);
+        methodIndexMap.put("getDtw_brt_LB_ivt_out", 334);
+        methodIndexMap.put("getDtw_brt_LB_ivt_in", 335);
+        methodIndexMap.put("getDtw_brt_EB_ivt_out", 336);
+        methodIndexMap.put("getDtw_brt_EB_ivt_in", 337);
+        methodIndexMap.put("getDtw_brt_BRT_ivt_out", 338);
+        methodIndexMap.put("getDtw_brt_BRT_ivt_in", 339);
+        methodIndexMap.put("getDtw_brt_fwait_out", 340);
+        methodIndexMap.put("getDtw_brt_fwait_in", 341);
+        methodIndexMap.put("getDtw_brt_xwait_out", 342);
+        methodIndexMap.put("getDtw_brt_xwait_in", 343);
+        methodIndexMap.put("getDtw_brt_AccTime_out", 344);
+        methodIndexMap.put("getDtw_brt_AccTime_in", 345);
+        methodIndexMap.put("getDtw_brt_EgrTime_out", 346);
+        methodIndexMap.put("getDtw_brt_EgrTime_in", 347);
+        methodIndexMap.put("getDtw_brt_WalkAuxTime_out", 348);
+        methodIndexMap.put("getDtw_brt_WalkAuxTime_in", 349);
+        methodIndexMap.put("getDtw_brt_fare_out", 350);
+        methodIndexMap.put("getDtw_brt_fare_in", 351);
+        methodIndexMap.put("getDtw_brt_xfers_out", 352);
+        methodIndexMap.put("getDtw_brt_xfers_in", 353);
         methodIndexMap.put("getDtw_lr_LB_ivt_out", 354);
         methodIndexMap.put("getDtw_lr_LB_ivt_in", 355);
         methodIndexMap.put("getDtw_lr_EB_ivt_out", 356);
         methodIndexMap.put("getDtw_lr_EB_ivt_in", 357);
-        methodIndexMap.put("getDtw_lr_FRY_ivt_out", 358);
-        methodIndexMap.put("getDtw_lr_FRY_ivt_in", 359);
-        methodIndexMap.put("getDtw_lr_HR_ivt_in", 339);
-        methodIndexMap.put("getDtw_lr_HR_ivt_out", 338);
+        methodIndexMap.put("getDtw_lr_BRT_ivt_out", 358);
+        methodIndexMap.put("getDtw_lr_BRT_ivt_in", 359);
         methodIndexMap.put("getDtw_lr_LRT_ivt_out", 360);
         methodIndexMap.put("getDtw_lr_LRT_ivt_in", 361);
         methodIndexMap.put("getDtw_lr_fwait_out", 362);
@@ -714,10 +638,8 @@ public class SandagAppendMcLogsumDMU
         methodIndexMap.put("getDtw_cr_LB_ivt_in", 377);
         methodIndexMap.put("getDtw_cr_EB_ivt_out", 378);
         methodIndexMap.put("getDtw_cr_EB_ivt_in", 379);
-        methodIndexMap.put("getDtw_cr_FRY_ivt_out", 380);
-        methodIndexMap.put("getDtw_cr_FRY_ivt_in", 381);
-        methodIndexMap.put("getDtw_cr_HR_ivt_in", 339);
-        methodIndexMap.put("getDtw_cr_HR_ivt_out", 338);
+        methodIndexMap.put("getDtw_cr_BRT_ivt_out", 380);
+        methodIndexMap.put("getDtw_cr_BRT_ivt_in", 381);
         methodIndexMap.put("getDtw_cr_LRT_ivt_out", 382);
         methodIndexMap.put("getDtw_cr_LRT_ivt_in", 383);
         methodIndexMap.put("getDtw_cr_CR_ivt_out", 384);
@@ -928,130 +850,64 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(WTW, EB, XFERS, IN);
                 break;
             case 134:
-                returnValue = getTransitSkim(WTW, FRY, LB_IVT, OUT);
+                returnValue = getTransitSkim(WTW, BRT, LB_IVT, OUT);
                 break;
             case 135:
-                returnValue = getTransitSkim(WTW, FRY, LB_IVT, IN);
+                returnValue = getTransitSkim(WTW, BRT, LB_IVT, IN);
                 break;
             case 136:
-                returnValue = getTransitSkim(WTW, FRY, EB_IVT, OUT);
+                returnValue = getTransitSkim(WTW, BRT, EB_IVT, OUT);
                 break;
             case 137:
-                returnValue = getTransitSkim(WTW, FRY, EB_IVT, IN);
+                returnValue = getTransitSkim(WTW, BRT, EB_IVT, IN);
                 break;
             case 138:
-                returnValue = getTransitSkim(WTW, FRY, FRY_IVT, OUT);
+                returnValue = getTransitSkim(WTW, BRT, BRT_IVT, OUT);
                 break;
             case 139:
-                returnValue = getTransitSkim(WTW, FRY, FRY_IVT, IN);
+                returnValue = getTransitSkim(WTW, BRT, BRT_IVT, IN);
                 break;
             case 140:
-                returnValue = getTransitSkim(WTW, FRY, FWAIT, OUT);
+                returnValue = getTransitSkim(WTW, BRT, FWAIT, OUT);
                 break;
             case 141:
-                returnValue = getTransitSkim(WTW, FRY, FWAIT, IN);
+                returnValue = getTransitSkim(WTW, BRT, FWAIT, IN);
                 break;
             case 142:
-                returnValue = getTransitSkim(WTW, FRY, XWAIT, OUT);
+                returnValue = getTransitSkim(WTW, BRT, XWAIT, OUT);
                 break;
             case 143:
-                returnValue = getTransitSkim(WTW, FRY, XWAIT, IN);
+                returnValue = getTransitSkim(WTW, BRT, XWAIT, IN);
                 break;
             case 144:
-                returnValue = getTransitSkim(WTW, FRY, ACC, OUT);
+                returnValue = getTransitSkim(WTW, BRT, ACC, OUT);
                 break;
             case 145:
-                returnValue = getTransitSkim(WTW, FRY, ACC, IN);
+                returnValue = getTransitSkim(WTW, BRT, ACC, IN);
                 break;
             case 146:
-                returnValue = getTransitSkim(WTW, FRY, EGR, OUT);
+                returnValue = getTransitSkim(WTW, BRT, EGR, OUT);
                 break;
             case 147:
-                returnValue = getTransitSkim(WTW, FRY, EGR, IN);
+                returnValue = getTransitSkim(WTW, BRT, EGR, IN);
                 break;
             case 148:
-                returnValue = getTransitSkim(WTW, FRY, AUX, OUT);
+                returnValue = getTransitSkim(WTW, BRT, AUX, OUT);
                 break;
             case 149:
-                returnValue = getTransitSkim(WTW, FRY, AUX, IN);
+                returnValue = getTransitSkim(WTW, BRT, AUX, IN);
                 break;
             case 150:
-                returnValue = getTransitSkim(WTW, FRY, FARE, OUT);
+                returnValue = getTransitSkim(WTW, BRT, FARE, OUT);
                 break;
             case 151:
-                returnValue = getTransitSkim(WTW, FRY, FARE, IN);
+                returnValue = getTransitSkim(WTW, BRT, FARE, IN);
                 break;
             case 152:
-                returnValue = getTransitSkim(WTW, FRY, XFERS, OUT);
+                returnValue = getTransitSkim(WTW, BRT, XFERS, OUT);
                 break;
             case 153:
-                returnValue = getTransitSkim(WTW, FRY, XFERS, IN);
-                break;
-            case 134:
-                returnValue = getTransitSkim(WTW, HR, LB_IVT, OUT);
-                break;
-            case 135:
-                returnValue = getTransitSkim(WTW, HR, LB_IVT, IN);
-                break;
-            case 136:
-                returnValue = getTransitSkim(WTW, HR, EB_IVT, OUT);
-                break;
-            case 137:
-                returnValue = getTransitSkim(WTW, HR, EB_IVT, IN);
-                break;
-            case 138:
-                returnValue = getTransitSkim(WTW, HR, FRY_IVT, OUT);
-                break;
-            case 139:
-                returnValue = getTransitSkim(WTW, HR, FRY_IVT, IN);
-                break;
-            case 138:
-                returnValue = getTransitSkim(WTW, HR, HR_IVT, OUT);
-                break;
-            case 139:
-                returnValue = getTransitSkim(WTW, HR, HR_IVT, IN);
-                break;
-            case 140:
-                returnValue = getTransitSkim(WTW, HR, FWAIT, OUT);
-                break;
-            case 141:
-                returnValue = getTransitSkim(WTW, HR, FWAIT, IN);
-                break;
-            case 142:
-                returnValue = getTransitSkim(WTW, HR, XWAIT, OUT);
-                break;
-            case 143:
-                returnValue = getTransitSkim(WTW, HR, XWAIT, IN);
-                break;
-            case 144:
-                returnValue = getTransitSkim(WTW, HR, ACC, OUT);
-                break;
-            case 145:
-                returnValue = getTransitSkim(WTW, HR, ACC, IN);
-                break;
-            case 146:
-                returnValue = getTransitSkim(WTW, HR, EGR, OUT);
-                break;
-            case 147:
-                returnValue = getTransitSkim(WTW, HR, EGR, IN);
-                break;
-            case 148:
-                returnValue = getTransitSkim(WTW, HR, AUX, OUT);
-                break;
-            case 149:
-                returnValue = getTransitSkim(WTW, HR, AUX, IN);
-                break;
-            case 150:
-                returnValue = getTransitSkim(WTW, HR, FARE, OUT);
-                break;
-            case 151:
-                returnValue = getTransitSkim(WTW, HR, FARE, IN);
-                break;
-            case 152:
-                returnValue = getTransitSkim(WTW, HR, XFERS, OUT);
-                break;
-            case 153:
-                returnValue = getTransitSkim(WTW, HR, XFERS, IN);
+                returnValue = getTransitSkim(WTW, BRT, XFERS, IN);
                 break;
             case 154:
                 returnValue = getTransitSkim(WTW, LR, LB_IVT, OUT);
@@ -1066,16 +922,10 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(WTW, LR, EB_IVT, IN);
                 break;
             case 158:
-                returnValue = getTransitSkim(WTW, LR, FRY_IVT, OUT);
+                returnValue = getTransitSkim(WTW, LR, BRT_IVT, OUT);
                 break;
             case 159:
-                returnValue = getTransitSkim(WTW, LR, FRY_IVT, IN);
-                break;
-            case 138:
-                returnValue = getTransitSkim(WTW, LR, HR_IVT, OUT);
-                break;
-            case 139:
-                returnValue = getTransitSkim(WTW, LR, HR_IVT, IN);
+                returnValue = getTransitSkim(WTW, LR, BRT_IVT, IN);
                 break;
             case 160:
                 returnValue = getTransitSkim(WTW, LR, LR_IVT, OUT);
@@ -1138,16 +988,10 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(WTW, CR, EB_IVT, IN);
                 break;
             case 180:
-                returnValue = getTransitSkim(WTW, CR, FRY_IVT, OUT);
+                returnValue = getTransitSkim(WTW, CR, BRT_IVT, OUT);
                 break;
             case 181:
-                returnValue = getTransitSkim(WTW, CR, FRY_IVT, IN);
-                break;
-            case 138:
-                returnValue = getTransitSkim(WTW, CR, HR_IVT, OUT);
-                break;
-            case 139:
-                returnValue = getTransitSkim(WTW, CR, HR_IVT, IN);
+                returnValue = getTransitSkim(WTW, CR, BRT_IVT, IN);
                 break;
             case 182:
                 returnValue = getTransitSkim(WTW, CR, LR_IVT, OUT);
@@ -1306,130 +1150,64 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(WTD, EB, XFERS, IN);
                 break;
             case 234:
-                returnValue = getTransitSkim(WTD, FRY, LB_IVT, OUT);
+                returnValue = getTransitSkim(WTD, BRT, LB_IVT, OUT);
                 break;
             case 235:
-                returnValue = getTransitSkim(WTD, FRY, LB_IVT, IN);
+                returnValue = getTransitSkim(WTD, BRT, LB_IVT, IN);
                 break;
             case 236:
-                returnValue = getTransitSkim(WTD, FRY, EB_IVT, OUT);
+                returnValue = getTransitSkim(WTD, BRT, EB_IVT, OUT);
                 break;
             case 237:
-                returnValue = getTransitSkim(WTD, FRY, EB_IVT, IN);
+                returnValue = getTransitSkim(WTD, BRT, EB_IVT, IN);
                 break;
             case 238:
-                returnValue = getTransitSkim(WTD, FRY, FRY_IVT, OUT);
+                returnValue = getTransitSkim(WTD, BRT, BRT_IVT, OUT);
                 break;
             case 239:
-                returnValue = getTransitSkim(WTD, FRY, FRY_IVT, IN);
+                returnValue = getTransitSkim(WTD, BRT, BRT_IVT, IN);
                 break;
             case 240:
-                returnValue = getTransitSkim(WTD, FRY, FWAIT, OUT);
+                returnValue = getTransitSkim(WTD, BRT, FWAIT, OUT);
                 break;
             case 241:
-                returnValue = getTransitSkim(WTD, FRY, FWAIT, IN);
+                returnValue = getTransitSkim(WTD, BRT, FWAIT, IN);
                 break;
             case 242:
-                returnValue = getTransitSkim(WTD, FRY, XWAIT, OUT);
+                returnValue = getTransitSkim(WTD, BRT, XWAIT, OUT);
                 break;
             case 243:
-                returnValue = getTransitSkim(WTD, FRY, XWAIT, IN);
+                returnValue = getTransitSkim(WTD, BRT, XWAIT, IN);
                 break;
             case 244:
-                returnValue = getTransitSkim(WTD, FRY, ACC, OUT);
+                returnValue = getTransitSkim(WTD, BRT, ACC, OUT);
                 break;
             case 245:
-                returnValue = getTransitSkim(WTD, FRY, ACC, IN);
+                returnValue = getTransitSkim(WTD, BRT, ACC, IN);
                 break;
             case 246:
-                returnValue = getTransitSkim(WTD, FRY, EGR, OUT);
+                returnValue = getTransitSkim(WTD, BRT, EGR, OUT);
                 break;
             case 247:
-                returnValue = getTransitSkim(WTD, FRY, EGR, IN);
+                returnValue = getTransitSkim(WTD, BRT, EGR, IN);
                 break;
             case 248:
-                returnValue = getTransitSkim(WTD, FRY, AUX, OUT);
+                returnValue = getTransitSkim(WTD, BRT, AUX, OUT);
                 break;
             case 249:
-                returnValue = getTransitSkim(WTD, FRY, AUX, IN);
+                returnValue = getTransitSkim(WTD, BRT, AUX, IN);
                 break;
             case 250:
-                returnValue = getTransitSkim(WTD, FRY, FARE, OUT);
+                returnValue = getTransitSkim(WTD, BRT, FARE, OUT);
                 break;
             case 251:
-                returnValue = getTransitSkim(WTD, FRY, FARE, IN);
+                returnValue = getTransitSkim(WTD, BRT, FARE, IN);
                 break;
             case 252:
-                returnValue = getTransitSkim(WTD, FRY, XFERS, OUT);
+                returnValue = getTransitSkim(WTD, BRT, XFERS, OUT);
                 break;
             case 253:
-                returnValue = getTransitSkim(WTD, FRY, XFERS, IN);
-                break;
-            case 234:
-                returnValue = getTransitSkim(WTD, HR, LB_IVT, OUT);
-                break;
-            case 235:
-                returnValue = getTransitSkim(WTD, HR, LB_IVT, IN);
-                break;
-            case 236:
-                returnValue = getTransitSkim(WTD, HR, EB_IVT, OUT);
-                break;
-            case 237:
-                returnValue = getTransitSkim(WTD, HR, EB_IVT, IN);
-                break;
-            case 238:
-                returnValue = getTransitSkim(WTD, HR, FRY_IVT, OUT);
-                break;
-            case 239:
-                returnValue = getTransitSkim(WTD, HR, FRY_IVT, IN);
-                break;
-            case 238:
-                returnValue = getTransitSkim(WTD, HR, HR_IVT, OUT);
-                break;
-            case 239:
-                returnValue = getTransitSkim(WTD, HR, HR_IVT, IN);
-                break;
-            case 240:
-                returnValue = getTransitSkim(WTD, HR, FWAIT, OUT);
-                break;
-            case 241:
-                returnValue = getTransitSkim(WTD, HR, FWAIT, IN);
-                break;
-            case 242:
-                returnValue = getTransitSkim(WTD, HR, XWAIT, OUT);
-                break;
-            case 243:
-                returnValue = getTransitSkim(WTD, HR, XWAIT, IN);
-                break;
-            case 244:
-                returnValue = getTransitSkim(WTD, HR, ACC, OUT);
-                break;
-            case 245:
-                returnValue = getTransitSkim(WTD, HR, ACC, IN);
-                break;
-            case 246:
-                returnValue = getTransitSkim(WTD, HR, EGR, OUT);
-                break;
-            case 247:
-                returnValue = getTransitSkim(WTD, HR, EGR, IN);
-                break;
-            case 248:
-                returnValue = getTransitSkim(WTD, HR, AUX, OUT);
-                break;
-            case 249:
-                returnValue = getTransitSkim(WTD, HR, AUX, IN);
-                break;
-            case 250:
-                returnValue = getTransitSkim(WTD, HR, FARE, OUT);
-                break;
-            case 251:
-                returnValue = getTransitSkim(WTD, HR, FARE, IN);
-                break;
-            case 252:
-                returnValue = getTransitSkim(WTD, HR, XFERS, OUT);
-                break;
-            case 253:
-                returnValue = getTransitSkim(WTD, HR, XFERS, IN);
+                returnValue = getTransitSkim(WTD, BRT, XFERS, IN);
                 break;
             case 254:
                 returnValue = getTransitSkim(WTD, LR, LB_IVT, OUT);
@@ -1444,16 +1222,10 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(WTD, LR, EB_IVT, IN);
                 break;
             case 258:
-                returnValue = getTransitSkim(WTD, LR, FRY_IVT, OUT);
+                returnValue = getTransitSkim(WTD, LR, BRT_IVT, OUT);
                 break;
             case 259:
-                returnValue = getTransitSkim(WTD, LR, FRY_IVT, IN);
-                break;
-            case 238:
-                returnValue = getTransitSkim(WTD, LR, HR_IVT, OUT);
-                break;
-            case 239:
-                returnValue = getTransitSkim(WTD, LR, HR_IVT, IN);
+                returnValue = getTransitSkim(WTD, LR, BRT_IVT, IN);
                 break;
             case 260:
                 returnValue = getTransitSkim(WTD, LR, LR_IVT, OUT);
@@ -1516,16 +1288,10 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(WTD, CR, EB_IVT, IN);
                 break;
             case 280:
-                returnValue = getTransitSkim(WTD, CR, FRY_IVT, OUT);
+                returnValue = getTransitSkim(WTD, CR, BRT_IVT, OUT);
                 break;
             case 281:
-                returnValue = getTransitSkim(WTD, CR, FRY_IVT, IN);
-                break;
-            case 238:
-                returnValue = getTransitSkim(WTD, CR, HR_IVT, OUT);
-                break;
-            case 239:
-                returnValue = getTransitSkim(WTD, CR, HR_IVT, IN);
+                returnValue = getTransitSkim(WTD, CR, BRT_IVT, IN);
                 break;
             case 282:
                 returnValue = getTransitSkim(WTD, CR, LR_IVT, OUT);
@@ -1684,130 +1450,64 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(DTW, EB, XFERS, IN);
                 break;
             case 334:
-                returnValue = getTransitSkim(DTW, FRY, LB_IVT, OUT);
+                returnValue = getTransitSkim(DTW, BRT, LB_IVT, OUT);
                 break;
             case 335:
-                returnValue = getTransitSkim(DTW, FRY, LB_IVT, IN);
+                returnValue = getTransitSkim(DTW, BRT, LB_IVT, IN);
                 break;
             case 336:
-                returnValue = getTransitSkim(DTW, FRY, EB_IVT, OUT);
+                returnValue = getTransitSkim(DTW, BRT, EB_IVT, OUT);
                 break;
             case 337:
-                returnValue = getTransitSkim(DTW, FRY, EB_IVT, IN);
+                returnValue = getTransitSkim(DTW, BRT, EB_IVT, IN);
                 break;
             case 338:
-                returnValue = getTransitSkim(DTW, FRY, FRY_IVT, OUT);
+                returnValue = getTransitSkim(DTW, BRT, BRT_IVT, OUT);
                 break;
             case 339:
-                returnValue = getTransitSkim(DTW, FRY, FRY_IVT, IN);
+                returnValue = getTransitSkim(DTW, BRT, BRT_IVT, IN);
                 break;
             case 340:
-                returnValue = getTransitSkim(DTW, FRY, FWAIT, OUT);
+                returnValue = getTransitSkim(DTW, BRT, FWAIT, OUT);
                 break;
             case 341:
-                returnValue = getTransitSkim(DTW, FRY, FWAIT, IN);
+                returnValue = getTransitSkim(DTW, BRT, FWAIT, IN);
                 break;
             case 342:
-                returnValue = getTransitSkim(DTW, FRY, XWAIT, OUT);
+                returnValue = getTransitSkim(DTW, BRT, XWAIT, OUT);
                 break;
             case 343:
-                returnValue = getTransitSkim(DTW, FRY, XWAIT, IN);
+                returnValue = getTransitSkim(DTW, BRT, XWAIT, IN);
                 break;
             case 344:
-                returnValue = getTransitSkim(DTW, FRY, ACC, OUT);
+                returnValue = getTransitSkim(DTW, BRT, ACC, OUT);
                 break;
             case 345:
-                returnValue = getTransitSkim(DTW, FRY, ACC, IN);
+                returnValue = getTransitSkim(DTW, BRT, ACC, IN);
                 break;
             case 346:
-                returnValue = getTransitSkim(DTW, FRY, EGR, OUT);
+                returnValue = getTransitSkim(DTW, BRT, EGR, OUT);
                 break;
             case 347:
-                returnValue = getTransitSkim(DTW, FRY, EGR, IN);
+                returnValue = getTransitSkim(DTW, BRT, EGR, IN);
                 break;
             case 348:
-                returnValue = getTransitSkim(DTW, FRY, AUX, OUT);
+                returnValue = getTransitSkim(DTW, BRT, AUX, OUT);
                 break;
             case 349:
-                returnValue = getTransitSkim(DTW, FRY, AUX, IN);
+                returnValue = getTransitSkim(DTW, BRT, AUX, IN);
                 break;
             case 350:
-                returnValue = getTransitSkim(DTW, FRY, FARE, OUT);
+                returnValue = getTransitSkim(DTW, BRT, FARE, OUT);
                 break;
             case 351:
-                returnValue = getTransitSkim(DTW, FRY, FARE, IN);
+                returnValue = getTransitSkim(DTW, BRT, FARE, IN);
                 break;
             case 352:
-                returnValue = getTransitSkim(DTW, FRY, XFERS, OUT);
+                returnValue = getTransitSkim(DTW, BRT, XFERS, OUT);
                 break;
             case 353:
-                returnValue = getTransitSkim(DTW, FRY, XFERS, IN);
-                break;
-            case 334:
-                returnValue = getTransitSkim(DTW, HR, LB_IVT, OUT);
-                break;
-            case 335:
-                returnValue = getTransitSkim(DTW, HR, LB_IVT, IN);
-                break;
-            case 336:
-                returnValue = getTransitSkim(DTW, HR, EB_IVT, OUT);
-                break;
-            case 337:
-                returnValue = getTransitSkim(DTW, HR, EB_IVT, IN);
-                break;
-            case 338:
-                returnValue = getTransitSkim(DTW, HR, FRY_IVT, OUT);
-                break;
-            case 339:
-                returnValue = getTransitSkim(DTW, HR, FRY_IVT, IN);
-                break;
-            case 338:
-                returnValue = getTransitSkim(DTW, HR, HR_IVT, OUT);
-                break;
-            case 339:
-                returnValue = getTransitSkim(DTW, HR, HR_IVT, IN);
-                break;
-            case 340:
-                returnValue = getTransitSkim(DTW, HR, FWAIT, OUT);
-                break;
-            case 341:
-                returnValue = getTransitSkim(DTW, HR, FWAIT, IN);
-                break;
-            case 342:
-                returnValue = getTransitSkim(DTW, HR, XWAIT, OUT);
-                break;
-            case 343:
-                returnValue = getTransitSkim(DTW, HR, XWAIT, IN);
-                break;
-            case 344:
-                returnValue = getTransitSkim(DTW, HR, ACC, OUT);
-                break;
-            case 345:
-                returnValue = getTransitSkim(DTW, HR, ACC, IN);
-                break;
-            case 346:
-                returnValue = getTransitSkim(DTW, HR, EGR, OUT);
-                break;
-            case 347:
-                returnValue = getTransitSkim(DTW, HR, EGR, IN);
-                break;
-            case 348:
-                returnValue = getTransitSkim(DTW, HR, AUX, OUT);
-                break;
-            case 349:
-                returnValue = getTransitSkim(DTW, HR, AUX, IN);
-                break;
-            case 350:
-                returnValue = getTransitSkim(DTW, HR, FARE, OUT);
-                break;
-            case 351:
-                returnValue = getTransitSkim(DTW, HR, FARE, IN);
-                break;
-            case 352:
-                returnValue = getTransitSkim(DTW, HR, XFERS, OUT);
-                break;
-            case 353:
-                returnValue = getTransitSkim(DTW, HR, XFERS, IN);
+                returnValue = getTransitSkim(DTW, BRT, XFERS, IN);
                 break;
             case 354:
                 returnValue = getTransitSkim(DTW, LR, LB_IVT, OUT);
@@ -1822,16 +1522,10 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(DTW, LR, EB_IVT, IN);
                 break;
             case 358:
-                returnValue = getTransitSkim(DTW, LR, FRY_IVT, OUT);
+                returnValue = getTransitSkim(DTW, LR, BRT_IVT, OUT);
                 break;
             case 359:
-                returnValue = getTransitSkim(DTW, LR, FRY_IVT, IN);
-                break;
-            case 338:
-                returnValue = getTransitSkim(DTW, LR, HR_IVT, OUT);
-                break;
-            case 339:
-                returnValue = getTransitSkim(DTW, LR, HR_IVT, IN);
+                returnValue = getTransitSkim(DTW, LR, BRT_IVT, IN);
                 break;
             case 360:
                 returnValue = getTransitSkim(DTW, LR, LR_IVT, OUT);
@@ -1894,16 +1588,10 @@ public class SandagAppendMcLogsumDMU
                 returnValue = getTransitSkim(DTW, CR, EB_IVT, IN);
                 break;
             case 380:
-                returnValue = getTransitSkim(DTW, CR, FRY_IVT, OUT);
+                returnValue = getTransitSkim(DTW, CR, BRT_IVT, OUT);
                 break;
             case 381:
-                returnValue = getTransitSkim(DTW, CR, FRY_IVT, IN);
-                break;
-            case 338:
-                returnValue = getTransitSkim(DTW, CR, HR_IVT, OUT);
-                break;
-            case 339:
-                returnValue = getTransitSkim(DTW, CR, HR_IVT, IN);
+                returnValue = getTransitSkim(DTW, CR, BRT_IVT, IN);
                 break;
             case 382:
                 returnValue = getTransitSkim(DTW, CR, LR_IVT, OUT);

@@ -57,7 +57,6 @@ public final class MgraDataManager
     public static final String          MGRA_4DDENSITY_EMP_DEN_FIELD     = "EmpDen";
     public static final String          MGRA_4DDENSITY_TOT_INT_FIELD     = "TotInt";
 
-    //public static final String          MGRA_FIELD_NAME                                  = "MGRASR10";
     public static final String          MGRA_FIELD_NAME                                  = "MAZ";
     public static final String          MGRA_TAZ_FIELD_NAME                              = "TAZ";
     private static final String         MGRA_POPULATION_FIELD_NAME                       = "pop";
@@ -108,6 +107,10 @@ public final class MgraDataManager
     // An array of Hashmaps dimensioned by destination mgra, with distance in feet, in a ragged
     // array (no key for mgra means no other mgras in walk distance)
     private HashMap<Integer, Integer>[] dMgraWalkDistance;
+    
+
+    private HashMap<Integer, Integer>[] oMgraBikeDistance;
+    private HashMap<Integer, Integer>[] dMgraBikeDistance;
 
     // An array dimensioned to maxMgra of ragged arrays of lists of TAPs accessible by driving
     private Set<Integer>[]              driveAccessibleTaps;
@@ -150,6 +153,7 @@ public final class MgraDataManager
         readMgraTableData(rbMap);
         readMgraWlkTaps(rbMap);
         readMazMazWalkDistance(rbMap);
+        readMazMazBikeDistance(rbMap);
 
         // pre-process the list of TAPS reachable by drive access for each MGRA 
         mapDriveAccessTapsToMgras( TazDataManager.getInstance(rbMap) );
@@ -249,21 +253,24 @@ public final class MgraDataManager
         }
     }
 
-    
-    /**
-     * Read the walk distance skim for mazs.
-     * 
-     * @param rb The resourcebundle with the scenario.path and
-     *            mgra.wlkacc.taps.and.distance.file properties.
-     */
-    public void readMazMazWalkDistance(HashMap<String, String> rbMap) {
-        File mgraWlkTapCorresFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+    private void readMazMazWalkDistance(HashMap<String, String> rbMap) {
+        File mazMazDistanceFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
                 		                      Util.getStringValueFromPropertyMap(rbMap, "maz.maz.distance.file")).toFile();
-
         oMgraWalkDistance = new HashMap[maxMgra + 1];
         dMgraWalkDistance = new HashMap[maxMgra + 1];
-        Map<Integer,Map<Integer,Integer>> mgraToTapToDistance = new TreeMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(mgraWlkTapCorresFile))) {
+        readMazMazDistance(mazMazDistanceFile,oMgraWalkDistance,dMgraWalkDistance);
+    }
+
+    private void readMazMazBikeDistance(HashMap<String, String> rbMap) {
+        File mazMazDistanceFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
+                		                      Util.getStringValueFromPropertyMap(rbMap, "maz.maz.bike.distance.file")).toFile();
+        oMgraBikeDistance = new HashMap[maxMgra + 1];
+        dMgraBikeDistance = new HashMap[maxMgra + 1];
+        readMazMazDistance(mazMazDistanceFile,oMgraBikeDistance,dMgraBikeDistance);
+    }
+    
+    private void readMazMazDistance(File mazMazDistanceFile, HashMap[] oDistance, HashMap[] dDistance) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(mazMazDistanceFile))) {
         	String line;
         	while ((line = reader.readLine()) != null) {
 				line = line.trim();
@@ -275,12 +282,12 @@ public final class MgraDataManager
         		int fmaz = Integer.parseInt(data[0]);
         		int tmaz = Integer.parseInt(data[1]);
         		int distance = new Double(data[4]).intValue();
-        		if (oMgraWalkDistance[fmaz] == null)
-        			oMgraWalkDistance[fmaz] = new HashMap();
-        		oMgraWalkDistance[fmaz].put(tmaz,distance);
-        		if (dMgraWalkDistance[tmaz] == null)
-        			dMgraWalkDistance[tmaz] = new HashMap();
-        		dMgraWalkDistance[tmaz].put(fmaz,distance);
+        		if (oDistance[fmaz] == null)
+        			oDistance[fmaz] = new HashMap();
+        		oDistance[fmaz].put(tmaz,distance);
+        		if (dDistance[tmaz] == null)
+        			dDistance[tmaz] = new HashMap();
+        		dDistance[tmaz].put(fmaz,distance);
         	}
         } catch (IOException e) {
 			throw new RuntimeException(e);
@@ -451,13 +458,45 @@ public final class MgraDataManager
      */
     public float getMgraToMgraWalkTime(int oMgra, int dMgra)
     {
+    	return getMgraToMgraWalkDistTo(oMgra,dMgra)*Constants.walkMinutesPerFoot;
+    }
 
-        if (oMgraWalkDistance[oMgra] == null)
-            return 0f;
-        else if (oMgraWalkDistance[oMgra].containsKey(dMgra))
-            return ((float) oMgraWalkDistance[oMgra].get(dMgra)) * Constants.walkMinutesPerFoot;
+    /**
+     * Get the bike distance from an MGRA to an MGRA. Return 0 if not within short bike
+     * distance.
+     * 
+     * @param oMgra The number of the production/origin MGRA.
+     * @param dMgra The number of the attraction/destination MGRA.
+     * @return The bike distance in feet.
+     */
+    public int getMgraToMgraBikeDistFrom(int oMgra, int dMgra)
+    {
 
-        return 0f;
+        if (oMgraBikeDistance[oMgra] == null)
+            return 0;
+        else if (oMgraBikeDistance[oMgra].containsKey(dMgra))
+            return oMgraBikeDistance[oMgra].get(dMgra);
+
+        return 0;
+    }
+
+    /**
+     * Get the bike distance from an MGRA to an MGRA. Return 0 if not within bikeing
+     * distance.
+     * 
+     * @param oMgra The number of the production/origin MGRA.
+     * @param dMgra The number of the attraction/destination MGRA.
+     * @return The bike distance in feet.
+     */
+    public int getMgraToMgraBikeDistTo(int oMgra, int dMgra)
+    {
+
+        if (dMgraBikeDistance[dMgra] == null)
+            return 0;
+        else if (dMgraBikeDistance[dMgra].containsKey(oMgra))
+            return dMgraBikeDistance[dMgra].get(oMgra);
+
+        return 0;
     }
 
     /**
@@ -470,13 +509,7 @@ public final class MgraDataManager
      */
     public float getMgraToMgraBikeTime(int oMgra, int dMgra)
     {
-
-        if (oMgraWalkDistance[oMgra] == null)
-            return 0f;
-        else if (oMgraWalkDistance[oMgra].containsKey(dMgra))
-            return ((float) oMgraWalkDistance[oMgra].get(dMgra)) * Constants.bikeMinutesPerFoot;
-
-        return 0f;
+    	return getMgraToMgraBikeDistTo(oMgra,dMgra)*Constants.bikeMinutesPerFoot;
     }
 
     /**

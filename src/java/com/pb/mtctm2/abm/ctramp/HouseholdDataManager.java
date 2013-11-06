@@ -46,7 +46,7 @@ public abstract class HouseholdDataManager
     public static final String        HH_INCOME_CATEGORY_FIELD_NAME          = "HINCCAT1";
     public static final String        HH_INCOME_DOLLARS_FIELD_NAME           = "HINC";
     public static final String        HH_WORKERS_FIELD_NAME                  = "HWORKERS";
-    public static final String        HH_AUTOS_FIELD_NAME                    = "VEH";
+    public static final String        HH_AUTOS_FIELD_NAME                    = "VEHICL";
     public static final String        HH_SIZE_FIELD_NAME                     = "PERSONS";
     public static final String        HH_TYPE_FIELD_NAME                     = "HHT";
     public static final String        HH_BLDGSZ_FIELD_NAME                   = "BLDGSZ";

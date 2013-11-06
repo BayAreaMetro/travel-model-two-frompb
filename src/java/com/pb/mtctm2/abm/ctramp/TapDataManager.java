@@ -3,6 +3,7 @@ package com.pb.mtctm2.abm.ctramp;
 import com.pb.common.datafile.TableDataFileReader;
 import com.pb.common.datafile.TableDataSet;
 import com.pb.common.util.ResourceUtil;
+import com.pb.mtctm2.abm.application.NodeZoneMapping;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -187,32 +188,16 @@ public final class TapDataManager
      * @param rb A Resourcebundle with skims.path and tap.skim.file properties.
      */
     public void getTapList(HashMap<String, String> rbMap)
-    {File mgraWlkTapCorresFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
-            Util.getStringValueFromPropertyMap(rbMap, "maz.tap.distance.file")).toFile();
-
-		Set<Integer> tapSet = new TreeSet<>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(mgraWlkTapCorresFile))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				line = line.trim();
-				if (line.length() == 0)
-					continue;
-				String[] data = line.split(",");
-				//10001,90002,90002,43053.39,11689.23
-				//maz,tap,tap,generalized cost,distance in feet
-				int tap = Integer.parseInt(data[1]);
-				tapSet.add(tap);
-				if (tap > maxTap) 
-					maxTap = tap;
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		taps = new int[tapSet.size() + 1];
-		int counter = 1;
-		for (int tap : tapSet)
-			taps[counter++] = tap;
-
+    {
+    	maxTap = 0;
+    	Set<Integer> tapSequence = new NodeZoneMapping(rbMap).getSequenceTaps();
+    	taps = new int[tapSequence.size()+1];
+    	int counter = 1;
+    	for (int tap : tapSequence) {
+    		taps[counter++] = tap;
+    		if (tap > maxTap)
+    			maxTap = tap;
+    	}
     }
 
     public int getLotUse(int lotId)

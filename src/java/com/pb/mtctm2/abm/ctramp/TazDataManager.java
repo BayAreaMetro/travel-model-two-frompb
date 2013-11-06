@@ -164,7 +164,7 @@ public class TazDataManager
     
     private void readTazTapAccessData(HashMap<String,String> rbMap) {
         File dataFile = Paths.get(Util.getStringValueFromPropertyMap(rbMap, "scenario.path"),
-                                  Util.getStringValueFromPropertyMap(rbMap,TAZ_DATA_FILE_PROPERTY)).toFile();
+                                  Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_PROPERTY)).toFile();
         
         String ftazColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_FTAZ_COLUMN_PROPERTY);
         String modeColumn = Util.getStringValueFromPropertyMap(rbMap,TAZ_TAP_ACCESS_FILE_MODE_COLUMN_PROPERTY);

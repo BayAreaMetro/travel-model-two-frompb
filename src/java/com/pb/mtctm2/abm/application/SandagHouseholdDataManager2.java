@@ -14,6 +14,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Set;
+
 import gnu.cajo.invoke.Remote;
 import gnu.cajo.utils.ItemServer;
 
@@ -94,8 +97,9 @@ public class SandagHouseholdDataManager2
 //            logger.fatal(String.format("Exception occurred opening output skims file: %s.", outputFileName));
 //            throw new RuntimeException(e);
 //        }
-        
-        int[] tempFreqArray = new int[40000];
+
+
+        Set<Integer> mgrasUsed = new HashSet<>();
         int[] hhOriginSortArray = new int[numHouseholdsInSample];
         for (int i = 0; i < numHouseholdsInSample; i++)
         {
@@ -104,7 +108,7 @@ public class SandagHouseholdDataManager2
             int hhMgra = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_HOME_MGRA_FIELD_NAME));
             int hhTaz = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_HOME_TAZ_FIELD_NAME));
             hhOriginSortArray[i] = hhMgra;
-            tempFreqArray[hhMgra]++;
+            mgrasUsed.add(hhMgra);
 
 //            outStream.println(i + "," + hhMgra + "," + hhTaz);
         }
@@ -113,14 +117,8 @@ public class SandagHouseholdDataManager2
 //        System.exit(1);
         
         
-        
-        int mgrasInSample = 0;
-        for (int i = 0; i < tempFreqArray.length; i++)
-        {
-            if ( tempFreqArray[i] > 0 )
-                mgrasInSample++;
-        }        
-        logger.info( mgrasInSample + " unique MGRA values in the " + (sampleRate*100) + "% sample." );
+            
+        logger.info( mgrasUsed.size() + " unique MGRA values in the " + (sampleRate*100) + "% sample." );
         
         // get an index array for households sorted in order of home mgra
         int[] newOrder = new int[numHouseholdsInSample];

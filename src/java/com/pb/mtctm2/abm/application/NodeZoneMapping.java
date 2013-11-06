@@ -5,87 +5,112 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+
+import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 
 public class NodeZoneMapping {
-	public static final String HIGHWAY_NODE_MAPPING_FILE_PROPERTY = "highway.skim.node.to.taz.file";
-	public static final String HIGHWAY_NODE_MAPPING_FILE_PERIOD_TOKEN_PROPERTY = "highway.skim.node.to.taz.period.token";
-	public static final String TRANSIT_NODE_MAPPING_FILE_PROPERTY = "transit.skim.node.to.taz.file";
+	public static final String NETWORK_NODE_SEQUENCE_FILE_PROPERTY = "network.node.seq.mapping.file";
 	
-	private final Map<TimePeriod,Map<Integer,Integer>> highwayAssignmentNodeToTaz;
-	private final Map<TimePeriod,Map<Integer,Integer>> highwayAssignmentTazToNode;
-	private final Map<Integer,Integer> transitAssignmentNodeToTaz;
-	private final Map<Integer,Integer> transitAssignmentTazToNode;
+	private final Map<Integer,Integer> originalToSequenceTaz;
+	private final Map<Integer,Integer> originalToSequenceMaz;
+	private final Map<Integer,Integer> originalToSequenceTap;
+	private final Map<Integer,Integer> sequenceToOriginalTaz;
+	private final Map<Integer,Integer> sequenceToOriginalMaz;
+	private final Map<Integer,Integer> sequenceToOriginalTap;
 	
 	public NodeZoneMapping(Map<String,String> properties) {
-		highwayAssignmentNodeToTaz = new EnumMap<>(TimePeriod.class);
-		highwayAssignmentTazToNode = new EnumMap<>(TimePeriod.class);
-		String periodToken = properties.get(HIGHWAY_NODE_MAPPING_FILE_PERIOD_TOKEN_PROPERTY);
-		String tokenizedPath = properties.get(HIGHWAY_NODE_MAPPING_FILE_PROPERTY);
-		for (TimePeriod period: TimePeriod.values()) {
-			highwayAssignmentNodeToTaz.put(period,loadNodeData(Paths.get(tokenizedPath.replace(periodToken,period.getShortName())),tazFilter));
-			highwayAssignmentTazToNode.put(period,buildReverseMapping(highwayAssignmentNodeToTaz.get(period)));
-		}
-		transitAssignmentNodeToTaz = loadNodeData(Paths.get(properties.get(TRANSIT_NODE_MAPPING_FILE_PROPERTY)),tapFilter);
-		transitAssignmentTazToNode = buildReverseMapping(transitAssignmentNodeToTaz);
+		originalToSequenceTaz = new TreeMap<>();
+		originalToSequenceMaz = new TreeMap<>();
+		originalToSequenceTap = new TreeMap<>();
+		loadNodeSequenceData(Paths.get(properties.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY) + properties.get(NETWORK_NODE_SEQUENCE_FILE_PROPERTY)));
+		sequenceToOriginalTaz = reverseMap(originalToSequenceTaz);
+		sequenceToOriginalMaz = reverseMap(originalToSequenceMaz);
+		sequenceToOriginalTap = reverseMap(originalToSequenceTap);
 	}
 	
-	private interface ZoneFilter {
-		boolean isValidZone(int value);
-	}
-	
-	private ZoneFilter tazFilter = new ZoneFilter() {
-		public boolean isValidZone(int value) {
-			return (value < 1000000) && ((value % 100000) < 10000);
-		}
-	};
-	
-	private ZoneFilter tapFilter = new ZoneFilter() {
-		public boolean isValidZone(int value) {
-			return (value < 1000000) && ((value % 100000) > 90000);
-		}
-	};
-	
-	private Map<Integer,Integer> loadNodeData(Path correspondenceFile, ZoneFilter filter) {
-		Map<Integer,Integer> map = new HashMap<>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(correspondenceFile.toFile()))) {
+	private void loadNodeSequenceData(Path sequenceFile) {
+		//hard coded the structure of the file, but it has no headers so we have to
+		try (BufferedReader reader = new BufferedReader(new FileReader(sequenceFile.toFile()))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				String[] data = line.trim().split("\\s+");
-				int ptaz = Integer.parseInt(data[1]);
-				if (filter.isValidZone(ptaz))
-					map.put(Integer.parseInt(data[0]),ptaz);
+				line = line.trim();
+				if (line.length() == 0)
+					continue;
+				String[] s = line.trim().split(",");
+				int original = Integer.parseInt(s[0]);
+				outer: for (int i = 1; i < s.length; i++) {
+					int zone = Integer.parseInt(s[i]);
+					if (zone > 0) {
+						switch (i) {
+							case 1 : originalToSequenceTaz.put(original,zone); break outer;
+							case 2 : originalToSequenceMaz.put(original,zone); break outer;
+							case 3 : originalToSequenceTap.put(original,zone); break outer;						
+						}
+					}
+				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		return map;
 	}
-	
-	private Map<Integer,Integer> buildReverseMapping(Map<Integer,Integer> mapping) {
-		Map<Integer,Integer> rmap = new HashMap<>();
-		for (Entry<Integer,Integer> e : mapping.entrySet())
-			rmap.put(e.getValue(),e.getKey());
+
+	private Map<Integer,Integer> reverseMap(Map<Integer,Integer> map) {
+		Map<Integer,Integer> rmap = new TreeMap<>();
+		for (Entry<Integer,Integer> entry : map.entrySet())
+			rmap.put(entry.getValue(),entry.getKey());
 		return rmap;
 	}
 	
-	public int getHighwayAssignmenNode(TimePeriod period, int taz) {
-		return highwayAssignmentTazToNode.get(period).get(taz);
+	public int getSequenceTaz(int originalTaz) {
+		return originalToSequenceTaz.get(originalTaz);
 	}
 	
-	public int getHighwayAssignmenTaz(TimePeriod period, int node) {
-		return highwayAssignmentNodeToTaz.get(period).get(node);
+	public int getSequenceMaz(int originalMaz) {
+		return originalToSequenceMaz.get(originalMaz);
 	}
 	
-	public int getTransitAssignmenNode(int taz) {
-		return transitAssignmentTazToNode.get(taz);
+	public int getSequenceTap(int originalTap) {
+		return originalToSequenceTap.get(originalTap);
 	}
 	
-	public int getTransitAssignmenTaz(int node) {
-		return transitAssignmentNodeToTaz.get(node);
+	public int getOriginalTaz(int sequenceTaz) {
+		return sequenceToOriginalTaz.get(sequenceTaz);
+	}
+	
+	public int getOriginalMaz(int sequenceMaz) {
+		return sequenceToOriginalMaz.get(sequenceMaz);
+	}
+	
+	public int getOriginalTap(int sequenceTap) {
+		return sequenceToOriginalTap.get(sequenceTap);
+	}
+
+	public Set<Integer> getOriginalTazs() {
+		return originalToSequenceTaz.keySet();
+	}
+
+	public Set<Integer> getOriginalMazs() {
+		return originalToSequenceMaz.keySet();
+	}
+
+	public Set<Integer> getOriginalTaps() {
+		return originalToSequenceTap.keySet();
+	}
+
+	public Set<Integer> getSequenceTazs() {
+		return sequenceToOriginalTaz.keySet();
+	}
+
+	public Set<Integer> getSequenceMazs() {
+		return sequenceToOriginalMaz.keySet();
+	}
+
+	public Set<Integer> getSequenceTaps() {
+		return sequenceToOriginalTap.keySet();
 	}
 
 }
