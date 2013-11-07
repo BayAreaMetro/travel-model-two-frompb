@@ -106,7 +106,7 @@ public final class BuildAccessibilities
 
     public static final int             TOTAL_LOGSUM_FIELD_NUMBER                        = 13;
 
-    private static int                  numThreads                                       = 12;
+    private static int                  numThreads                                       = -1; //12 //-1 = number of machine processors
     private static final int            DISTRIBUTED_PACKET_SIZE                          = 1000;
 
     private HashMap<Integer, Integer>   workerOccupValueSegmentIndexMap;

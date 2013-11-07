@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE project [
-	<!ENTITY properties SYSTEM "../../cmf/common-base/config/properties.xml">
-	<!ENTITY targets SYSTEM "../../cmf/common-base/config/targets.xml">
+	<!ENTITY properties SYSTEM "../cmf/common-base/config/properties.xml">
+	<!ENTITY targets SYSTEM "../cmf/common-base/config/targets.xml">
 ]>
 
 

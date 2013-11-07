@@ -1055,7 +1055,7 @@ public class CtrampApplication implements Serializable
             // name before the extension, if this is a pre-auto ownership run
             if (preModel)
             {
-                int dotIndex = aoResultsFileName.indexOf('.');
+                int dotIndex = aoResultsFileName.indexOf(".csv");
                 if (dotIndex > 0)
                 {
                     String beforeDot = aoResultsFileName.substring(0, dotIndex);
