@@ -1,16 +1,15 @@
-package com.pb.mtctm2.abm.accessibilities;
+package com.pb.serpm.abm.accessibilities;
 
 import com.pb.common.util.Tracer;
 import com.pb.common.calculator.IndexValues;
-import com.pb.mtctm2.abm.ctramp.CtrampApplication;
-import com.pb.mtctm2.abm.ctramp.MgraDataManager;
-import com.pb.mtctm2.abm.ctramp.ModelStructure;
-import com.pb.mtctm2.abm.ctramp.Util;
+import com.pb.serpm.abm.ctramp.CtrampApplication;
+import com.pb.serpm.abm.ctramp.MgraDataManager;
+import com.pb.serpm.abm.ctramp.ModelStructure;
+import com.pb.serpm.abm.ctramp.Util;
 import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;
 import java.io.Serializable;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -106,7 +104,7 @@ public final class BuildAccessibilities
 
     public static final int             TOTAL_LOGSUM_FIELD_NUMBER                        = 13;
 
-    private static int                  numThreads                                       = -1; //12 //-1 = number of machine processors
+    private static int                  numThreads                                       = 12;
     private static final int            DISTRIBUTED_PACKET_SIZE                          = 1000;
 
     private HashMap<Integer, Integer>   workerOccupValueSegmentIndexMap;
@@ -593,23 +591,33 @@ public final class BuildAccessibilities
 
         
         float[][] accessibilities = submitTasks( startEndIndexList, rbMap );
-        accessibilitiesTableObject = new AccessibilitiesTable( accessibilities );        
+        float[][] newAccessibilities = new float[maxMgra+1][alts];
 
         
         // create a field to append to the accessibilities table when writing to a file that holds mgra values
-        int[] mgraNumbers = new int[mgraManager.getMgras().size()]; //Should not use maxmMgra, this will result in blank cells 
+        int[] mgraNumbers = new int[maxMgra+1]; //Should not use maxmMgra, this will result in blank cells 
 
         // LOOP OVER ORIGIN MGRA
-        int i = 0;
-        for (int iMgra : mgraManager.getMgras())
+        ArrayList<Integer> mgras = mgraManager.getMgras();
+        int counter = 0;
+        for (int i = 0; i <= maxMgra; i++)
         { // Origin MGRA
-            mgraNumbers[i++] = iMgra;
+        	mgraNumbers[i] = i;
+        	
+        	if(!mgras.contains(i)){
+        		newAccessibilities[i] = new float[alts];
+        		counter = counter - 1;
+        		//System.out.println("i = " + i + " .... " + "counter = " + counter);
+        	}else{
+        		newAccessibilities[i] = accessibilities[counter];
+        	}
+        	counter++;
         }
 
-        
+        accessibilitiesTableObject = new AccessibilitiesTable( newAccessibilities ); 
         // output data
-        String projectDirectory = Util.getStringValueFromPropertyMap(rbMap,CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
-        String accFileName = Paths.get(projectDirectory,Util.getStringValueFromPropertyMap(rbMap, "acc.output.file")).toString();
+        String projectDirectory = rbMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
+        String accFileName = projectDirectory + Util.getStringValueFromPropertyMap(rbMap, "acc.output.file");
 
         accessibilitiesTableObject.writeAccessibilityTableToFile( accFileName, mgraNumbers, "mgra" );
         
@@ -672,7 +680,9 @@ public final class BuildAccessibilities
         }
 
         
-        float[][] accessibilities = new float[mgraManager.getMgras().size()][alts]; //Should not use maxmMgra, this will result in blank cells 
+        float[][] accessibilities = new float[mgraManager.getMgras().size()+1][alts]; //maxMgra+1][alts]; //
+        //ymm may need blanks here otherwise indexing is off
+        //Should not use maxmMgra, this will result in blank cells 
         
         for (Future<List<Object>> fs : results)
         {
