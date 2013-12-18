@@ -172,7 +172,7 @@ public class BestTransitPathCalculator implements Serializable
         walkEgressUEC = createUEC(uecFile, walkEgressPage, dataPage, rbMap, walkDmu);
         driveEgressUEC = createUEC(uecFile, driveEgressPage, dataPage, rbMap, driveDmu);
 
-        for (int i = 1; i < NUM_PERIODS; i++)
+        for (int i = 0; i < NUM_PERIODS; i++)
             tapToTapUEC[i] = createUEC(uecFile, tapToTapPages[i], dataPage, rbMap, walkDmu);
 
         mgraManager = MgraDataManager.getInstance(rbMap);
@@ -781,63 +781,68 @@ public class BestTransitPathCalculator implements Serializable
 
         int dummy=0;
         
+        synchronized (storedDepartPeriodTapTapUtils[accEgr]) {
         // allocate space for the pTap if necessary
-        if (storedDepartPeriodTapTapUtils[accEgr][period] == null)
-        {
-            storedDepartPeriodTapTapUtils[accEgr][period] = new double[maxTap + 1][][];                
-            if ( storedDepartPeriodTapTapUtils[accEgr][period] == null ) {
-                logger.error ( "error allocating array of length " + (maxTap + 1) + " for storedDepartPeriodTapTapUtils[accEgr][period]." );
-                throw new RuntimeException();
-            }
+	        if (storedDepartPeriodTapTapUtils[accEgr][period] == null)
+	        {
+	            storedDepartPeriodTapTapUtils[accEgr][period] = new double[maxTap + 1][][];                
+	            if ( storedDepartPeriodTapTapUtils[accEgr][period] == null ) {
+	                logger.error ( "error allocating array of length " + (maxTap + 1) + " for storedDepartPeriodTapTapUtils[accEgr][period]." );
+	                throw new RuntimeException();
+	            }
+	        }
         }
 
-        
-        // allocate space for the aTap if necessary
-        if (storedDepartPeriodTapTapUtils[accEgr][period][pTap] == null)
-        {
-            storedDepartPeriodTapTapUtils[accEgr][period][pTap] = new double[maxTap + 1][];
-            if ( storedDepartPeriodTapTapUtils[accEgr][period][pTap] == null ) {
-                logger.error ( "error allocating array of length " + (maxTap + 1) + " for storedDepartPeriodTapTapUtils[accEgr][period][pTap]." );
-                throw new RuntimeException();
-            }
+
+        synchronized (storedDepartPeriodTapTapUtils[accEgr][period]) {
+	        // allocate space for the aTap if necessary
+	        if (storedDepartPeriodTapTapUtils[accEgr][period][pTap] == null)
+	        {
+	            storedDepartPeriodTapTapUtils[accEgr][period][pTap] = new double[maxTap + 1][];
+	            if ( storedDepartPeriodTapTapUtils[accEgr][period][pTap] == null ) {
+	                logger.error ( "error allocating array of length " + (maxTap + 1) + " for storedDepartPeriodTapTapUtils[accEgr][period][pTap]." );
+	                throw new RuntimeException();
+	            }
+	        }
         }
 
-        
-        // calculate the tap-tap utilities if they haven't already been.
-        if (storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] == null)
-        {
-            
-            // set up the index and dmu objects
-            index.setOriginZone(pTap);
-            index.setDestZone(aTap);
-            //walkDmu.setEscalatorTime(tapManager.getEscalatorTime(pTap));
 
-            // log DMU values
-            if (myTrace)
-            {
-                if (Arrays.binarySearch(tapManager.getTaps(), pTap) > 0
-                        && Arrays.binarySearch(tapManager.getTaps(), aTap) > 0)
-                    tapToTapUEC[period].logDataValues(myLogger, pTap, aTap, 0);
-                walkDmu.logValues(myLogger);
-            }
-
-            // solve
-            double[] results = tapToTapUEC[period].solve(index, walkDmu, null);
-            if ( results == null ) {
-                logger.error ( "error calcuating UEC to store results in storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap]." );
-                RuntimeException e = new RuntimeException();
-                logger.error( "accEgr=" + accEgr + ",period=" + period + ",pTap=" + pTap + ",aTap=" + aTap, e );
-                throw e;
-            }
-            storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] = results;
-
-            // logging
-            if (myTrace)
-            {
-                tapToTapUEC[period].logAnswersArray(myLogger, "pTap=" + pTap + " to aTap=" + aTap + " Utility Piece");
-                tapToTapUEC[period].logResultsArray(myLogger, pTap, aTap);
-            }
-
+        synchronized (storedDepartPeriodTapTapUtils[accEgr][period][pTap]) {
+	        // calculate the tap-tap utilities if they haven't already been.
+	        if (storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] == null)
+	        {
+	            
+	            // set up the index and dmu objects
+	            index.setOriginZone(pTap);
+	            index.setDestZone(aTap);
+	            //walkDmu.setEscalatorTime(tapManager.getEscalatorTime(pTap));
+	
+	            // log DMU values
+	            if (myTrace)
+	            {
+	                if (Arrays.binarySearch(tapManager.getTaps(), pTap) > 0
+	                        && Arrays.binarySearch(tapManager.getTaps(), aTap) > 0)
+	                    tapToTapUEC[period].logDataValues(myLogger, pTap, aTap, 0);
+	                walkDmu.logValues(myLogger);
+	            }
+	
+	            // solve
+	            double[] results = tapToTapUEC[period].solve(index, walkDmu, null);
+	            if ( results == null ) {
+	                logger.error ( "error calcuating UEC to store results in storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap]." );
+	                RuntimeException e = new RuntimeException();
+	                logger.error( "accEgr=" + accEgr + ",period=" + period + ",pTap=" + pTap + ",aTap=" + aTap, e );
+	                throw e;
+	            }
+	            storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] = results;
+	
+	            // logging
+	            if (myTrace)
+	            {
+	                tapToTapUEC[period].logAnswersArray(myLogger, "pTap=" + pTap + " to aTap=" + aTap + " Utility Piece");
+	                tapToTapUEC[period].logResultsArray(myLogger, pTap, aTap);
+	            }
+	        }
         }
 
     }

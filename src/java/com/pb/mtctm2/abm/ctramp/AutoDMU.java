@@ -71,7 +71,7 @@ public class AutoDMU
         localLogger.info("");
         localLogger.info("Auto DMU Values:");
         localLogger.info("");
-        localLogger.info(String.format("Average TAZ Parking cost at destination:     %9d", avgHourlyParkingCostAtDestTaz));
+        localLogger.info(String.format("Average TAZ Parking cost at destination:     %9.4f", avgHourlyParkingCostAtDestTaz));
         localLogger.info(String.format("Production/Origin Terminal Time: %9.4f", pTazTerminalTime));
         localLogger.info(String.format("Attraction/Destin Terminal Time: %9.4f", aTazTerminalTime));
 

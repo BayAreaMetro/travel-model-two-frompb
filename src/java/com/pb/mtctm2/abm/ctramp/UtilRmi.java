@@ -51,7 +51,10 @@ public class UtilRmi
 
                 try
                 {
-                    Thread.currentThread().wait(MAX_RETRY_TIME);
+                	Thread thread = Thread.currentThread();
+                	synchronized (thread) {
+                		Thread.currentThread().wait(MAX_RETRY_TIME);
+                	}
                 } catch (InterruptedException e1)
                 {
                     // TODO Auto-generated catch block
