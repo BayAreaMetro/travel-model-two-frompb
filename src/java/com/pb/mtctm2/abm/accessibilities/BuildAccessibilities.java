@@ -1,11 +1,11 @@
-package com.pb.serpm.abm.accessibilities;
+package com.pb.mtctm2.abm.accessibilities;
 
 import com.pb.common.util.Tracer;
 import com.pb.common.calculator.IndexValues;
-import com.pb.serpm.abm.ctramp.CtrampApplication;
-import com.pb.serpm.abm.ctramp.MgraDataManager;
-import com.pb.serpm.abm.ctramp.ModelStructure;
-import com.pb.serpm.abm.ctramp.Util;
+import com.pb.mtctm2.abm.ctramp.CtrampApplication;
+import com.pb.mtctm2.abm.ctramp.MgraDataManager;
+import com.pb.mtctm2.abm.ctramp.ModelStructure;
+import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;
@@ -104,7 +104,7 @@ public final class BuildAccessibilities
 
     public static final int             TOTAL_LOGSUM_FIELD_NUMBER                        = 13;
 
-    private static int                  numThreads                                       = 12;
+    private static int                  numThreads                                       = -1; //12 //-1 = number of machine processors
     private static final int            DISTRIBUTED_PACKET_SIZE                          = 1000;
 
     private HashMap<Integer, Integer>   workerOccupValueSegmentIndexMap;

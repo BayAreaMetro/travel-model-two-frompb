@@ -34,7 +34,7 @@ public class StoredUtilityData
         storedDriveAccessUtils = new double[maxTaz + 1][maxTap + 1][];
         storedWalkEgressUtils = new double[maxTap + 1][maxMgra + 1][];
         storedDriveEgressUtils = new double[maxTap + 1][maxTaz + 1][];
-        storedDepartPeriodTapTapUtils = new double[numAccEgrSegments + 1][numPeriods + 1][][][];        
+        storedDepartPeriodTapTapUtils = new double[numAccEgrSegments + 1][numPeriods + 1][maxTap + 1][maxTap + 1][]; //dim all to avoid nulls thread safe problem        
     }
     
     public double[][][] getStoredWalkAccessUtils() {

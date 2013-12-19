@@ -404,26 +404,6 @@ public class BestTransitPathCalculator implements Serializable
                 // already been computed.
                 setWalkEgressUtility(aTap, aMgra, aPos, writeCalculations, myLogger);
 
-                if ( aTap == 0 || pTap == 0 || aMgra == 0 || pMgra == 0 ) {
-                    logger.error( "aTap=" + aTap + "pTap=" + pTap + "aMgra=" + aMgra + "pMgra=" + pMgra + "period=" + period );
-                    throw new RuntimeException();
-                }
-                else if ( storedWalkAccessUtils[pMgra][pTap] == null ) {
-                    logger.error( "aTap=" + aTap + "pTap=" + pTap + "aMgra=" + aMgra + "pMgra=" + pMgra + "period=" + period );
-                    logger.error( "storedWalkAccessUtils[pMgra][pTap] == null" );
-                    throw new RuntimeException();
-                }
-                else if ( storedWalkEgressUtils[aTap][aMgra] == null ) {
-                    logger.error( "aTap=" + aTap + "pTap=" + pTap + "aMgra=" + aMgra + "pMgra=" + pMgra + "period=" + period );
-                    logger.error( "storedWalkEgressUtils[aTap][aMgra] == null" );
-                    throw new RuntimeException();
-                }
-                else if ( storedDepartPeriodTapTapUtils[WTW][period][pTap][aTap] == null ) {
-                    logger.error( "aTap=" + aTap + "pTap=" + pTap + "aMgra=" + aMgra + "pMgra=" + pMgra + "period=" + period );
-                    logger.error( "storedDepartPeriodTapTapUtils[WTW][period][pTap][aTap] == null" );
-                    throw new RuntimeException();
-                }
-                    
                 // compare the utilities for this TAP pair to previously calculated
                 // utilities for each ride mode and store the TAP numbers if this
                 // TAP pair is the best.
@@ -529,26 +509,6 @@ public class BestTransitPathCalculator implements Serializable
                     // been computed.
                     setUtilitiesForTapPair(DTW, period, pTap, aTap, writeCalculations, myLogger);
 
-                    if ( aTap == 0 || pTap == 0 || aMgra == 0 || pMgra == 0 ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        throw new RuntimeException();
-                    }
-                    else if ( storedDriveAccessUtils[pTaz][pTap] == null ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        logger.error( "storedDriveAccessUtils[pTaz][pTap] == null" );
-                        throw new RuntimeException();
-                    }
-                    else if ( storedWalkEgressUtils[aTap][aMgra] == null ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        logger.error( "storedWalkEgressUtils[aTap][aMgra] == null" );
-                        throw new RuntimeException();
-                    }
-                    else if ( storedDepartPeriodTapTapUtils[DTW][period][pTap][aTap] == null ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        logger.error( "storedDepartPeriodTapTapUtils[DTW][period][pTap][aTap] == null" );
-                        throw new RuntimeException();
-                    }
-                        
                     // compare the utilities for this TAP pair to previously
                     // calculated
                     // utilities for each ride mode and store the TAP numbers if this
@@ -644,26 +604,6 @@ public class BestTransitPathCalculator implements Serializable
                     // set the pTap to aTap utility values, if they haven't already
                     // been computed.
                     setUtilitiesForTapPair(WTD, period, pTap, aTap, writeCalculations, myLogger);
-
-                    if ( aTap == 0 || pTap == 0 || aMgra == 0 || pMgra == 0 ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        throw new RuntimeException();
-                    }
-                    else if ( storedWalkAccessUtils[pMgra][pTap] == null ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        logger.error( "storedWalkAccessUtils[pMgra][pTap] == null" );
-                        throw new RuntimeException();
-                    }
-                    else if ( storedDriveEgressUtils[aTap][aTaz] == null ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        logger.error( "storedDriveEgressUtils[aTap][aTaz] == null" );
-                        throw new RuntimeException();
-                    }
-                    else if ( storedDepartPeriodTapTapUtils[WTD][period][pTap][aTap] == null ) {
-                        logger.error( "aTap=" + aTap + ",pTap=" + pTap + ",aMgra=" + aMgra + ",pMgra=" + pMgra + ",period=" + period );
-                        logger.error( "storedDepartPeriodTapTapUtils[WTD][period][pTap][aTap] == null" );
-                        throw new RuntimeException();
-                    }
                         
                     // compare the utilities for this TAP pair to previously
                     // calculated
@@ -776,73 +716,41 @@ public class BestTransitPathCalculator implements Serializable
      * @return A set of utilities for the Tap-pair, dimensioned by ride mode in @link
      *         <Modes>.
      */
-    public void setUtilitiesForTapPair(int accEgr, int period, int pTap, int aTap, boolean myTrace, Logger myLogger)
-    {
+    private void setUtilitiesForTapPair(int accEgr, int period, int pTap, int aTap, boolean myTrace, Logger myLogger) {
 
-        int dummy=0;
-        
-        synchronized (storedDepartPeriodTapTapUtils[accEgr]) {
-        // allocate space for the pTap if necessary
-	        if (storedDepartPeriodTapTapUtils[accEgr][period] == null)
-	        {
-	            storedDepartPeriodTapTapUtils[accEgr][period] = new double[maxTap + 1][][];                
-	            if ( storedDepartPeriodTapTapUtils[accEgr][period] == null ) {
-	                logger.error ( "error allocating array of length " + (maxTap + 1) + " for storedDepartPeriodTapTapUtils[accEgr][period]." );
-	                throw new RuntimeException();
-	            }
-	        }
-        }
+    	// calculate the tap-tap utilities if they haven't already been.
+    	if (storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] == null)
+        {
+            
+            // set up the index and dmu objects
+            index.setOriginZone(pTap);
+            index.setDestZone(aTap);
 
+            // log DMU values
+            if (myTrace)
+            {
+                if (Arrays.binarySearch(tapManager.getTaps(), pTap) > 0
+                        && Arrays.binarySearch(tapManager.getTaps(), aTap) > 0)
+                    tapToTapUEC[period].logDataValues(myLogger, pTap, aTap, 0);
+                walkDmu.logValues(myLogger);
+            }
 
-        synchronized (storedDepartPeriodTapTapUtils[accEgr][period]) {
-	        // allocate space for the aTap if necessary
-	        if (storedDepartPeriodTapTapUtils[accEgr][period][pTap] == null)
-	        {
-	            storedDepartPeriodTapTapUtils[accEgr][period][pTap] = new double[maxTap + 1][];
-	            if ( storedDepartPeriodTapTapUtils[accEgr][period][pTap] == null ) {
-	                logger.error ( "error allocating array of length " + (maxTap + 1) + " for storedDepartPeriodTapTapUtils[accEgr][period][pTap]." );
-	                throw new RuntimeException();
-	            }
-	        }
-        }
+            // solve
+            storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] = tapToTapUEC[period].solve(index, walkDmu, null);
+            if ( storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] == null ) {
+            	System.out.println ( "error calcuating UEC to store results in storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap]." );
+            	System.out.println ( "accEgr=" + accEgr + ",period=" + period + ",pTap=" + pTap + ",aTap=" + aTap );
+            	System.out.flush();
+                System.exit( -1 );
+            }
 
-
-        synchronized (storedDepartPeriodTapTapUtils[accEgr][period][pTap]) {
-	        // calculate the tap-tap utilities if they haven't already been.
-	        if (storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] == null)
-	        {
-	            
-	            // set up the index and dmu objects
-	            index.setOriginZone(pTap);
-	            index.setDestZone(aTap);
-	            //walkDmu.setEscalatorTime(tapManager.getEscalatorTime(pTap));
-	
-	            // log DMU values
-	            if (myTrace)
-	            {
-	                if (Arrays.binarySearch(tapManager.getTaps(), pTap) > 0
-	                        && Arrays.binarySearch(tapManager.getTaps(), aTap) > 0)
-	                    tapToTapUEC[period].logDataValues(myLogger, pTap, aTap, 0);
-	                walkDmu.logValues(myLogger);
-	            }
-	
-	            // solve
-	            double[] results = tapToTapUEC[period].solve(index, walkDmu, null);
-	            if ( results == null ) {
-	                logger.error ( "error calcuating UEC to store results in storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap]." );
-	                RuntimeException e = new RuntimeException();
-	                logger.error( "accEgr=" + accEgr + ",period=" + period + ",pTap=" + pTap + ",aTap=" + aTap, e );
-	                throw e;
-	            }
-	            storedDepartPeriodTapTapUtils[accEgr][period][pTap][aTap] = results;
-	
-	            // logging
-	            if (myTrace)
-	            {
-	                tapToTapUEC[period].logAnswersArray(myLogger, "pTap=" + pTap + " to aTap=" + aTap + " Utility Piece");
-	                tapToTapUEC[period].logResultsArray(myLogger, pTap, aTap);
-	            }
-	        }
+            // logging
+            if (myTrace)
+            {
+                tapToTapUEC[period].logAnswersArray(myLogger, "pTap=" + pTap + " to aTap=" + aTap + " Utility Piece");
+                tapToTapUEC[period].logResultsArray(myLogger, pTap, aTap);
+            }
+            
         }
 
     }

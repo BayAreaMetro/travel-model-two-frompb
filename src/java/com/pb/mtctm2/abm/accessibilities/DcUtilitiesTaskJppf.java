@@ -166,8 +166,8 @@ public class DcUtilitiesTaskJppf
             ntUtilities.buildUtilitiesForOrigMgraAndPeriod( iMgra, NonTransitUtilities.PEAK_PERIOD_INDEX );
             ntUtilities.buildUtilitiesForOrigMgraAndPeriod( iMgra, NonTransitUtilities.OFFPEAK_PERIOD_INDEX );
             
-            // if(originMgras<=10 || (originMgras % 500) ==0 )
-            // logger.info("...Origin MGRA "+iMgra);
+            //log origin MGRA processed
+            logger.info("...Origin MGRA "+iMgra);
 
             int iTaz = mgraManager.getTaz(iMgra);
             boolean trace = false;
