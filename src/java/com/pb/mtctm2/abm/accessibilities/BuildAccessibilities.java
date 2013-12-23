@@ -104,7 +104,7 @@ public final class BuildAccessibilities
 
     public static final int             TOTAL_LOGSUM_FIELD_NUMBER                        = 13;
 
-    private static int                  numThreads                                       = -1; //12 //-1 = number of machine processors
+    private int                         numThreads;                                       
     private static final int            DISTRIBUTED_PACKET_SIZE                          = 1000;
 
     private HashMap<Integer, Integer>   workerOccupValueSegmentIndexMap;
@@ -198,12 +198,13 @@ public final class BuildAccessibilities
     public void setupBuildAccessibilities(HashMap<String, String> rbMap)
     {
 
-        Runtime runtime = Runtime.getRuntime();
-        if (numThreads < 0)
-        {
-            int nrOfProcessors = runtime.availableProcessors();
-            numThreads = nrOfProcessors;
-        }
+        //Runtime runtime = Runtime.getRuntime();
+        //if (numThreads < 0)
+        //{
+        //   int nrOfProcessors = runtime.availableProcessors();
+        //    numThreads = nrOfProcessors;
+        //}
+        numThreads = Util.getIntegerValueFromPropertyMap(rbMap, "acc.numThreads");
 
         gsDistrictIndexMap = new HashMap<Integer, Integer>();
         hsDistrictIndexMap = new HashMap<Integer, Integer>();

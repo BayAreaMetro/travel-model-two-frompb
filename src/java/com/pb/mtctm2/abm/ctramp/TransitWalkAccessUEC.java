@@ -32,6 +32,7 @@ public class TransitWalkAccessUEC
     public static final int              PM          = 3;
     public static final int              EV          = 4;
     public static final String[]         PERIODS     = { "EA", "AM", "MD", "PM", "EV" };
+    public static final int[]            PERIODCODES = { EA, AM, MD, PM, EV };
     public static final int              NUM_PERIODS = PERIODS.length;    
     
     // DMU for this UEC
@@ -44,9 +45,7 @@ public class TransitWalkAccessUEC
 
     // this is only used if piece-wise utilities are being computed
     private UtilityExpressionCalculator walkAccessUEC;
-
-    private double[][][][] storedDepartPeriodTapTapUtils = new double[NUM_PERIODS][][][];
-
+    
     private float                       bestWalkAccessTime;
     private float                       bestWalkEgressTime;
 

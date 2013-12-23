@@ -156,9 +156,13 @@ public class DcUtilitiesTaskJppf
         for (int i = startRange; i <= endRange; i++)
         { // Origin MGRA
 
+        	
             int iMgra = mgraManager.getMgras().get(i);
+  
+            //log zone processed
+            logger.info("...Origin MGRA "+ iMgra);
+        	
             ++originMgras;
-
             mgraNumbers[iMgra] = iMgra;
 
             // pre-calculate the hov, sov, and non-motorized exponentiated utilities for the origin MGRA.
@@ -166,9 +170,6 @@ public class DcUtilitiesTaskJppf
             ntUtilities.buildUtilitiesForOrigMgraAndPeriod( iMgra, NonTransitUtilities.PEAK_PERIOD_INDEX );
             ntUtilities.buildUtilitiesForOrigMgraAndPeriod( iMgra, NonTransitUtilities.OFFPEAK_PERIOD_INDEX );
             
-            //log origin MGRA processed
-            logger.info("...Origin MGRA "+iMgra);
-
             int iTaz = mgraManager.getTaz(iMgra);
             boolean trace = false;
             
@@ -185,6 +186,9 @@ public class DcUtilitiesTaskJppf
             for (Integer jMgra : mgraManager.getMgras())
             { // Destination MGRA
 
+            	//log zone pair processed
+                //logger.info("...Origin MGRA "+ iMgra + "...Destination MGRA "+ jMgra);
+            	
                 if (!hasSizeTerm[jMgra]) continue;
 
                 int jTaz = mgraManager.getTaz(jMgra);
