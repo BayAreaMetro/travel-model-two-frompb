@@ -6,19 +6,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import com.pb.common.datafile.TableDataSet;
 import com.pb.common.util.Tracer;
+import com.pb.mtctm2.abm.ctramp.CtrampDmuFactoryIf;
+import com.pb.mtctm2.abm.ctramp.HouseholdDataManagerIf;
 import com.pb.mtctm2.abm.ctramp.McLogsumsCalculator;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
 import com.pb.mtctm2.abm.ctramp.ModelStructure;
 import com.pb.mtctm2.abm.ctramp.TransitWalkAccessUEC;
+import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import org.apache.log4j.Logger;
 
-public class DcUtilitiesTaskJppf
-        implements Callable<List<Object>>
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.task.storage.DataProvider;
+
+
+public class DcUtilitiesTaskJppf extends JPPFTask implements Callable<List<Object>> 
 {
 
     private static final int MIN_EXP_FUNCTION_ARGUMENT = -500;
@@ -52,9 +59,32 @@ public class DcUtilitiesTaskJppf
     private UtilityExpressionCalculator dcUEC;
     private AccessibilitiesDMU          aDmu;
     
-    private HashMap<String, String> rbMap;
+    private HashMap<String, String>     rbMap;
+    
+    
    
-
+    /**
+     * Call threaded but not with JPPF
+     * @param taskIndex
+     * @param startRange
+     * @param endRange
+     * @param mgraManager
+     * @param mySovExpUtilities
+     * @param myHovExpUtilities
+     * @param myNMotorExpUtilities
+     * @param logsumSegments
+     * @param hasSizeTerm
+     * @param expConstants
+     * @param sizeTerms
+     * @param seek
+     * @param trace
+     * @param traceOtaz
+     * @param traceDtaz
+     * @param dcUecFileName
+     * @param dcDataPage
+     * @param dcUtilityPage
+     * @param myRbMap
+     */
     public DcUtilitiesTaskJppf( int taskIndex, int startRange, int endRange, MgraDataManager mgraManager,
             double[][][] mySovExpUtilities, double[][][] myHovExpUtilities, double[][][] myNMotorExpUtilities,
             String[] logsumSegments, boolean[] hasSizeTerm, double[][] expConstants,
@@ -93,15 +123,94 @@ public class DcUtilitiesTaskJppf
         this.traceOtaz = traceOtaz;
         this.traceDtaz = traceDtaz;
     }
+    
+    /**
+     * Call distributed with JPPF
+     * @param taskIndex
+     * @param startRange
+     * @param endRange
+     */
+    public DcUtilitiesTaskJppf( int taskIndex, int startRange, int endRange)
+    {
+        this.taskIndex = taskIndex;
+        this.startRange = startRange;
+        this.endRange = endRange;
+    }
 
     public String getId()
     {
         return Integer.toString(taskIndex);
     }
-
+    
+    //for threaded
     public List<Object> call()
     {
+    	List<Object> resultBundle = doWork();
+        return resultBundle;
 
+    }
+    
+    //for jppf
+    public void run()
+    {
+    	
+    	//get shared JPPF data
+    	String dcUecFileName = "";
+        int dcDataPage = -1;
+        int dcUtilityPage = -1;
+
+    	try {
+
+            DataProvider dataProvider = getDataProvider();
+
+            mgraManager = (MgraDataManager) dataProvider.getValue("mgraManager");
+            sovExpUtilities = (double[][][]) dataProvider.getValue("sovExpUtilities");
+            hovExpUtilities = (double[][][]) dataProvider.getValue("hovExpUtilities");
+            nMotorExpUtilities = (double[][][]) dataProvider.getValue("nMotorExpUtilities");
+            logsumSegments = (String[]) dataProvider.getValue("LOGSUM_SEGMENTS");
+            
+            hasSizeTerm = (boolean[]) dataProvider.getValue("hasSizeTerm");
+            expConstants = (double[][]) dataProvider.getValue("expConstants");
+            sizeTerms = (double[][]) dataProvider.getValue("sizeTerms");
+            seek = (boolean) dataProvider.getValue("seek");
+            trace = (boolean) dataProvider.getValue("trace");
+            
+            traceOtaz = (int[]) dataProvider.getValue("traceOtaz");
+            traceDtaz = (int[]) dataProvider.getValue("traceDtaz");
+            dcUecFileName = (String) dataProvider.getValue("dcUecFileName");
+            dcDataPage = (int) dataProvider.getValue("dcDataPage");
+            dcUtilityPage = (int) dataProvider.getValue("dcUtilityPage");
+
+            rbMap = (HashMap<String, String>) dataProvider.getValue("rbMap");
+            
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    	
+    	//create accessibilities calculator
+        aDmu = new AccessibilitiesDMU();
+        File dcUecFile = new File(dcUecFileName);
+        dcUEC = new UtilityExpressionCalculator(dcUecFile, dcUtilityPage, dcDataPage, rbMap, aDmu);
+        TableDataSet altData = dcUEC.getAlternativeData();
+        aDmu.setAlternativeData(altData);
+        int alts = dcUEC.getNumberOfAlternatives();
+        accessibilities = new float[endRange - startRange + 1][alts];
+        
+        //do work
+    	List<Object> resultBundle = doWork();
+    	
+    	//return result for JPPF
+        setResult(resultBundle);
+    }
+    
+    private List<Object> doWork()
+    {
+
+    	//get destination maz sample rate
+    	float samplePercent = Util.getFloatValueFromPropertyMap(rbMap, "acc.destination.sampleRate");
+    	
         Logger logger = Logger.getLogger(this.getClass());
 
         String threadName = null;
@@ -156,7 +265,6 @@ public class DcUtilitiesTaskJppf
         for (int i = startRange; i <= endRange; i++)
         { // Origin MGRA
 
-        	
             int iMgra = mgraManager.getMgras().get(i);
   
             //log zone processed
@@ -165,6 +273,16 @@ public class DcUtilitiesTaskJppf
             ++originMgras;
             mgraNumbers[iMgra] = iMgra;
 
+            //get random destinations
+            int stepSize = (int)(1/samplePercent);
+            Random r = new Random(iMgra);
+            int startingPoint = (int) (stepSize * r.nextFloat()) + 1; //mazs start at 1
+            boolean[] sample = new boolean[maxMgra + 1];
+            while(startingPoint < sample.length) {
+            	sample[startingPoint] = true;
+            	startingPoint = startingPoint + stepSize;
+            }
+            
             // pre-calculate the hov, sov, and non-motorized exponentiated utilities for the origin MGRA.
             // the method called returns cached values if they were already calculated.
             ntUtilities.buildUtilitiesForOrigMgraAndPeriod( iMgra, NonTransitUtilities.PEAK_PERIOD_INDEX );
@@ -186,6 +304,9 @@ public class DcUtilitiesTaskJppf
             for (Integer jMgra : mgraManager.getMgras())
             { // Destination MGRA
 
+            	//skip if not in sample
+            	if (!sample[jMgra]) continue;
+            	
             	//log zone pair processed
                 //logger.info("...Origin MGRA "+ iMgra + "...Destination MGRA "+ jMgra);
             	
@@ -373,5 +494,6 @@ public class DcUtilitiesTaskJppf
         return resultBundle;
 
     }
+
 
 }

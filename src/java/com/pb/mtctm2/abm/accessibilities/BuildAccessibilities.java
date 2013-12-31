@@ -3,6 +3,7 @@ package com.pb.mtctm2.abm.accessibilities;
 import com.pb.common.util.Tracer;
 import com.pb.common.calculator.IndexValues;
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
+import com.pb.mtctm2.abm.ctramp.HouseholdChoiceModelsTaskJppf;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
 import com.pb.mtctm2.abm.ctramp.ModelStructure;
 import com.pb.mtctm2.abm.ctramp.Util;
@@ -16,11 +17,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
+
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.server.protocol.JPPFTask;
+import org.jppf.task.storage.DataProvider;
+import org.jppf.task.storage.MemoryMapDataProvider;
+
 
 /**
  * This class builds accessibility components for all modes.
@@ -104,7 +113,6 @@ public final class BuildAccessibilities
 
     public static final int             TOTAL_LOGSUM_FIELD_NUMBER                        = 13;
 
-    private int                         numThreads;                                       
     private static final int            DISTRIBUTED_PACKET_SIZE                          = 1000;
 
     private HashMap<Integer, Integer>   workerOccupValueSegmentIndexMap;
@@ -176,6 +184,8 @@ public final class BuildAccessibilities
     
     private boolean                     accessibilitiesBuilt                             = false;
 
+    private JPPFClient                  jppfClient;
+
 
     private BuildAccessibilities()
     {
@@ -197,14 +207,6 @@ public final class BuildAccessibilities
 
     public void setupBuildAccessibilities(HashMap<String, String> rbMap)
     {
-
-        //Runtime runtime = Runtime.getRuntime();
-        //if (numThreads < 0)
-        //{
-        //   int nrOfProcessors = runtime.availableProcessors();
-        //    numThreads = nrOfProcessors;
-        //}
-        numThreads = Util.getIntegerValueFromPropertyMap(rbMap, "acc.numThreads");
 
         gsDistrictIndexMap = new HashMap<Integer, Integer>();
         hsDistrictIndexMap = new HashMap<Integer, Integer>();
@@ -563,8 +565,8 @@ public final class BuildAccessibilities
             }
         }
     }
-
-    public void calculateDCUtilitiesDistributed(HashMap<String, String> rbMap)
+    
+    private ArrayList<int[]> calcStartEndIndexList()
     {
 
         int packetSize = DISTRIBUTED_PACKET_SIZE;
@@ -590,11 +592,14 @@ public final class BuildAccessibilities
             startIndex += packetSize;
         }
 
-        
-        float[][] accessibilities = submitTasks( startEndIndexList, rbMap );
+        return( startEndIndexList);
+    }
+    
+    public void processAccessibilityResults(float[][] accessibilities, HashMap<String, String> rbMap)
+    {
+
         float[][] newAccessibilities = new float[maxMgra+1][alts];
 
-        
         // create a field to append to the accessibilities table when writing to a file that holds mgra values
         int[] mgraNumbers = new int[maxMgra+1]; //Should not use maxmMgra, this will result in blank cells 
 
@@ -617,7 +622,7 @@ public final class BuildAccessibilities
 
         accessibilitiesTableObject = new AccessibilitiesTable( newAccessibilities ); 
         // output data
-        String projectDirectory = rbMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
+        String projectDirectory = Util.getStringValueFromPropertyMap(rbMap, CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
         String accFileName = projectDirectory + Util.getStringValueFromPropertyMap(rbMap, "acc.output.file");
 
         accessibilitiesTableObject.writeAccessibilityTableToFile( accFileName, mgraNumbers, "mgra" );
@@ -626,6 +631,28 @@ public final class BuildAccessibilities
 
     }
 
+
+    public void calculateDCUtilitiesDistributed(HashMap<String, String> rbMap)
+    {
+        
+        //dim output table
+        float[][] accessibilities;
+        
+        //thread on one machine or use JPPF
+        boolean calcAccessWithJPPF = Util.getBooleanValueFromPropertyMap(rbMap, "acc.jppf");
+        
+        //get task ranges
+        ArrayList<int[]> startEndIndexList = calcStartEndIndexList();
+        
+        if(! calcAccessWithJPPF ) {
+        	accessibilities = submitTasks( startEndIndexList, rbMap );
+        } else {
+        	accessibilities = submitTasksJPPF( startEndIndexList, rbMap);
+        }        
+        processAccessibilityResults(accessibilities, rbMap);
+    }
+
+        
     public void readAccessibilityTableFromFile( String accFileName ){
         
         accessibilitiesTableObject = new AccessibilitiesTable( accFileName );        
@@ -644,22 +671,13 @@ public final class BuildAccessibilities
     }
 
 
-    /**
-     * @param client is a JPPFClient object which is used to establish a connection
-     *            to a computing node, submit tasks, and receive results.
-     */
     private float[][] submitTasks(ArrayList<int[]> startEndIndexList, HashMap<String, String> rbMap)
     {
 
-        // Create a setup task object and submit it to the computing node.
-        // This setup task creates the HouseholdChoiceModelManager and causes it to
-        // create the necessary numuber
-        // of HouseholdChoiceModels objects which will operate in parallel on the
-        // computing node.
-
+    	int numThreads = Util.getIntegerValueFromPropertyMap(rbMap, "acc.without.jppf.numThreads");
         ExecutorService exec = Executors.newFixedThreadPool(numThreads);
+        
         ArrayList<Future<List<Object>>> results = new ArrayList<Future<List<Object>>>();
-
         
         int startIndex = 0;
         int endIndex = 0;
@@ -676,7 +694,7 @@ public final class BuildAccessibilities
                     LOGSUM_SEGMENTS, hasSizeTerm, expConstants, sizeTerms,
                     seek, trace, traceOtaz, traceDtaz, dcUecFileName, dcDataPage, dcUtilityPage, rbMap );
 
-            results.add(exec.submit(task));
+            results.add(exec.submit((Callable<List<Object>>) task));
             taskIndex++;
         }
 
@@ -717,6 +735,91 @@ public final class BuildAccessibilities
         return accessibilities;
     }
 
+    private float[][] submitTasksJPPF(ArrayList<int[]> startEndIndexList, HashMap<String, String> rbMap)
+    {
+
+    	//output table
+    	float[][] accessibilities = new float[mgraManager.getMgras().size()+1][alts];
+    	
+        try
+        {
+
+            JPPFJob job = new JPPFJob();
+            job.setId("BuildAccessibilities Job");
+
+            //pass shared data
+            DataProvider dataProvider = new MemoryMapDataProvider();
+            dataProvider.setValue("mgraManager", mgraManager);
+            dataProvider.setValue("sovExpUtilities", sovExpUtilities);
+            dataProvider.setValue("hovExpUtilities", hovExpUtilities);
+            dataProvider.setValue("nMotorExpUtilities", nMotorExpUtilities);
+            dataProvider.setValue("LOGSUM_SEGMENTS", LOGSUM_SEGMENTS);
+            
+            dataProvider.setValue("hasSizeTerm", hasSizeTerm);
+            dataProvider.setValue("expConstants", expConstants);
+            dataProvider.setValue("sizeTerms", sizeTerms);
+            dataProvider.setValue("seek", seek);
+            dataProvider.setValue("trace", trace);
+            
+            dataProvider.setValue("traceOtaz", traceOtaz);
+            dataProvider.setValue("traceDtaz", traceDtaz);
+            dataProvider.setValue("dcUecFileName", dcUecFileName);
+            dataProvider.setValue("dcDataPage", dcDataPage);
+            dataProvider.setValue("dcUtilityPage", dcUtilityPage);
+            dataProvider.setValue("rbMap", rbMap);
+            
+            job.setDataProvider(dataProvider);
+
+            //create jppf tasks
+            int startIndex = 0;
+            int endIndex = 0;
+            int taskIndex = 1;
+            for (int[] startEndIndices : startEndIndexList)
+            {
+                startIndex = startEndIndices[0];
+                endIndex = startEndIndices[1];
+
+                DcUtilitiesTaskJppf task = new DcUtilitiesTaskJppf( taskIndex, startIndex, endIndex);
+                job.addTask(task);
+                taskIndex++;
+            }
+
+            List<JPPFTask> results = jppfClient.submit(job);
+            for (JPPFTask task : results)
+            {
+                if (task.getException() != null) throw task.getException();
+
+                try
+                {
+                	List<Object> resultBundle = (List<Object>) task.getResult();
+                    int taskid = (Integer) resultBundle.get(0);
+                    int start = (Integer) resultBundle.get(1);
+                    int end = (Integer) resultBundle.get(2);
+                    logger.info(String.format("returned TASK: %d, start=%d, end=%d.", taskid, start, end));
+                    float[][] taskAccessibilities = (float[][]) resultBundle.get(3);
+                	int count = 0;
+                	for (int i = start; i <= end; i++) {
+                		accessibilities[i] = taskAccessibilities[count++];
+                	}
+                
+                } catch (Exception e)
+                {
+                    logger.error( "Exception returned by computing node caught in BuildAccessibilities.", e);
+                    throw new RuntimeException();
+                }
+
+            }
+
+        } catch (Exception e)
+        {
+            logger.error( "Exception caught creating/submitting/receiving BuildAccessibilities.", e);
+            throw new RuntimeException();
+        }
+        
+        return accessibilities;
+    }
+
+    
     public double[][] getExpConstants()
     {
         return expConstants;
@@ -1271,7 +1374,9 @@ public final class BuildAccessibilities
         return nonMandatorySizeSegmentNameIndexMap.get( ModelStructure.ESCORT_PRIMARY_PURPOSE_NAME );
     }
 
-
+    public void setJPPFClient(JPPFClient jppfClient) {
+    	this.jppfClient = jppfClient;
+    }
 
 
 }

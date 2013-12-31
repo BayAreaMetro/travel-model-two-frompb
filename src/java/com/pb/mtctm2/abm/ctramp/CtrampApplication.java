@@ -162,6 +162,8 @@ public class CtrampApplication implements Serializable
     private HashMap<String, HashMap<String, Integer>>  cdapByPersonTypeAndActivity;
 
     private BuildAccessibilities                       aggAcc;
+    
+    private JPPFClient 								   jppfClient;
 
     public CtrampApplication(ResourceBundle rb, HashMap<String,String> rbMap)
     {
@@ -287,7 +289,7 @@ public class CtrampApplication implements Serializable
         if (restartModel == null) restartModel = "none";
         if (!restartModel.equalsIgnoreCase("none")) restartModels(householdDataManager);
 
-        JPPFClient jppfClient = new JPPFClient();
+        jppfClient = new JPPFClient();
 
         boolean runPreAutoOwnershipChoiceModel = ResourceUtil.getBooleanProperty(resourceBundle, PROPERTIES_RUN_PRE_AUTO_OWNERSHIP);
         if (runPreAutoOwnershipChoiceModel)
@@ -604,7 +606,8 @@ public class CtrampApplication implements Serializable
 
         aggAcc = BuildAccessibilities.getInstance();
         aggAcc.setupBuildAccessibilities(propertyMap);
-
+        aggAcc.setJPPFClient(jppfClient);
+        
         aggAcc.calculateSizeTerms();
         aggAcc.calculateConstants();
         //aggAcc.buildAccessibilityComponents(propertyMap);
@@ -626,157 +629,6 @@ public class CtrampApplication implements Serializable
         }
 
     }
-
-    /*
-     * method used in original ARC implementation private void runIteration( int
-     * iteration, HouseholdDataManagerIf householdDataManager, CtrampDmuFactoryIf
-     * dmuFactory ) { String restartModel = ""; if ( hhDiskObjectKey != null && !
-     * hhDiskObjectKey.equalsIgnoreCase("none") ) { String doFileName =
-     * hhDiskObjectFile + "_" + hhDiskObjectKey;
-     * householdDataManager.createHhArrayFromSerializedObjectInFile( doFileName,
-     * hhDiskObjectKey ); restartModel = hhDiskObjectKey; restartModels (
-     * householdDataManager ); } else { restartModel = ResourceUtil.getProperty(
-     * resourceBundle, PROPERTIES_RESTART_WITH_HOUSEHOLD_SERVER ); if ( restartModel
-     * == null ) restartModel = "none"; if ( ! restartModel.equalsIgnoreCase("none")
-     * ) restartModels ( householdDataManager ); } JPPFClient jppfClient = new
-     * JPPFClient(); boolean runUsualWorkSchoolChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_WORKSCHOOL_CHOICE); if(runUsualWorkSchoolChoiceModel){ //
-     * create an object for calculating destination choice attraction size terms and
-     * managing shadow price calculations. DestChoiceSize dcSizeObj = new
-     * DestChoiceSize( modelStructure, tazDataManager ); // new the usual school and
-     * location choice model object UsualWorkSchoolLocationChoiceModel
-     * usualWorkSchoolLocationChoiceModel = new
-     * UsualWorkSchoolLocationChoiceModel(resourceBundle, restartModel, jppfClient,
-     * modelStructure, ms, tazDataManager, dcSizeObj, dmuFactory ); // run the model
-     * logger.info ( "starting usual work and school location choice.");
-     * usualWorkSchoolLocationChoiceModel
-     * .runSchoolAndLocationChoiceModel(householdDataManager); logger.info (
-     * "finished with usual work and school location choice."); logger.info (
-     * "writing work/school location choice results file; may take a few minutes ..."
-     * ); usualWorkSchoolLocationChoiceModel.saveResults( householdDataManager,
-     * projectDirectory, iteration ); logger.info (
-     * String.format("finished writing results file.") );
-     * usualWorkSchoolLocationChoiceModel = null; dcSizeObj = null; System.gc(); //
-     * write a disk object fle for the householdDataManager, in case we want to
-     * restart from the next step. if ( hhDiskObjectFile != null ) { logger.info (
-     * "writing household disk object file after work/school location choice; may take a long time ..."
-     * ); String hhFileName = String.format( "%s_%d_ao", hhDiskObjectFile, iteration
-     * ); householdDataManager.createSerializedHhArrayInFileFromObject( hhFileName,
-     * "ao" ); logger.info (String.format(
-     * "finished writing household disk object file = %s after uwsl; continuing to household choice models ..."
-     * , hhFileName) ); } } boolean runAutoOwnershipChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle, PROPERTIES_RUN_AUTO_OWNERSHIP
-     * ); boolean runFreeParkingChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_FREE_PARKING_AVAILABLE ); boolean
-     * runCoordinatedDailyActivityPatternChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_DAILY_ACTIVITY_PATTERN ); boolean
-     * runMandatoryTourFreqChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_INDIV_MANDATORY_TOUR_FREQ ); boolean
-     * runMandatoryTourTimeOfDayChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_MAND_TOUR_DEP_TIME_AND_DUR ); boolean
-     * runMandatoryTourModeChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_MAND_TOUR_MODE_CHOICE ); boolean runJointTourFrequencyModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle, PROPERTIES_RUN_JOINT_TOUR_FREQ
-     * ); boolean runJointTourLocationChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_JOINT_LOCATION_CHOICE ); boolean runJointTourModeChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_JOINT_TOUR_MODE_CHOICE ); boolean
-     * runJointTourDepartureTimeAndDurationModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_JOINT_TOUR_DEP_TIME_AND_DUR ); boolean
-     * runIndivNonManTourFrequencyModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_INDIV_NON_MANDATORY_TOUR_FREQ ); boolean
-     * runIndivNonManTourLocationChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_INDIV_NON_MANDATORY_LOCATION_CHOICE ); boolean
-     * runIndivNonManTourModeChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_INDIV_NON_MANDATORY_TOUR_MODE_CHOICE ); boolean
-     * runIndivNonManTourDepartureTimeAndDurationModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_INDIV_NON_MANDATORY_TOUR_DEP_TIME_AND_DUR ); boolean
-     * runAtWorkSubTourFrequencyModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_AT_WORK_SUBTOUR_FREQ ); boolean
-     * runAtWorkSubtourLocationChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_AT_WORK_SUBTOUR_LOCATION_CHOICE ); boolean
-     * runAtWorkSubtourModeChoiceModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_AT_WORK_SUBTOUR_MODE_CHOICE ); boolean
-     * runAtWorkSubtourDepartureTimeAndDurationModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_AT_WORK_SUBTOUR_DEP_TIME_AND_DUR ); boolean
-     * runStopFrequencyModel = ResourceUtil.getBooleanProperty(resourceBundle,
-     * PROPERTIES_RUN_STOP_FREQUENCY ); boolean runStopLocationModel =
-     * ResourceUtil.getBooleanProperty(resourceBundle, PROPERTIES_RUN_STOP_LOCATION
-     * ); boolean runHouseholdModels = false; if ( runAutoOwnershipChoiceModel ||
-     * runFreeParkingChoiceModel || runCoordinatedDailyActivityPatternChoiceModel ||
-     * runMandatoryTourFreqChoiceModel || runMandatoryTourModeChoiceModel ||
-     * runMandatoryTourTimeOfDayChoiceModel || runJointTourFrequencyModel ||
-     * runJointTourLocationChoiceModel || runJointTourModeChoiceModel ||
-     * runJointTourDepartureTimeAndDurationModel || runIndivNonManTourFrequencyModel
-     * || runIndivNonManTourLocationChoiceModel || runIndivNonManTourModeChoiceModel
-     * || runIndivNonManTourDepartureTimeAndDurationModel ||
-     * runAtWorkSubTourFrequencyModel || runAtWorkSubtourLocationChoiceModel ||
-     * runAtWorkSubtourModeChoiceModel ||
-     * runAtWorkSubtourDepartureTimeAndDurationModel || runStopFrequencyModel ||
-     * runStopLocationModel ) runHouseholdModels = true; // disk object file is
-     * labeled with the next component eligible to be run if model restarted String
-     * lastComponent = "uwsl"; String nextComponent = "ao"; if( runHouseholdModels )
-     * { logger.info ( "starting HouseholdChoiceModelRunner." ); HashMap<String,
-     * String> propertyMap =
-     * ResourceUtil.changeResourceBundleIntoHashMap(resourceBundle);
-     * HouseholdChoiceModelRunner runner = new HouseholdChoiceModelRunner(
-     * propertyMap, jppfClient, restartModel, householdDataManager, ms,
-     * modelStructure, tazDataManager, dmuFactory );
-     * runner.runHouseholdChoiceModels(); if( runAutoOwnershipChoiceModel ){
-     * saveAoResults( householdDataManager, projectDirectory ); logAoResults(
-     * householdDataManager ); lastComponent = "ao"; nextComponent = "fp"; } if(
-     * runFreeParkingChoiceModel ){ logFpResults( householdDataManager );
-     * lastComponent = "fp"; nextComponent = "cdap"; } if(
-     * runCoordinatedDailyActivityPatternChoiceModel ){ saveCdapResults(
-     * householdDataManager, projectDirectory ); logCdapResults( householdDataManager
-     * ); lastComponent = "cdap"; nextComponent = "imtf"; } if(
-     * runMandatoryTourFreqChoiceModel ){ logImtfResults( householdDataManager );
-     * lastComponent = "imtf"; nextComponent = "imtod"; } if(
-     * runMandatoryTourTimeOfDayChoiceModel || runMandatoryTourModeChoiceModel ){
-     * lastComponent = "imtod"; nextComponent = "jtf"; } if(
-     * runJointTourFrequencyModel ){ logJointModelResults( householdDataManager );
-     * lastComponent = "jtf"; nextComponent = "jtl"; } if(
-     * runJointTourLocationChoiceModel ){ lastComponent = "jtl"; nextComponent =
-     * "jtod"; } if( runJointTourDepartureTimeAndDurationModel ||
-     * runJointTourModeChoiceModel ){ lastComponent = "jtod"; nextComponent =
-     * "inmtf"; } if( runIndivNonManTourFrequencyModel ){ lastComponent = "inmtf";
-     * nextComponent = "inmtl"; } if( runIndivNonManTourLocationChoiceModel ){
-     * lastComponent = "inmtl"; nextComponent = "inmtod"; } if(
-     * runIndivNonManTourDepartureTimeAndDurationModel ||
-     * runIndivNonManTourModeChoiceModel ){ lastComponent = "inmtod"; nextComponent =
-     * "awf"; } if( runAtWorkSubTourFrequencyModel ){ logAtWorkSubtourFreqResults(
-     * householdDataManager ); lastComponent = "awf"; nextComponent = "awl"; } if(
-     * runAtWorkSubtourLocationChoiceModel ){ lastComponent = "awl"; nextComponent =
-     * "awtod"; } if( runAtWorkSubtourDepartureTimeAndDurationModel ||
-     * runAtWorkSubtourModeChoiceModel ){ lastComponent = "awtod"; nextComponent =
-     * "stf"; } if( runStopFrequencyModel ){ lastComponent = "stf"; nextComponent =
-     * "stl"; } if( runStopLocationModel ){ lastComponent = "stl"; nextComponent =
-     * "done"; } // write a disk object fle for the householdDataManager, in case we
-     * want to restart from the next step. if ( hhDiskObjectFile != null && !
-     * lastComponent.equalsIgnoreCase("uwsl") ) { logger.info (String.format(
-     * "writing household disk object file after %s choice model; may take a long time ..."
-     * , lastComponent) ); String hhFileName = hhDiskObjectFile + "_" +
-     * nextComponent; householdDataManager.createSerializedHhArrayInFileFromObject(
-     * hhFileName, nextComponent ); logger.info (
-     * String.format("finished writing household disk object file = %s.", hhFileName)
-     * ); } logger.info ( "finished with HouseholdChoiceModelRunner." ); }
-     */
 
     public String getProjectDirectoryName()
     {
