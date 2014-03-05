@@ -262,13 +262,17 @@ public class DcUtilitiesTaskJppf extends JPPFTask implements Callable<List<Objec
 
         // LOOP OVER ORIGIN MGRA
         int originMgras = 0;
+        int progressReportPercentage = 5;
+        int totalWidth = endRange - startRange;
+        int progressWidth = Math.max(1,totalWidth / (100 / progressReportPercentage));
+        
         for (int i = startRange; i <= endRange; i++)
         { // Origin MGRA
 
             int iMgra = mgraManager.getMgras().get(i);
   
             //log zone processed
-            logger.info("...Origin MGRA "+ iMgra);
+            //logger.info("...Origin MGRA "+ iMgra);
         	
             ++originMgras;
             mgraNumbers[iMgra] = iMgra;
@@ -481,6 +485,12 @@ public class DcUtilitiesTaskJppf extends JPPFTask implements Callable<List<Objec
                     accessibilities[originMgras - 1][alt] = (float) Math
                             .log(accessibilities[originMgras - 1][alt]);
             	
+            }
+            
+            if (originMgras % progressWidth == 0) {
+            	int percentFinished = (originMgras*100) / totalWidth;
+            	logger.info(String.format("accesibilities worker thread %d finished %d%% (%d of %d)",
+            			Thread.currentThread().getId(),percentFinished,originMgras,totalWidth));
             }
             
         }

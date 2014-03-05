@@ -15,7 +15,7 @@ public class StoredUtilityData
     private float[][][] storedWalkEgressUtils;
     private float[][][] storedDriveEgressUtils;
     
-    private HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,Float[]>>> storedDepartPeriodTapTapUtils;
+    private HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>> storedDepartPeriodTapTapUtils;
     
     
     
@@ -41,12 +41,12 @@ public class StoredUtilityData
         storedDriveEgressUtils = new float[maxTap + 1][maxTaz + 1][];
         
         //put into concurrent hashmap
-        storedDepartPeriodTapTapUtils = new HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,Float[]>>>();
+        storedDepartPeriodTapTapUtils = new HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>>();
         for(int i=0; i<accEgrSegments.length; i++) {
-        	storedDepartPeriodTapTapUtils.put(accEgrSegments[i], new HashMap<Integer,ConcurrentHashMap<Long,Float[]>>());
+        	storedDepartPeriodTapTapUtils.put(accEgrSegments[i], new HashMap<Integer,ConcurrentHashMap<Long,float[]>>());
         	for(int j=0; j<periods.length; j++) {
-        		HashMap<Integer,ConcurrentHashMap<Long,Float[]>> hm = storedDepartPeriodTapTapUtils.get(accEgrSegments[i]);
-        		hm.put(periods[j], new ConcurrentHashMap<Long,Float[]>()); //key method paTapKey below
+        		HashMap<Integer,ConcurrentHashMap<Long,float[]>> hm = storedDepartPeriodTapTapUtils.get(accEgrSegments[i]);
+        		hm.put(periods[j], new ConcurrentHashMap<Long,float[]>()); //key method paTapKey below
         	}
     	}        
     }
@@ -67,7 +67,7 @@ public class StoredUtilityData
         return storedDriveEgressUtils;
     }
     
-    public HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,Float[]>>> getStoredDepartPeriodTapTapUtils() {
+    public HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>> getStoredDepartPeriodTapTapUtils() {
         return storedDepartPeriodTapTapUtils;
     }
     
@@ -83,15 +83,6 @@ public class StoredUtilityData
     		f[i] = (float)d[i];
     	}
     	return(f);
-    }
-    
-    //convert double array to Float array
-    public Float[] d2F(double[] d) {
-    	Float[] F = new Float[d.length];
-    	for(int i=0; i<d.length; i++) {
-    		F[i] = new Float(d[i]);
-    	}
-    	return(F);
     }
     
 }

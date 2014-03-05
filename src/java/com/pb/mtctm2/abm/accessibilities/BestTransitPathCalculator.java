@@ -88,7 +88,7 @@ public class BestTransitPathCalculator implements Serializable
     private float[][][]                  storedWalkEgressUtils;
     private float[][][]                  storedDriveEgressUtils;
     
-    private HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,Float[]>>> storedDepartPeriodTapTapUtils;
+    private HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>> storedDepartPeriodTapTapUtils;
     
     private double                        pWalkTime;
     private double                        aWalkTime;
@@ -742,7 +742,7 @@ public class BestTransitPathCalculator implements Serializable
             }
 
             // solve
-            Float[] utils = storedDataObject.d2F(tapToTapUEC[period].solve(index, walkDmu, null));  
+            float[] utils = storedDataObject.d2f(tapToTapUEC[period].solve(index, walkDmu, null));  
             
             // store
             storedDepartPeriodTapTapUtils.get(accEgr).get(period).putIfAbsent(storedDataObject.paTapKey(pTap, aTap), utils);
