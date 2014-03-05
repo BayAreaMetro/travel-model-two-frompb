@@ -1,41 +1,27 @@
 package com.pb.mtctm2.abm.application;
 
-import gnu.cajo.invoke.Remote;
-import gnu.cajo.utils.ItemServer;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.UnknownHostException;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.TapDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
-
 import com.pb.common.calculator.MatrixDataServerIf;
-import com.pb.common.datafile.CSVFileReader;
 import com.pb.common.datafile.OLD_CSVFileReader;
 import com.pb.common.datafile.CSVFileWriter;
 import com.pb.common.datafile.TableDataSet;
 import com.pb.common.matrix.Matrix;
-import com.pb.common.matrix.MatrixIO32BitJvm;
-import com.pb.common.matrix.MatrixType;
-import com.pb.common.matrix.MatrixWriter;
-import com.pb.common.summit.*;
 import com.pb.common.util.ResourceUtil;
 import com.pb.mtctm2.abm.ctramp.CtrampApplication;
-import com.pb.common.calculator.MatrixDataManager;
 import com.pb.mtctm2.abm.ctramp.MatrixDataServer;
 import com.pb.mtctm2.abm.ctramp.MatrixDataServerRmi;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
-import com.pb.mtctm2.abm.ctramp.TazDataHandler;
 import com.pb.mtctm2.abm.reports.SkimBuilder;
 
 public class MTCTM2TripTables {
@@ -63,8 +49,7 @@ public class MTCTM2TripTables {
     // matrices are indexed by modes
     private Matrix[][] matrix;
      
-    private String propertiesFile;
-    private ResourceBundle rb;
+    private Properties properties;
     private HashMap<String, String> rbMap;
     private MgraDataManager mgraManager;
     private TazDataManager tazManager;
@@ -85,12 +70,13 @@ public class MTCTM2TripTables {
     
     public MazSets mazSets;
     
-    public MTCTM2TripTables(String resourceFile, int iteration, float sampleRate){
+    public MTCTM2TripTables(String resourceBundleName, int iteration, float sampleRate){
 
-        propertiesFile = resourceFile;
-        rb = ResourceUtil.getPropertyBundle(new File(resourceFile));        
-        rbMap = ResourceUtil.changeResourceBundleIntoHashMap(rb);
-        directory = rbMap.get(CtrampApplication.PROPERTIES_PROJECT_DIRECTORY);
+        HashMap<String,String> rbMap = ResourceUtil.getResourceBundleAsHashMap(resourceBundleName);
+        properties = new Properties();
+        for (String key : rbMap.keySet()) 
+        	properties.put(key,rbMap.get(key));
+        directory = properties.getProperty("Project.Directory");
         
 		tazManager = TazDataManager.getInstance(rbMap);
 		tapManager = TapDataManager.getInstance(rbMap);
@@ -134,7 +120,7 @@ public class MTCTM2TripTables {
 		this.iteration = iteration; 
 		
 		//create mazSets
-		mazSets = new MazSets(rb);
+		mazSets = new MazSets();
 	}
 	
 	/**
@@ -146,7 +132,7 @@ public class MTCTM2TripTables {
 		
 		for(int i=0;i<purposeName.length;++i){
 			String searchString = "occ3plus.purpose." + purposeName[i];
-			float occupancy = new Float(rb.getString(searchString));
+			float occupancy = new Float(properties.getProperty(searchString));
 			averageOcc3Plus.put(purposeName[i], occupancy);
 		}
 	}
@@ -217,12 +203,12 @@ public class MTCTM2TripTables {
 		
 
 		//Open the individual trip file 
-		String indivTripFile = rb.getString("Results.IndivTripDataFile");
+		String indivTripFile = properties.getProperty("Results.IndivTripDataFile");
 		indivTripFile = formFileName(directory + indivTripFile, iteration);		
 		indivTripData = openTripFile(indivTripFile);
 		
 		//Open the joint trip file 
-		String jointTripFile = rb.getString("Results.JointTripDataFile");
+		String jointTripFile = properties.getProperty("Results.JointTripDataFile");
 		jointTripFile = formFileName(directory + jointTripFile, iteration);
 		jointTripData = openTripFile(jointTripFile);
 
@@ -254,11 +240,11 @@ public class MTCTM2TripTables {
 		}
         
 		//write the vehicles by parking-constrained MGRA
-		String CBDFile = rb.getString("Results.CBDFile");
+		String CBDFile = properties.getProperty("Results.CBDFile");
 		writeCBDFile(directory+CBDFile);
 
 		//write the vehicles by PNR lot TAP
-		String PNRFile = rb.getString("Results.PNRFile");
+		String PNRFile = properties.getProperty("Results.PNRFile");
 		writePNRFile(directory+PNRFile);
 	}
 	
@@ -306,7 +292,7 @@ public class MTCTM2TripTables {
         for(int i = 1; i <= tripData.getRowCount(); ++i){
         
         	int departTime = (int) tripData.getValueAt(i,"stop_period");
-        	int period = modelStructure.getModelPeriodIndex(departTime);
+        	int period = SandagModelStructure.getModelPeriodIndex(departTime);
             if(period!=timePeriod)
             	continue;
             
@@ -438,10 +424,10 @@ public class MTCTM2TripTables {
 		String end = "_" + per;
 		String[] fileName = new String[4];
 		
-		fileName[0] = directory + rb.getString("Results.AutoTripMatrix") + end;
-		fileName[1] = directory + rb.getString("Results.NMotTripMatrix") + end;
-		fileName[2] = directory + rb.getString("Results.TranTripMatrix") + end; 
-		fileName[3] = directory + rb.getString("Results.OthrTripMatrix") + end; 
+		fileName[0] = directory + properties.getProperty("Results.AutoTripMatrix") + end;
+		fileName[1] = directory + properties.getProperty("Results.NMotTripMatrix") + end;
+		fileName[2] = directory + properties.getProperty("Results.TranTripMatrix") + end; 
+		fileName[3] = directory + properties.getProperty("Results.OthrTripMatrix") + end; 
 		
 		for(int i=0;i<fileName.length;++i) {
 			writeMatricesToFile(fileName[i], matrix[i]);
@@ -478,8 +464,8 @@ public class MTCTM2TripTables {
     {
     	
 		// get matrix server address and port
-		String matrixServerAddress = rb.getString("RunModel.MatrixServerAddress");
-		int serverPort = Integer.parseInt(rb.getString("RunModel.MatrixServerPort"));
+		String matrixServerAddress = properties.getProperty("RunModel.MatrixServerAddress");
+		int serverPort = Integer.parseInt(properties.getProperty("RunModel.MatrixServerPort"));
 		
 		ms = new MatrixDataServerRmi(matrixServerAddress, serverPort, MatrixDataServer.MATRIX_DATA_SERVER_NAME);
 		ms.testRemote(Thread.currentThread().getName());
@@ -616,14 +602,14 @@ public class MTCTM2TripTables {
 	public static void main(String[] args) {
 
 		//command line arguments
-		String propertiesFile = args[0] + ".properties";
+		String propertiesName = args[0];
 		//args[1] is "-iteration"
 		int iteration = new Integer(args[2]).intValue();
 		//args[3] is "-sampleRate"
 		float sampleRate = new Float(args[4]).floatValue();
 		
 		//run trip table generator
-		MTCTM2TripTables tripTables = new MTCTM2TripTables(propertiesFile, iteration, sampleRate);		
+		MTCTM2TripTables tripTables = new MTCTM2TripTables(propertiesName, iteration, sampleRate);		
 		tripTables.createTripTables();
 
 	}
@@ -649,12 +635,6 @@ public class MTCTM2TripTables {
         float[] tripCost = new float[rowCount];
         
         //setup skim builder class
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(propertiesFile));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         SkimBuilder skimBuilder = new SkimBuilder(properties);
         
         //loop through trips and get trip attributes
@@ -690,15 +670,15 @@ public class MTCTM2TripTables {
 		public int numSets = maxMaz.length;
 		public int autoMatOffset;
 		
-		public MazSets(ResourceBundle rb) {
+		public MazSets() {
 			
 			//get max distance for maz to maz trips
-			maxMazAutoTripDistance = Float.parseFloat(rb.getString("Results.MAZAutoTripMatrix.TripMaxDistance"));
+			maxMazAutoTripDistance = Float.parseFloat(properties.getProperty("Results.MAZAutoTripMatrix.TripMaxDistance"));
 			
 			//get the near maz to maz assignment sets
-			maxMaz[0] = Integer.parseInt(rb.getString("Results.MAZAutoTripMatrix.MaxSeqMazSet1"));
-			maxMaz[1] = Integer.parseInt(rb.getString("Results.MAZAutoTripMatrix.MaxSeqMazSet2"));
-			maxMaz[2] = Integer.parseInt(rb.getString("Results.MAZAutoTripMatrix.MaxSeqMazSet3"));
+			maxMaz[0] = Integer.parseInt(properties.getProperty("Results.MAZAutoTripMatrix.MaxSeqMazSet1"));
+			maxMaz[1] = Integer.parseInt(properties.getProperty("Results.MAZAutoTripMatrix.MaxSeqMazSet2"));
+			maxMaz[2] = Integer.parseInt(properties.getProperty("Results.MAZAutoTripMatrix.MaxSeqMazSet3"));
 			
 			numZones[0] = maxMaz[0];
 			numZones[1] = maxMaz[1] - maxMaz[0];
