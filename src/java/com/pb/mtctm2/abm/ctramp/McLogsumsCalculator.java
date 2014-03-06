@@ -1147,7 +1147,7 @@ public class McLogsumsCalculator implements Serializable
 
         int i = Modes.getTransitModeIndex("CR");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
             crSkims = wtw.getWalkTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
        }
@@ -1157,7 +1157,7 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("LR");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
             lrSkims = wtw.getWalkTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
@@ -1167,7 +1167,7 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("BRT");
         if (bestTapPairs[i] != null) {
-        	 double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+        	 double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
              double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
              brSkims = wtw.getWalkTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
          }
@@ -1177,7 +1177,7 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("EB");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
             ebSkims = wtw.getWalkTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
@@ -1187,7 +1187,7 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("LB");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
             lbSkims = wtw.getWalkTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
@@ -1231,9 +1231,9 @@ public class McLogsumsCalculator implements Serializable
         
         int i = Modes.getTransitModeIndex("CR");
         if (bestTapPairs[i] != null) {
-            double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double pDriveTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            crSkims = dtw.getDriveTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+            crSkims = dtw.getDriveTransitWalkSkims(i, pDriveTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
        }
         else {
             crSkims = dtw.getNullTransitSkims(i);
@@ -1241,9 +1241,9 @@ public class McLogsumsCalculator implements Serializable
 
         i = Modes.getTransitModeIndex("LR");
         if (bestTapPairs[i] != null) {
-            double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double pDriveTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            lrSkims = dtw.getDriveTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+            lrSkims = dtw.getDriveTransitWalkSkims(i, pDriveTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
         else {
             lrSkims = dtw.getNullTransitSkims(i);
@@ -1251,9 +1251,9 @@ public class McLogsumsCalculator implements Serializable
 
         i = Modes.getTransitModeIndex("BRT");
         if (bestTapPairs[i] != null) {
-            double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double pDriveTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            brSkims = dtw.getDriveTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+            brSkims = dtw.getDriveTransitWalkSkims(i, pDriveTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
         else {
             brSkims = dtw.getNullTransitSkims(i);
@@ -1261,9 +1261,9 @@ public class McLogsumsCalculator implements Serializable
         
         i = Modes.getTransitModeIndex("EB");
         if (bestTapPairs[i] != null) {
-            double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double pDriveTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            ebSkims = dtw.getDriveTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+            ebSkims = dtw.getDriveTransitWalkSkims(i, pDriveTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
         else {
             ebSkims = dtw.getNullTransitSkims(i);
@@ -1271,9 +1271,9 @@ public class McLogsumsCalculator implements Serializable
 
         i = Modes.getTransitModeIndex("LB");
         if (bestTapPairs[i] != null) {
-            double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double pDriveTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            lbSkims = dtw.getDriveTransitWalkSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+            lbSkims = dtw.getDriveTransitWalkSkims(i, pDriveTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
         else {
             lbSkims = dtw.getNullTransitSkims(i);
@@ -1312,9 +1312,9 @@ public class McLogsumsCalculator implements Serializable
         
         int i = Modes.getTransitModeIndex("CR");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
-            double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            crSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double aDriveTime = BestTransitPathCalculator.findDriveTransitEgressTime( destMgra, bestTapPairs[i][1] );
+            crSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aDriveTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
        }
         else {
             crSkims = wtd.getNullTransitSkims(i);
@@ -1322,9 +1322,9 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("LR");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
-            double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            lrSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double aDriveTime = BestTransitPathCalculator.findDriveTransitEgressTime( destMgra, bestTapPairs[i][1] );
+            lrSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aDriveTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
         else {
             lrSkims = wtd.getNullTransitSkims(i);
@@ -1332,9 +1332,9 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("BRT");
         if (bestTapPairs[i] != null) {
-        	 double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
-             double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-             brSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+        	 double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
+             double aDriveTime = BestTransitPathCalculator.findDriveTransitEgressTime( destMgra, bestTapPairs[i][1] );
+             brSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aDriveTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
          }
         else {
             brSkims = wtd.getNullTransitSkims(i);
@@ -1342,9 +1342,9 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("EB");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
-            double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            ebSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double aDriveTime = BestTransitPathCalculator.findDriveTransitEgressTime( destMgra, bestTapPairs[i][1] );
+            ebSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aDriveTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
         else {
             ebSkims = wtd.getNullTransitSkims(i);
@@ -1352,9 +1352,9 @@ public class McLogsumsCalculator implements Serializable
     
         i = Modes.getTransitModeIndex("LB");
         if (bestTapPairs[i] != null) {
-        	double pWalkTime = BestTransitPathCalculator.findDriveTransitAccessTime( origMgra, bestTapPairs[i][0] );
-            double aWalkTime = BestTransitPathCalculator.findWalkTransitEgressTime( destMgra, bestTapPairs[i][1] );
-            lbSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aWalkTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
+        	double pWalkTime = BestTransitPathCalculator.findWalkTransitAccessTime( origMgra, bestTapPairs[i][0] );
+            double aDriveTime = BestTransitPathCalculator.findDriveTransitEgressTime( destMgra, bestTapPairs[i][1] );
+            lbSkims = wtd.getWalkTransitDriveSkims(i, pWalkTime, aDriveTime, bestTapPairs[i][0], bestTapPairs[i][1], skimPeriodIndex, loggingEnabled);
         }
         else {
             lbSkims = wtd.getNullTransitSkims(i);
