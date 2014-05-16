@@ -426,7 +426,7 @@ public class BestTransitPathCalculator implements Serializable
                     throw new RuntimeException();
                 }
                 
-                comparePaths(combinedUtilities, pTap, aTap, writeCalculations, myLogger);
+                comparePaths(combinedUtilities, pTap, aTap, WTW, writeCalculations, myLogger);
 
             }
         }
@@ -532,7 +532,7 @@ public class BestTransitPathCalculator implements Serializable
                         throw new RuntimeException();
                     }
 
-                    comparePaths(combinedUtilities, pTap, aTap, writeCalculations, myLogger);
+                    comparePaths(combinedUtilities, pTap, aTap, DTW, writeCalculations, myLogger);
 
                 }
             }
@@ -628,7 +628,7 @@ public class BestTransitPathCalculator implements Serializable
                         throw new RuntimeException();
                     }
 
-                    comparePaths(combinedUtilities, pTap, aTap, writeCalculations, myLogger);
+                    comparePaths(combinedUtilities, pTap, aTap, WTD, writeCalculations, myLogger);
 
                 }
             }
@@ -783,8 +783,9 @@ public class BestTransitPathCalculator implements Serializable
      * @param calculatedUtilities An array of utilities by ride mode.
      * @param pTap The origin TAP for this set of utilities.
      * @param aTap The destination TAP for this set of utilities.
+     * @param access access/egress indicator
      */
-    public void comparePaths(double[] calculatedUtilities, int pTap, int aTap, boolean myTrace, Logger myLogger)
+    public void comparePaths(double[] calculatedUtilities, int pTap, int aTap, int access, boolean myTrace, Logger myLogger)
     {
 
         for (int i = 0; i < bestUtilities.length; i++)
@@ -799,11 +800,21 @@ public class BestTransitPathCalculator implements Serializable
             if (calculatedUtilities[i] > bestUtilities[i] && calculatedUtilities[i] > -999)
             {
                 bestUtilities[i] = calculatedUtilities[i];
+                
                 bestPTap[i] = pTap;
                 bestATap[i] = aTap;
-                bestAccessTime[i] = pWalkTime;
-                bestEgressTime[i] = aWalkTime;
                 
+                if (access == WTW) {
+                	bestAccessTime[i] = pWalkTime;
+                	bestEgressTime[i] = aWalkTime;                    
+                } else if (access == DTW) {
+                	bestAccessTime[i] = pDriveTime;
+                	bestEgressTime[i] = aWalkTime;
+                } else if (access == WTD) {
+                	bestAccessTime[i] = pWalkTime;
+                    bestEgressTime[i] = aDriveTime;
+                }
+
                 if (myTrace)
                 {
                     myLogger.info("Best utility so far for mode " + tm[i] + " pTap " + pTap
