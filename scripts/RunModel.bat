@@ -24,7 +24,7 @@ set TAZ_COUNT=4688
 set TAZ_EXTS_COUNT=4709
 
 :: The number of transit access point zones
-set TAP_COUNT=6225
+set TAP_COUNT=6227
 
 :: ------------------------------------------------------------------------------------------------------
 ::
