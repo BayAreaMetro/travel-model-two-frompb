@@ -123,16 +123,16 @@ mkdir ctramp_output
 echo STARTED MODEL RUN  %DATE% %TIME% >> logs\feedback.rpt 
 
 :: Move the input files, which are not accessed by the model, to the working directories
-copy INPUT\hwy\                 hwy\
-copy INPUT\trn\                 trn\
-copy INPUT\trn\transit_lines\   trn\
-copy INPUT\trn\transit_fares\   trn\ 
-copy INPUT\trn\transit_support\ trn\
-copy INPUT\landuse\             landuse\
-copy INPUT\popsyn\              popsyn\
-copy INPUT\nonres\              nonres\
-copy INPUT\warmstart\main\      main\
-copy INPUT\warmstart\nonres\    nonres\
+copy INPUT\hwy\                 hwy\   /Y
+copy INPUT\trn\                 trn\   /Y
+copy INPUT\trn\transit_lines\   trn\   /Y
+copy INPUT\trn\transit_fares\   trn\   /Y
+copy INPUT\trn\transit_support\ trn\   /Y
+copy INPUT\landuse\             landuse\   /Y
+copy INPUT\popsyn\              popsyn\    /Y
+copy INPUT\nonres\              nonres\    /Y
+copy INPUT\warmstart\main\      main\      /Y
+copy INPUT\warmstart\nonres\    nonres\    /Y
 
 ::create necessary directory structure for hh and matrix data servers
 :: and copy dependencies
