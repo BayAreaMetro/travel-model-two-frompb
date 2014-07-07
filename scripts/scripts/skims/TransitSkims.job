@@ -215,6 +215,10 @@ LOOP PERIOD = 1,5
                 FILEI NETI = "trn\mtc_transit_network_@TOKEN_PERIOD@_@MODE_NAME@.net"
                 FILEI LINEI[1] = "trn\transitLines_new_nodes.lin"
                 FILEI FACTORI[1] = "trn\transitFactors_@MODE_NAME@.fac"
+                
+                FILEI FAREMATI[1] = "trn\fareMatrix.txt"
+                FILEI FAREI= "trn\fares.far"
+                
                 FILEO NETO = "trn\mtc_transit_network_@TOKEN_PERIOD@_@MODE_NAME@_with_transit.net" 
                 FILEO MATO[1] = "skims\transit_skims_@TOKEN_PERIOD@_@MODE_NAME@.TPP",
                                  MO=2-16, 
@@ -229,6 +233,7 @@ LOOP PERIOD = 1,5
                 PARAMETERS NOROUTEERRS=17000000
                 PARAMETERS TRANTIME=LI.TRANTIME
                 PARAMETERS MAPSCALE=5280
+                PARAMETERS FARE=T
 
                 PROCESS PHASE=LINKREAD
                     LW.TRANTIME = LI.TRANTIME
@@ -262,8 +267,7 @@ LOOP PERIOD = 1,5
                     MW[5] = XFERPENA(0,ALLMODES)
                     MW[6] = BRDPEN(0,ALLMODES)
                     MW[7] = BRDINGS(0,ALLMODES)
-                    ;MW[8] = FAREA(0,ALLMODES)
-                    MW[8] = 0
+                    MW[8] = FAREA(0,ALLMODES)
                     MW[9] = TIMEA(0,992)
                     MW[10] = TIMEA(0,991)
                     MW[11] = TIMEA(0,1,-57,59,-79,104)

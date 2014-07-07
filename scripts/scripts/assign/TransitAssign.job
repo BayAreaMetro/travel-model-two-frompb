@@ -145,6 +145,9 @@ LOOP PERIOD = 1,5
                 FILEI LINEI[1] = "trn\transitLines_new_nodes.lin"
                 FILEI FACTORI[1] = "trn\transitFactors_@MODE_NAME@.fac"
                 
+                FILEI FAREMATI[1] = "trn\fareMatrix.txt"
+                FILEI FAREI= "trn\fares.far"
+                
                 FILEI MATI[1] = ctramp_output\TAP_Demand_@TOKEN_PERIOD@.mat
                 
                 FILEO NETO = trn\mtc_transit_network_@TOKEN_PERIOD@_@MODE_NAME@_with_transit_assign.net
@@ -155,7 +158,8 @@ LOOP PERIOD = 1,5
                 PARAMETERS NOROUTEERRS=17000000
                 PARAMETERS TRANTIME=LI.TRANTIME
                 PARAMETERS MAPSCALE=5280
-                
+                PARAMETERS FARE=T
+                                
                 PROCESS PHASE=LINKREAD
                     LW.TRANTIME = LI.TRANTIME
                     LW.DISTANCE = LI.FEET/5280
