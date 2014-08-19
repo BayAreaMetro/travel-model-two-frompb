@@ -29,30 +29,16 @@
 ; are relatively straightforward, encompassing TAP->TAP movements, and only looking at walk access/egress/transfer. Walk access
 ; is provided through TAP->TAP walk-only connectors, which are discussed in more detail in the BuildTransitNetworks.job script.
 ;
-; Local bus an premium transit modes are skimmed separately, as somebody using that mode only has access to it and other select modes. 
-; Currently there is an implied mode hierarchy, as listed below (along with the mode numbers):
+; Three sets of skims are created: Set 1 - local bus only, Set 2 - all modes, and Set 3 - all modes with a high transfer penalty weight.
 ;
-;       Mode class        Modes
-;       -----------------------------------
-;       Commuter Rail     130-139
-;       Heavy Rail        120-129
-;       Light Rail        110-119
-;       Ferry             100-103,105-109
-;       Express Bus       58,80-99
-;       Local Bus         1-57,59-79,104
-;
-; In order to match with the CTRAMP inputs, these 6 mode classes must be collapsed to 5, so the Ferry and Light Rail categories are combined, leading
-; to the following categories, along with main mode number:
-;
-;      +---------------+-------------+-------------------+------------------------+---------------+
-;      | Mode category | Mode number | Mode Abbreviation | Modes                  | Skim category |
-;      +---------------+-------------+-------------------+------------------------+---------------+
-;      | Commuter Rail | 5           | CR                |130-139                 | Premium       |
-;      | Heavy Rail    | 4           | HR                |120-129                 | Premium       |
-;      | Light Rail    | 3           | LRT               |100-103,105-109,110-119 | Premium       |
-;      | Express Bus   | 2           | EXP               |58,80-99                | Premium       |
-;      | Local Bus     | 1           | LOC               |1-57,59-79,104          | Local bus     |
-;      +---------------+-------------+-------------------+------------------------+---------------+
+;       Mode class        Modes                Set 1     Set 2     Set 3
+;       ----------------------------------------------------------------
+;       Commuter Rail     130-139                n         y        y
+;       Heavy Rail        120-129                n         y        y
+;       Light Rail        110-119                n         y        y
+;       Ferry             100-103,105-109        n         y        y
+;       Express Bus       58,80-99               n         y        y
+;       Local Bus         1-57,59-79,104         y         y        y
 ;
 ; Each transit skim mode is controlled by a factors file, kept in the /trn/ output directory (copied from the INPUTS/trn/tansit_support/
 ; directory). Each factor file specifies penalties, available modes (including access, egress and transfer modes), and transfer limits.
@@ -72,7 +58,7 @@
 ;        (6) An original node->new node correspondence file
 ;
 ; Output: (1) A (csv) drive-access matrix linking TAZ->TAP, as well as the intermediate MAZ for the path.
-;         (2) A 15 table transit skim for each of the five time periods by skim-mode, containing the following information:
+;         (2) A 15 table transit skim for each of the five time periods by skim-set, containing the following information:
 ;             (a) The generalized cost for the path
 ;             (b) The initial wait time, in minutes
 ;             (c) The transfer wait time, in minutes
@@ -90,7 +76,7 @@
 ;             (o) The "highest" mode used 
 ;
 ; version:  Travel Model Zed
-; authors:  crf (2013 08)
+; authors:  crf (2013 08) ; bts 06/11/14
 ; ----------------------------------------------------------------------------------------------------------------
 
 
@@ -157,7 +143,7 @@ ENDRUN
 
 ;call python program to build transit drive access skims
 *"%PYTHON_PATH%\python.exe" %BASE_SCRIPTS%\skims\build_drive_access_skims.py . %BASE_SCRIPTS%\block
-*del skims\DA_*_taz_time.csv
+;*del skims\DA_*_taz_time.csv
 
 ; run script used to help consolidate taps
 *"%PYTHON_PATH%\python.exe" %BASE_SCRIPTS%\skims\tap_lines.py
@@ -167,14 +153,6 @@ ENDRUN
 
 ;start cluster nodes - one for each mode and time period
 *Cluster.exe MTC_TRANSKIM 1-10 start exit
-
-;mode list, for now
-;'Commuter': ['130,', '133,', '131,'],
-;'Heavy': ['120,'],         
-;'Light': ['110,', '111,'],                 \__ merge into LRT
-;'Ferry': ['103,', '100,', '101,', '104,'], /
-;'Express': ['84,', '81,', '86,', '82,', '90,', '91,', '87,', '92,', '58,','88,', '80,'],
-;'Local': ['12,', '21,', '30,', '68,', '70,', '66,', '20,', '28,', '44,', '17,', '60,', '49,', '24,', '63,', '52,', '13,', '42,', '104,', '56,', '46,', '38,', '55,', '40,']}
 
 ;now build transit times based on congested times from loaded network
 ;loop over time period
@@ -193,47 +171,41 @@ LOOP PERIOD = 1,5
         TOKEN_PERIOD = 'EV'
     ENDIF
     
-    LOOP MODE = 1,2
+    LOOP SKIMSET = 1,3
 
-        ; specify mode specific stuff
-        IF (MODE = 1)   
-            MODE_NAME = 'LOCAL_BUS'
-        ELSEIF (MODE = 2)   
-            MODE_NAME = 'PREMIUM'
-        ENDIF
+        ; specify SKIMSET specific stuff
+        SKIMSET_NAME = 'SET' + STR(SKIMSET,1,0)
+        counter = 2*(PERIOD - 1) + SKIMSET
 
-        counter = 2*(PERIOD - 1) + MODE
-
-        ; do each time of day and mode as a separate process
+        ; do each time of day and SKIMSET as a separate process
         DistributeMultistep processid = 'MTC_TRANSKIM', processNum = counter
             ;make a copy of the network so that we don't walk all over each other
-            *copy hwy\mtc_transit_network_@TOKEN_PERIOD@.net trn\mtc_transit_network_@TOKEN_PERIOD@_@MODE_NAME@.net
+            *copy hwy\mtc_transit_network_@TOKEN_PERIOD@.net trn\mtc_transit_network_@TOKEN_PERIOD@_@SKIMSET_NAME@.net
             
 
             ;next, build actual transit skims
             RUN PGM = PUBLIC TRANSPORT
-                FILEI NETI = "trn\mtc_transit_network_@TOKEN_PERIOD@_@MODE_NAME@.net"
+                FILEI NETI = "trn\mtc_transit_network_@TOKEN_PERIOD@_@SKIMSET_NAME@.net"
                 FILEI LINEI[1] = "trn\transitLines_new_nodes.lin"
-                FILEI FACTORI[1] = "trn\transitFactors_@MODE_NAME@.fac"
-                
-                FILEI FAREMATI[1] = "trn\fareMatrix.txt"
+                FILEI FACTORI[1] = "trn\transitFactors_@SKIMSET_NAME@.fac"
+				
+				FILEI FAREMATI[1] = "trn\fareMatrix.txt"
                 FILEI FAREI= "trn\fares.far"
-                
-                FILEO NETO = "trn\mtc_transit_network_@TOKEN_PERIOD@_@MODE_NAME@_with_transit.net" 
-                FILEO MATO[1] = "skims\transit_skims_@TOKEN_PERIOD@_@MODE_NAME@.TPP",
+				
+                FILEO NETO = "trn\mtc_transit_network_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.net" 
+                FILEO MATO[1] = "skims\transit_skims_@TOKEN_PERIOD@_@SKIMSET_NAME@.TPP",
                                  MO=2-16, 
                                  NAME = COMPCOST,IWAIT,XWAIT,XPEN,BRDPEN,XFERS,FARE,XWTIME,AEWTIME,
                                         LB_TIME,EB_TIME,LR_TIME,HR_TIME,CR_TIME,BEST_MODE
-                FILEO LINEO = "trn\mtc_transit_lines_@TOKEN_PERIOD@_@MODE_NAME@_with_transit.lin"
-                FILEO NTLEGO = "trn\mtc_transit_ntlegs_@TOKEN_PERIOD@_@MODE_NAME@_with_transit.ntl"
-                FILEO ROUTEO[1] = "trn\mtc_transit_routes_@TOKEN_PERIOD@_@MODE_NAME@_with_transit.rte"
-                FILEO REPORTO = "trn\mtc_transit_report_@TOKEN_PERIOD@_@MODE_NAME@_with_transit.rpt"
+                FILEO LINEO = "trn\mtc_transit_lines_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.lin"
+                FILEO NTLEGO = "trn\mtc_transit_ntlegs_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.ntl"
+                FILEO ROUTEO[1] = "trn\mtc_transit_routes_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.rte"
+                FILEO REPORTO = "trn\mtc_transit_report_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.rpt"
                 
                 PARAMETERS HDWAYPERIOD=@PERIOD@
                 PARAMETERS NOROUTEERRS=17000000
                 PARAMETERS TRANTIME=LI.TRANTIME
                 PARAMETERS MAPSCALE=5280
-                PARAMETERS FARE=T
 
                 PROCESS PHASE=LINKREAD
                     LW.TRANTIME = LI.TRANTIME
@@ -301,7 +273,7 @@ LOOP PERIOD = 1,5
             ENDRUN
 
             ;clean up
-            *del trn\mtc_transit_network_@TOKEN_PERIOD@_@MODE_NAME@.net
+            *del trn\mtc_transit_network_@TOKEN_PERIOD@_@SKIMSET_NAME@.net
 
         EndDistributeMultistep
 
