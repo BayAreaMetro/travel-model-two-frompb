@@ -473,7 +473,8 @@ public class DataExporter {
                     (int) table.getValueAt(row,tripStructureDefinition.boardTapColumn),
                     (int) table.getValueAt(row,tripStructureDefinition.alightTapColumn),
                     (int) table.getValueAt(row,tripStructureDefinition.todColumn),
-                    inbound);
+                    inbound,
+                    (int) table.getValueAt(row,tripStructureDefinition.setColumn));
             tripTime[i] = attributes.getTripTime();
             tripDistance[i] = attributes.getTripDistance();
             tripCost[i] = attributes.getTripCost();
@@ -485,7 +486,7 @@ public class DataExporter {
                 else
                     tripPurpose[i] = tripStructureDefinition.homeName;
             }
-            tripMode[i] = attributes.getTripModeName();
+            tripMode[i] = "";
             tripId[i] = i;
             tripDepartTime[i] = attributes.getTripStartTime();
             tripBoardTaz[i] = attributes.getTripBoardTaz();
@@ -1129,14 +1130,15 @@ public class DataExporter {
                             NUMBER_FORMAT_NAME, // trip_mode
                             NUMBER_FORMAT_NAME, // trip_board_tap
                             NUMBER_FORMAT_NAME, // trip_alight_tap
-                            NUMBER_FORMAT_NAME // tour_mode
+                            NUMBER_FORMAT_NAME, // tour_mode
+                            NUMBER_FORMAT_NAME // set
                         };
         Set<String> intColumns = new HashSet<String>();
         Set<String> floatColumns = new HashSet<String>();
         Set<String> stringColumns = new HashSet<String>(Arrays.asList("tour_purpose","orig_purpose","dest_purpose"));              
         Set<String> bitColumns = new HashSet<String>();
         Set<String> primaryKey = new LinkedHashSet<String>(Arrays.asList("hh_id","person_id","tour_id","tour_purpose","inbound","stop_id"));
-        exportDataGeneric(outputFileBase,"Results.IndivTripDataFile",true,formats,floatColumns,stringColumns,intColumns,bitColumns,FieldType.INT,primaryKey,new TripStructureDefinition(10,11,8,9,13,14,15,16,-1,17,"INDIV",6,false));
+        exportDataGeneric(outputFileBase,"Results.IndivTripDataFile",true,formats,floatColumns,stringColumns,intColumns,bitColumns,FieldType.INT,primaryKey,new TripStructureDefinition(10,11,8,9,13,14,15,16,-1,17,"INDIV",6,18,false));
     }
 
     private void exportJointTripData(String outputFileBase) {
@@ -1156,14 +1158,15 @@ public class DataExporter {
                             NUMBER_FORMAT_NAME, // num_participants
                             NUMBER_FORMAT_NAME, // trip_board_tap
                             NUMBER_FORMAT_NAME, // trip_alight_tap
-                            NUMBER_FORMAT_NAME // tour_mode
+                            NUMBER_FORMAT_NAME, // tour_mode
+                            NUMBER_FORMAT_NAME // set
                         };
         Set<String> intColumns = new HashSet<String>();
         Set<String> floatColumns = new HashSet<String>();
         Set<String> stringColumns = new HashSet<String>(Arrays.asList("tour_purpose","orig_purpose","dest_purpose"));             
         Set<String> bitColumns = new HashSet<String>();
         Set<String> primaryKey = new LinkedHashSet<String>(Arrays.asList("hh_id","tour_id","tour_purpose","inbound","stop_id"));
-        exportDataGeneric(outputFileBase,"Results.JointTripDataFile",true,formats,floatColumns,stringColumns,intColumns,bitColumns,FieldType.INT,primaryKey, new TripStructureDefinition(8,9,6,7,11,12,14,15,13,16,"JOINT",4,false));
+        exportDataGeneric(outputFileBase,"Results.JointTripDataFile",true,formats,floatColumns,stringColumns,intColumns,bitColumns,FieldType.INT,primaryKey, new TripStructureDefinition(8,9,6,7,11,12,14,15,13,16,"JOINT",4,17,false));
     }
 
 
@@ -1593,6 +1596,7 @@ public class DataExporter {
         private final int originPurposeColumn;
         private final int destinationPurposeColumn;
         private final int todColumn;
+        private final int setColumn;
         private final int modeColumn;
         private final int boardTapColumn;
         private final int alightTapColumn;
@@ -1615,13 +1619,14 @@ public class DataExporter {
 
         private TripStructureDefinition(int originMgraColumn, int destMgraColumn, int originPurposeColumn, int destinationPurposeColumn, int todColumn, int modeColumn, int boardTapColumn, int alightTapColumn, int partySizeColumn,
                                         int tripTimeColumn, int tripDistanceColumn, int tripCostColumn, int tripPurposeNameColumn, int tripModeNameColumn, int recIdColumn, int boardTazColumn, int alightTazColumn,
-                                        String tripType, String homeName, String destinationName, int inboundColumn, boolean booleanIndicatorVariables) {
+                                        String tripType, String homeName, String destinationName, int inboundColumn, int setColumn, boolean booleanIndicatorVariables) {
             this.recIdColumn = recIdColumn;
             this.originMgraColumn = originMgraColumn;
             this.destMgraColumn = destMgraColumn;
             this.originPurposeColumn = originPurposeColumn;
             this.destinationPurposeColumn = destinationPurposeColumn;
             this.todColumn = todColumn;
+            this.setColumn = setColumn;
             this.modeColumn = modeColumn;
             this.boardTapColumn = boardTapColumn;
             this.alightTapColumn = alightTapColumn;
@@ -1639,13 +1644,13 @@ public class DataExporter {
             this.alightTazColumn = alightTazColumn;
             this.booleanIndicatorVariables = booleanIndicatorVariables;
         }
-        private TripStructureDefinition(int originMgraColumn, int destMgraColumn, int originPurposeColumn, int destinationPurposeColumn, int todColumn, int modeColumn, int boardTapColumn, int alightTapColumn, int partySizeColumn, int columnCount, String tripType, int inboundColumn, boolean booleanIndicatorVariables) {
+        private TripStructureDefinition(int originMgraColumn, int destMgraColumn, int originPurposeColumn, int destinationPurposeColumn, int todColumn, int modeColumn, int boardTapColumn, int alightTapColumn, int partySizeColumn, int columnCount, String tripType, int inboundColumn, int setColumn, boolean booleanIndicatorVariables) {
             this(originMgraColumn,destMgraColumn,originPurposeColumn,destinationPurposeColumn,todColumn,modeColumn,boardTapColumn,alightTapColumn,partySizeColumn,
-                  columnCount+1,columnCount+2,columnCount+3,columnCount+4,columnCount+5,columnCount+6,columnCount+7,columnCount+8,tripType,"","",inboundColumn,booleanIndicatorVariables);
+                  columnCount+1,columnCount+2,columnCount+3,columnCount+4,columnCount+5,columnCount+6,columnCount+7,columnCount+8,tripType,"","",inboundColumn,setColumn,booleanIndicatorVariables);
         }
-        private TripStructureDefinition(int originMgraColumn, int destMgraColumn, int todColumn, int modeColumn, int boardTapColumn, int alightTapColumn, int partySizeColumn, int columnCount, String tripType, String homeName, String destinationName, int inboundColumn, boolean booleanIndicatorVariables) {
+        private TripStructureDefinition(int originMgraColumn, int destMgraColumn, int todColumn, int modeColumn, int boardTapColumn, int alightTapColumn, int partySizeColumn, int columnCount, String tripType, String homeName, String destinationName, int inboundColumn, int setColumn, boolean booleanIndicatorVariables) {
             this(originMgraColumn,destMgraColumn,-1,-1,todColumn,modeColumn,boardTapColumn,alightTapColumn,partySizeColumn,
-                  columnCount+1,columnCount+2,columnCount+3,columnCount+4,columnCount+5,columnCount+6,columnCount+7,columnCount+8,tripType,homeName,destinationName,inboundColumn,booleanIndicatorVariables);
+                  columnCount+1,columnCount+2,columnCount+3,columnCount+4,columnCount+5,columnCount+6,columnCount+7,columnCount+8,tripType,homeName,destinationName,inboundColumn,setColumn,booleanIndicatorVariables);
         }
         
     }

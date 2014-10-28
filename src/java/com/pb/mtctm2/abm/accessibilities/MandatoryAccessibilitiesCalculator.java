@@ -46,7 +46,6 @@ public class MandatoryAccessibilitiesCalculator
     private IndexValues                 iv;
 
     private NonTransitUtilities         ntUtilities;
-//    private TransitUtilities            transitUtilities;
 
     private MgraDataManager             mgraManager;
     private TazDataManager              tazManager;
@@ -80,7 +79,6 @@ public class MandatoryAccessibilitiesCalculator
     {
 
         ntUtilities = aNtUtilities;
-//        transitUtilities = aTransitUtilities;
         expConstants = aExpConstants;
 
         // Create the UECs
@@ -372,9 +370,10 @@ public class MandatoryAccessibilitiesCalculator
             accessibilities[6] = autoLogsum[0];
 
             
-            
+            //////////////////////////////////////////////////////////////////////////            
             // walk transit
-                        
+            //////////////////////////////////////////////////////////////////////////
+            
             // determine the best transit path, which also stores the best utilities array and the best mode
             bestPathCalculator.findBestWalkTransitWalkTaps( TransitWalkAccessUEC.AM, oMgra, dMgra, debug, aLogger);
             
@@ -395,36 +394,44 @@ public class MandatoryAccessibilitiesCalculator
             dmu.setWlkNestLogsum(accessibilities[7]);
 
 
-            Modes.TransitMode bestMode = bestPathCalculator.getBestTransitMode();
+            int bestAlt = bestPathCalculator.getBestTransitAlt();
 
-            if (bestMode != null)
+            if (bestAlt >= 0)
             {
-                int[] bestTaps = bestPathCalculator.getBestTaps(bestMode);
-                dmu.setBestMode(bestMode.ordinal());
-                int oTapPosition = mgraManager.getTapPosition(oMgra, bestTaps[0]);
-                int dTapPosition = mgraManager.getTapPosition(dMgra, bestTaps[1]);
+            	double[] bestTaps = bestPathCalculator.getBestTaps(bestAlt);
+                int oTapPosition = mgraManager.getTapPosition(oMgra, (int)bestTaps[0]);
+                int dTapPosition = mgraManager.getTapPosition(dMgra, (int)bestTaps[1]);
+                int set = (int)bestTaps[2];
 
                 if (oTapPosition == -1 || dTapPosition == -1)
                 {
-                    logger.fatal("Error:  Best walk mode " + bestMode + " found for origin mgra "
+                    logger.fatal("Error:  Best walk transit alt " + bestAlt + " found for origin mgra "
                         + oMgra + " to destination mgra " + dMgra + " but oTap pos "
                         + oTapPosition + " and dTap pos " + dTapPosition);
                     throw new RuntimeException();
                 }
 
-                if (walkTransitWalkUtilities[bestMode.ordinal()] <= MIN_EXP_FUNCTION_ARGUMENT)
+                if (walkTransitWalkUtilities[bestAlt] <= MIN_EXP_FUNCTION_ARGUMENT)
                 {
-                    logger.fatal("Error:  Best walk mode " + bestMode + " found for origin mgra "
+                    logger.fatal("Error:  Best walk transit alt " + bestAlt + " found for origin mgra "
                         + oMgra + " to destination mgra " + dMgra + " but Utility = "
-                        + walkTransitWalkUtilities[bestMode.ordinal()]);
+                        + walkTransitWalkUtilities[bestAlt]);
                     throw new RuntimeException();
                 }
-                accessibilities[5] = Math.log(walkTransitWalkUtilities[bestMode.ordinal()]);
+                accessibilities[5] = Math.log(walkTransitWalkUtilities[bestAlt]);
 
-                dmu.setMgraTapWalkTime((float)bestPathCalculator.getBestAccessTime(bestMode.ordinal()));
-                dmu.setTapMgraWalkTime((float)bestPathCalculator.getBestEgressTime(bestMode.ordinal()));
-                iv.setOriginZone(bestTaps[0]);
-                iv.setDestZone(bestTaps[1]);
+                //set access and egress times
+                int oPos = mgraManager.getTapPosition(oMgra, (int)bestTaps[0]);
+            	float mgraTapWalkTime = mgraManager.getMgraToTapWalkTime(oMgra, oPos);
+                dmu.setMgraTapWalkTime(mgraTapWalkTime);
+                
+                int dPos = mgraManager.getTapPosition(dMgra, (int)bestTaps[1]);
+                float tapMgraWalkTime = mgraManager.getMgraToTapWalkTime(dMgra, dPos);      
+                dmu.setTapMgraWalkTime(tapMgraWalkTime);
+                
+                dmu.setBestSet(set);
+                iv.setOriginZone((int)bestTaps[0]);
+                iv.setDestZone((int)bestTaps[1]);
                 double[] wlkTransitTimes = bestWalkTransitUEC.solve(iv, dmu, null);
                 
                 if (debug){
@@ -436,65 +443,10 @@ public class MandatoryAccessibilitiesCalculator
 
             }
             
-            /*
-            // walk transit
-
-            // calculate the exp utilities, which will also calculate and store best mode
-            double[] walkTransitExpUtilities = transitUtilities.calculateWalkTransitExpUtilities( oMgra, dMgra, 1 );
-
-            // add up the exp utilities
-            dmu.setWlkNestLogsum(-999f);
-            double sumWlkExpUtilities = 0;
-            for (int i = 0; i < walkTransitExpUtilities.length; ++i)
-                sumWlkExpUtilities += walkTransitExpUtilities[i];
-
-            if (sumWlkExpUtilities > 0) dmu.setWlkNestLogsum(Math.log(sumWlkExpUtilities));
-
-            accessibilities[7] = dmu.getWlkNestLogsum();
-
-            Modes.TransitMode bestMode = transitUtilities.getBestWalkTransitMode(1);
-
-            if (bestMode != null)
-            {
-                int[] bestTaps = transitUtilities.getBestWalkTaps(bestMode, 1);
-                dmu.setBestMode(bestMode.ordinal());
-                int oTapPosition = mgraManager.getTapPosition(oMgra, bestTaps[0]);
-                int dTapPosition = mgraManager.getTapPosition(dMgra, bestTaps[1]);
-
-                if (oTapPosition == -1 || dTapPosition == -1)
-                {
-                    logger.fatal("Error:  Best walk mode " + bestMode + " found for origin mgra "
-                            + oMgra + " to destination mgra " + dMgra + " but oTap pos "
-                            + oTapPosition + " and dTap pos " + dTapPosition);
-                    throw new RuntimeException();
-                }
-
-                if (walkTransitExpUtilities[bestMode.ordinal()] <= 0.0)
-                {
-                    logger.fatal("Error:  Best walk mode " + bestMode + " found for origin mgra "
-                            + oMgra + " to destination mgra " + dMgra + " but exp Utility = "
-                            + walkTransitExpUtilities[bestMode.ordinal()]);
-                    throw new RuntimeException();
-                }
-                accessibilities[5] = Math.log(walkTransitExpUtilities[bestMode.ordinal()]);
-
-                dmu.setMgraTapWalkTime(mgraManager.getMgraToTapWalkTime(oMgra, oTapPosition));
-                dmu.setTapMgraWalkTime(mgraManager.getMgraToTapWalkTime(dMgra, dTapPosition));
-                iv.setOriginZone(bestTaps[0]);
-                iv.setDestZone(bestTaps[1]);
-                double[] wlkTransitTimes = bestWalkTransitUEC.solve(iv, dmu, null);
-                if (debug)
-                    bestWalkTransitUEC.logAnswersArray(aLogger, String.format(
-                            "bestWalkTransitUEC:  oMgra=%d, dMgra=%d", oMgra, dMgra));
-                accessibilities[2] = wlkTransitTimes[0];
-                accessibilities[9] = wlkTransitTimes[1];
-
-            }
-            */
-            
-            
+            //////////////////////////////////////////////////////////////////////////
             // drive transit
-
+            //////////////////////////////////////////////////////////////////////////
+            
             // determine the best transit path, which also stores the best utilities array and the best mode
             bestPathCalculator.findBestDriveTransitWalkTaps( TransitWalkAccessUEC.AM, oMgra, dMgra, debug, aLogger);
             
@@ -516,38 +468,42 @@ public class MandatoryAccessibilitiesCalculator
             dmu.setDrvNestLogsum(accessibilities[11]);
 
 
-            bestMode = bestPathCalculator.getBestTransitMode();
+            bestAlt = bestPathCalculator.getBestTransitAlt();
 
-            if (bestMode != null)
+            if (bestAlt >= 0)
             {
-                int[] bestTaps = bestPathCalculator.getBestTaps(bestMode);
-                dmu.setBestMode(bestMode.ordinal());
-                int oTapPosition = tazManager.getTapPosition(oTaz, bestTaps[0], Modes.AccessMode.PARK_N_RIDE);
-                int dTapPosition = mgraManager.getTapPosition(dMgra, bestTaps[1]);
-
+            	double[] bestTaps = bestPathCalculator.getBestTaps(bestAlt);
+            	int oTapPosition = tazManager.getTapPosition(oTaz, (int)bestTaps[0], Modes.AccessMode.PARK_N_RIDE);
+                int dTapPosition = mgraManager.getTapPosition(dMgra, (int)bestTaps[1]);
+                int set = (int)bestTaps[2];
+            	
                 if (oTapPosition == -1 || dTapPosition == -1)
                 {
-                    logger.fatal("Error:  Best drive mode " + bestMode + " found for origin mgra "
+                    logger.fatal("Error:  Best drive transit alt " + bestAlt + " found for origin mgra "
                         + oMgra + " to destination mgra " + dMgra + " but oTap pos "
                         + oTapPosition + " and dTap pos " + dTapPosition);
                     throw new RuntimeException();
                 }
 
-                if (driveTransitWalkUtilities[bestMode.ordinal()] <= MIN_EXP_FUNCTION_ARGUMENT)
+                if (driveTransitWalkUtilities[bestAlt] <= MIN_EXP_FUNCTION_ARGUMENT)
                 {
-                    logger.fatal("Error:  Best drive mode " + bestMode + " found for origin mgra "
+                    logger.fatal("Error:  Best drive transit alt " + bestAlt + " found for origin mgra "
                         + oMgra + " to destination mgra " + dMgra + " but Utility = "
-                        + driveTransitWalkUtilities[bestMode.ordinal()]);
+                        + driveTransitWalkUtilities[bestAlt]);
                     throw new RuntimeException();
                 }
 
-                
-                dmu.setDriveTimeToTap((float)bestPathCalculator.getBestAccessTime(bestMode.ordinal()));
+                //set access and egress times
+                dmu.setDriveTimeToTap(tazManager.getTapTime(oTaz, oTapPosition, Modes.AccessMode.PARK_N_RIDE));
                 dmu.setDriveDistToTap(tazManager.getTapDist(oTaz, oTapPosition, Modes.AccessMode.PARK_N_RIDE));
-                dmu.setTapMgraWalkTime((float)bestPathCalculator.getBestEgressTime(bestMode.ordinal()));
+                
+                int dPos = mgraManager.getTapPosition(dMgra, (int)bestTaps[1]);
+                float tapMgraWalkTime = mgraManager.getMgraToTapWalkTime(dMgra, dPos);      
+                dmu.setTapMgraWalkTime(tapMgraWalkTime);
 
-                iv.setOriginZone(bestTaps[0]);
-                iv.setDestZone(bestTaps[1]);
+                dmu.setBestSet(set);
+                iv.setOriginZone((int)bestTaps[0]);
+                iv.setDestZone((int)bestTaps[1]);
                 double[] drvTransitTimes = bestDriveTransitUEC.solve(iv, dmu, null);
                 
                 if (debug){
@@ -558,62 +514,7 @@ public class MandatoryAccessibilitiesCalculator
                 accessibilities[10] = drvTransitTimes[1];
 
             }
-
-
-            /*
-            // drive transit
-
-            // calculate the exp utilities, which will also calculate and store best
-            // mode
-            double[] driveTransitExpUtilities = transitUtilities.calculateDriveTransitExpUtilities(
-                    oTaz, dMgra, 1);
-
-            // add up the exp utilities
-            dmu.setDrvNestLogsum(-999);
-            double sumDrvExpUtilities = 0;
-            for (int i = 0; i < driveTransitExpUtilities.length; ++i)
-                sumDrvExpUtilities += driveTransitExpUtilities[i];
-            if (sumDrvExpUtilities > 0) dmu.setDrvNestLogsum(Math.log(sumDrvExpUtilities));
-
-            accessibilities[11] = dmu.getDrvNestLogsum();
-
-            bestMode = transitUtilities.getBestDriveTransitMode(1);
-
-            if (bestMode != null)
-            {
-                int[] bestTaps = transitUtilities.getBestDriveTaps(bestMode, 1);
-                dmu.setBestMode(bestMode.ordinal());
-                int oTapPosition = tazManager.getTapPosition(oTaz, bestTaps[0],
-                        Modes.AccessMode.PARK_N_RIDE);
-                int dTapPosition = mgraManager.getTapPosition(dMgra, bestTaps[1]);
-
-                if (oTapPosition == -1 || dTapPosition == -1)
-                {
-                    logger.fatal("Error:  Best drive mode " + bestMode + " found for origin taz "
-                            + oTaz + " to destination mgra " + dMgra + " but oTap pos "
-                            + oTapPosition + " and dTap pos " + dTapPosition);
-                    throw new RuntimeException();
-                }
-
-                dmu.setDriveTimeToTap(tazManager.getTapTime(oTaz, oTapPosition,
-                        Modes.AccessMode.PARK_N_RIDE));
-                dmu.setDriveDistToTap(tazManager.getTapDist(oTaz, oTapPosition,
-                        Modes.AccessMode.PARK_N_RIDE));
-
-                dmu.setTapMgraWalkTime(mgraManager.getMgraToTapWalkTime(dMgra, dTapPosition));
-
-                iv.setOriginZone(bestTaps[0]);
-                iv.setDestZone(bestTaps[1]);
-                double[] drvTransitTimes = bestDriveTransitUEC.solve(iv, dmu, null);
-                if (debug)
-                    bestDriveTransitUEC.logAnswersArray(aLogger, String.format(
-                            "bestDriveTransitUEC:  oMgra=%d, dMgra=%d", oMgra, dMgra));
-                accessibilities[3] = drvTransitTimes[0];
-                accessibilities[10] = drvTransitTimes[1];
-
-            }
-             */
-
+            
             
             double[] transitLogsumResults = transitLogsumUEC.solve(iv, dmu, null);
             if (debug){

@@ -15,6 +15,7 @@ import com.pb.mtctm2.abm.ctramp.Tour;
 import com.pb.mtctm2.abm.ctramp.TripModeChoiceDMU;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
+import com.pb.mtctm2.abm.ctramp.Modes.AccessMode;
 import com.pb.common.newmodel.UtilityExpressionCalculator;
 
 import java.io.File;
@@ -44,6 +45,11 @@ public class IntermediateStopChoiceModels implements Serializable {
     private transient Logger smcLogger = Logger.getLogger("tripMcLog");
     private transient Logger tripDepartLogger = Logger.getLogger("tripDepartLog");
     private transient Logger parkLocLogger = Logger.getLogger("parkLocLog");
+    
+    public static final int               WTW           = 0;
+    public static final int               WTD           = 1;
+    public static final int               DTW           = 2;
+    public static final int[]             ACC_EGR       = {WTW,WTD,DTW};
     
     private static final String USE_NEW_SOA_METHOD_PROPERTY_KEY = "slc.use.new.soa";
     
@@ -215,8 +221,8 @@ public class IntermediateStopChoiceModels implements Serializable {
     private double[][] mcCumProbsSegmentIk;
     private double[][] mcCumProbsSegmentKj;
     
-    private int[][][] segmentIkBestTapPairs;
-    private int[][][] segmentKjBestTapPairs;
+    private double[][][][] segmentIkBestTapPairs;
+    private double[][][][] segmentKjBestTapPairs;
     
     private ChoiceModelApplication[] mcModelArray;
     private ChoiceModelApplication[] slcSoaModel;
@@ -410,8 +416,8 @@ public class IntermediateStopChoiceModels implements Serializable {
         mcCumProbsSegmentKj = new double[sampleSize+1][];
 
         // declare the arrays for storing stop location choice ik and kj segment best tap pair arrays
-        segmentIkBestTapPairs = new int[sampleSize+1][][];
-        segmentKjBestTapPairs = new int[sampleSize+1][][];
+        segmentIkBestTapPairs = new double[sampleSize+1][ACC_EGR.length][][];
+        segmentKjBestTapPairs = new double[sampleSize+1][ACC_EGR.length][][];
 
         // declare the arrays that holds ik and kj segment logsum values for each location choice sample alternative
         tripModeChoiceLogsums = new double[sampleSize+1];
@@ -997,21 +1003,33 @@ public class IntermediateStopChoiceModels implements Serializable {
                     
                     // if the trip is a transit mode, set the boarding and alighting tap pairs in the stop object based on the ik segment pairs
                     if ( modelStructure.getTripModeIsWalkTransit(modeAlt) | modelStructure.getTripModeIsPnrTransit(modeAlt) || modelStructure.getTripModeIsKnrTransit(modeAlt) ) {
-
-	                    if ( segmentIkBestTapPairs[selectedIndex] == null ) {
+ 
+                    	int accEgr = -1;
+                    	if(modelStructure.getTripModeIsWalkTransit(modeAlt)) {
+                    		accEgr = WTW;
+                    	} else { 
+                    		if (stop.isInboundStop()) {
+                    			accEgr = WTD;
+                    		} else {
+                    			accEgr = DTW;
+                    		}
+                    	}
+                    	
+	                    if ( segmentIkBestTapPairs[selectedIndex][accEgr] == null ) {
 	                        stop.setBoardTap( 0 );
 	                        stop.setAlightTap( 0 );
+	                        stop.setSet( 0 );
 	                    }
 	                    else {
-	                        int rideMode = modelStructure.getRideModeIndexForTripMode(modeAlt);
-	                        if ( segmentIkBestTapPairs[selectedIndex][rideMode] == null ) {
-	                            stop.setBoardTap( 0 );
-	                            stop.setAlightTap( 0 );
-	                        }
-	                        else {
-	                            stop.setBoardTap( segmentIkBestTapPairs[selectedIndex][rideMode][0] );
-	                            stop.setAlightTap( segmentIkBestTapPairs[selectedIndex][rideMode][1] );
-	                        }
+	                        
+                        	//pick transit path from N-paths
+                        	float rn = (float)household.getHhRandom().nextDouble();
+                        	int pathindex = logsumHelper.chooseTripPath(rn, segmentIkBestTapPairs[selectedIndex][accEgr], household.getDebugChoiceModels(), smcLogger);
+                        	
+                            stop.setBoardTap( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][0] );
+                            stop.setAlightTap( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][1] );
+                            stop.setSet( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][2] );
+	                        
 	                    }
                     
                     }
@@ -1061,20 +1079,32 @@ public class IntermediateStopChoiceModels implements Serializable {
 	                // if the last trip is a transit mode, set the boarding and alighting tap pairs in the stop object based on the kj segment pairs
 	                if ( modelStructure.getTripModeIsWalkTransit(modeAlt) | modelStructure.getTripModeIsPnrTransit(modeAlt) || modelStructure.getTripModeIsKnrTransit(modeAlt) ) {
 	
-	                    if ( segmentKjBestTapPairs[oldSelectedIndex] == null ) {
+	                	int accEgr = -1;
+                    	if(modelStructure.getTripModeIsWalkTransit(modeAlt)) {
+                    		accEgr = WTW;
+                    	} else { 
+                    		if (stop.isInboundStop()) {
+                    			accEgr = WTD;
+                    		} else {
+                    			accEgr = DTW;
+                    		}
+                    	}
+                    	
+	                    if ( segmentKjBestTapPairs[oldSelectedIndex][accEgr] == null ) {
 	                        stop.setBoardTap( 0 );
 	                        stop.setAlightTap( 0 );
+	                        stop.setSet( 0 );
 	                    }
 	                    else {
-	                        int rideMode = modelStructure.getRideModeIndexForTripMode(modeAlt);
-	                        if ( segmentKjBestTapPairs[oldSelectedIndex][rideMode] == null ) {
-	                            stop.setBoardTap( 0 );
-	                            stop.setAlightTap( 0 );
-	                        }
-	                        else {
-	                            stop.setBoardTap( segmentKjBestTapPairs[oldSelectedIndex][rideMode][0] );
-	                            stop.setAlightTap( segmentKjBestTapPairs[oldSelectedIndex][rideMode][1] );
-	                        }
+	                        
+	                    	
+                        	//pick transit path from N-paths
+                            float rn = (float)household.getHhRandom().nextDouble();
+                        	int pathindex = logsumHelper.chooseTripPath(rn, segmentKjBestTapPairs[oldSelectedIndex][accEgr], household.getDebugChoiceModels(), smcLogger);
+                        	
+                            stop.setBoardTap( (int)segmentKjBestTapPairs[oldSelectedIndex][accEgr][pathindex][0] );
+                            stop.setAlightTap( (int)segmentKjBestTapPairs[oldSelectedIndex][accEgr][pathindex][1] );
+                            stop.setSet( (int)segmentKjBestTapPairs[oldSelectedIndex][accEgr][pathindex][2] );
 	                    }
 	                
 	                }
@@ -1129,7 +1159,7 @@ public class IntermediateStopChoiceModels implements Serializable {
 
             stop.setMode( modeAlt );
             
-            int[][] bestTaps = null;
+            double[][] bestTaps = null;
             if ( modelStructure.getTripModeIsWalkTransit(modeAlt) ) {
                 if ( directionIsInbound )
                     bestTaps = tour.getBestWtwTapPairsIn();
@@ -1146,17 +1176,17 @@ public class IntermediateStopChoiceModels implements Serializable {
             if ( bestTaps == null ) {
                 stop.setBoardTap( 0 );
                 stop.setAlightTap( 0 );
+                stop.setSet( 0 );
             }
             else {
-                int rideMode = modelStructure.getRideModeIndexForTripMode(modeAlt);
-                if ( bestTaps[rideMode] == null ) {
-                    stop.setBoardTap( 0 );
-                    stop.setAlightTap( 0 );
-                }
-                else {
-                    stop.setBoardTap( bestTaps[rideMode][0] );
-                    stop.setAlightTap( bestTaps[rideMode][1] );
-                }
+            	
+            	//pick transit path from N-paths
+                float rn = (float)household.getHhRandom().nextDouble();
+                int pathindex = logsumHelper.chooseTripPath(rn, bestTaps, household.getDebugChoiceModels(), smcLogger);
+            	
+                stop.setBoardTap( (int)bestTaps[pathindex][0] );
+                stop.setAlightTap( (int)bestTaps[pathindex][1] );
+                stop.setSet( (int)bestTaps[pathindex][2] );
             }
 
             // inbound half-tour, only need park location choice if tour is work-based subtour;
@@ -1287,20 +1317,32 @@ public class IntermediateStopChoiceModels implements Serializable {
                     // if the trip is a transit mode, set the boarding and alighting tap pairs in the stop object based on the ik segment pairs
                     if ( modelStructure.getTripModeIsWalkTransit(modeAlt) | modelStructure.getTripModeIsPnrTransit(modeAlt) || modelStructure.getTripModeIsKnrTransit(modeAlt) ) {
 
+	                	int accEgr = -1;
+                    	if(modelStructure.getTripModeIsWalkTransit(modeAlt)) {
+                    		accEgr = WTW;
+                    	} else { 
+                    		if (stop.isInboundStop()) {
+                    			accEgr = WTD;
+                    		} else {
+                    			accEgr = DTW;
+                    		}
+                    	}
+                    	
 	                    if ( segmentIkBestTapPairs[selectedIndex] == null ) {
 	                        stop.setBoardTap( 0 );
 	                        stop.setAlightTap( 0 );
+	                        stop.setSet( 0 );
 	                    }
 	                    else {
-	                        int rideMode = modelStructure.getRideModeIndexForTripMode(modeAlt);
-	                        if ( segmentIkBestTapPairs[selectedIndex][rideMode] == null ) {
-	                            stop.setBoardTap( 0 );
-	                            stop.setAlightTap( 0 );
-	                        }
-	                        else {
-	                            stop.setBoardTap( segmentIkBestTapPairs[selectedIndex][rideMode][0] );
-	                            stop.setAlightTap( segmentIkBestTapPairs[selectedIndex][rideMode][1] );
-	                        }
+	                    	
+	                    	//pick transit path from N-paths
+                        	float rn = (float)household.getHhRandom().nextDouble();
+                        	int pathindex = logsumHelper.chooseTripPath(rn, segmentIkBestTapPairs[selectedIndex][accEgr], household.getDebugChoiceModels(), smcLogger);
+                        	
+                            stop.setBoardTap( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][0] );
+                            stop.setAlightTap( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][1] );
+                            stop.setSet( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][2]  );
+	                        
 	                    }
                     
                     }
@@ -1360,21 +1402,33 @@ public class IntermediateStopChoiceModels implements Serializable {
 	                
 	                // if the last trip is a transit mode, set the boarding and alighting tap pairs in the stop object based on the kj segment pairs
 	                if ( modelStructure.getTripModeIsWalkTransit(modeAlt) || modelStructure.getTripModeIsPnrTransit(modeAlt) || modelStructure.getTripModeIsKnrTransit(modeAlt) ) {
-	
+	                	
+	                	int accEgr = -1;
+                    	if(modelStructure.getTripModeIsWalkTransit(modeAlt)) {
+                    		accEgr = WTW;
+                    	} else { 
+                    		if (stop.isInboundStop()) {
+                    			accEgr = WTD;
+                    		} else {
+                    			accEgr = DTW;
+                    		}
+                    	}
+                    	
 	                    if ( segmentKjBestTapPairs[oldSelectedIndex] == null ) {
 	                        stop.setBoardTap( 0 );
 	                        stop.setAlightTap( 0 );
+	                        stop.setSet( 0 );
 	                    }
 	                    else {
-	                        int rideMode = modelStructure.getRideModeIndexForTripMode(modeAlt);
-	                        if ( segmentKjBestTapPairs[oldSelectedIndex][rideMode] == null ) {
-	                            stop.setBoardTap( 0 );
-	                            stop.setAlightTap( 0 );
-	                        }
-	                        else {
-	                            stop.setBoardTap( segmentKjBestTapPairs[oldSelectedIndex][rideMode][0] );
-	                            stop.setAlightTap( segmentKjBestTapPairs[oldSelectedIndex][rideMode][1] );
-	                        }
+
+	                    	//pick transit path from N-paths
+                        	float rn = (float)household.getHhRandom().nextDouble();
+                        	int pathindex = logsumHelper.chooseTripPath(rn, segmentKjBestTapPairs[oldSelectedIndex][accEgr], household.getDebugChoiceModels(), smcLogger);
+                        	
+                            stop.setBoardTap( (int)segmentKjBestTapPairs[oldSelectedIndex][accEgr][pathindex][0] );
+                            stop.setAlightTap( (int)segmentKjBestTapPairs[oldSelectedIndex][accEgr][pathindex][1] );
+                            stop.setSet( (int)segmentKjBestTapPairs[oldSelectedIndex][accEgr][pathindex][2] );
+                        
 	                    }
 	                
 	                }
@@ -1432,7 +1486,7 @@ public class IntermediateStopChoiceModels implements Serializable {
 
             stop.setMode( modeAlt );
 
-            int[][] bestTaps = null;
+            double[][] bestTaps = null;
             if ( modelStructure.getTripModeIsWalkTransit(modeAlt) ) {
                 if ( directionIsInbound )
                     bestTaps = tour.getBestWtwTapPairsIn();
@@ -1449,17 +1503,23 @@ public class IntermediateStopChoiceModels implements Serializable {
             if ( bestTaps == null ) {
                 stop.setBoardTap( 0 );
                 stop.setAlightTap( 0 );
+                stop.setSet( 0 );
             }
             else {
-                int rideMode = modelStructure.getRideModeIndexForTripMode(modeAlt);
-                if ( bestTaps[rideMode] == null ) {
-                    stop.setBoardTap( 0 );
-                    stop.setAlightTap( 0 );
+                
+            	// set taps
+                if ( modelStructure.getTripModeIsWalkTransit(modeAlt) || modelStructure.getTripModeIsPnrTransit(modeAlt) || modelStructure.getTripModeIsKnrTransit(modeAlt) ) {
+
+                	//pick transit path from N-paths
+                	float rn = (float)household.getHhRandom().nextDouble();
+                	int pathindex = logsumHelper.chooseTripPath(rn, bestTaps, household.getDebugChoiceModels(), smcLogger);
+                	
+                    stop.setBoardTap( (int)bestTaps[pathindex][0] );
+                    stop.setAlightTap( (int)bestTaps[pathindex][1] );
+                    stop.setSet( (int)bestTaps[pathindex][2] );
+
                 }
-                else {
-                    stop.setBoardTap( bestTaps[rideMode][0] );
-                    stop.setAlightTap( bestTaps[rideMode][1] );
-                }
+            
             }
 
             // inbound half-tour, only need park location choice if tour is work-based subtour;
@@ -2076,13 +2136,13 @@ public class IntermediateStopChoiceModels implements Serializable {
 
             		// if the sampled mgra is in the outbound half-tour boarding tap shed (near tour origin)
             		if ( sampleMgraInBoardingTapShed[altMgra] ) {
-            			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
-            			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+            			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
+            			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             		}
 
             		// if the sampled mgra is in the outbound half-tour alighting tap shed (near tour primary destination)
             		if ( sampleMgraInAlightingTapShed[altMgra] ) {
-            			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
+            			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
             			logsumHelper.setDtwTripMcDmuAttributes(mcDmuObject,s.getOrig(),altMgra,s.getStopPeriod(),s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels());
             		}
 
@@ -2090,7 +2150,7 @@ public class IntermediateStopChoiceModels implements Serializable {
             		// if the trip origin and sampled mgra are in the outbound half-tour alighting tap shed (near tour origin)
             		if ( sampleMgraInAlightingTapShed[s.getOrig()] && sampleMgraInAlightingTapShed[altMgra] ) {
             			logsumHelper.setWtwTripMcDmuAttributes(mcDmuObject, s.getOrig(), altMgra, s.getStopPeriod(),s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels());
-            			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+            			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             		}
             		            		
             	}
@@ -2099,19 +2159,19 @@ public class IntermediateStopChoiceModels implements Serializable {
             		// if the sampled mgra is in the inbound half-tour boarding tap shed (near tour primary destination)
             		if ( sampleMgraInBoardingTapShed[altMgra] ) {
             			logsumHelper.setWtwTripMcDmuAttributes( mcDmuObject, s.getOrig(), altMgra, s.getStopPeriod(), s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels() );
-            			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+            			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             		}
 
             		// if the sampled mgra is in the inbound half-tour alighting tap shed (near tour origin)
             		if ( sampleMgraInAlightingTapShed[altMgra] ) {
-            			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
+            			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
             			logsumHelper.setWtdTripMcDmuAttributes(mcDmuObject,s.getOrig(),altMgra,s.getStopPeriod(),s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels());
             		}
 
             		// if the trip origin and sampled mgra are in the inbound half-tour alighting tap shed (near tour origin)
             		if ( sampleMgraInAlightingTapShed[s.getOrig()] && sampleMgraInAlightingTapShed[altMgra] ) {
-            			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
-            			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+            			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
+            			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             		}
 
             	}
@@ -2124,8 +2184,8 @@ public class IntermediateStopChoiceModels implements Serializable {
             		            		
             }
             else {
-    			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
-    			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+    			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
+    			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             }
 			ikSegment = logsumHelper.calculateTripMcLogsum( s.getOrig(), altMgra, s.getStopPeriod(), mcModel, mcDmuObject, slcLogger );
             
@@ -2151,7 +2211,15 @@ public class IntermediateStopChoiceModels implements Serializable {
             mcCumProbsSegmentIk[i] = logsumHelper.getStoredSegmentCumulativeProbabilities();
 
            // store the best tap pairs for the segment
-            segmentIkBestTapPairs[i] = logsumHelper.getBestTripTaps();
+            for(int j=0; j<ACC_EGR.length; j++) {
+            	if(j==WTW) {
+            		segmentIkBestTapPairs[i][j] = logsumHelper.getBestWtwTripTaps();
+            	} else if (j==WTD) {
+            		segmentIkBestTapPairs[i][j] = logsumHelper.getBestWtdTripTaps();
+            	} else {
+            		segmentIkBestTapPairs[i][j] = logsumHelper.getBestDtwTripTaps();
+            	}
+            }
             
             // set values for walk-transit and drive-transit tours according to logic for KJ segments
             mcDmuObject.setAutoModeRequiredForTripSegment( false );
@@ -2176,28 +2244,28 @@ public class IntermediateStopChoiceModels implements Serializable {
             	if ( ! s.isInboundStop() ) {
             		
             		if ( sampleMgraInBoardingTapShed[altMgra] ) {
-            			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
+            			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
             			logsumHelper.setDtwTripMcDmuAttributes(mcDmuObject,altMgra,halfTourFinalDest,s.getStopPeriod(),s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels());
             		}
 
             		// if the trip origin is in the outbound half-tour alighting tap shed (close to tour primary destination)
             		if ( sampleMgraInAlightingTapShed[altMgra] ) {
             			logsumHelper.setWtwTripMcDmuAttributes( mcDmuObject, altMgra, halfTourFinalDest, s.getStopPeriod(), s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels() );
-            			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+            			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             		}
             		            		
             	}
             	else {
             		
             		if ( sampleMgraInBoardingTapShed[altMgra] ) {
-            			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
+            			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
             			logsumHelper.setWtdTripMcDmuAttributes(mcDmuObject,altMgra,halfTourFinalDest,s.getStopPeriod(),s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels());
             		}
             		
             		// if the trip origin is in the inbound half-tour alighting tap shed (close to tour origin)
             		if ( sampleMgraInAlightingTapShed[altMgra] ) {
             			logsumHelper.setWtwTripMcDmuAttributes( mcDmuObject, altMgra, halfTourFinalDest, s.getStopPeriod(), s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels() );
-            			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+            			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             		}
 
             	}
@@ -2210,8 +2278,8 @@ public class IntermediateStopChoiceModels implements Serializable {
             		            		
             }
             else {
-    			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
-    			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+    			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
+    			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
             }
 			kjSegment = logsumHelper.calculateTripMcLogsum( altMgra, halfTourFinalDest, s.getStopPeriod(), mcModel, mcDmuObject, slcLogger );
 
@@ -2234,7 +2302,15 @@ public class IntermediateStopChoiceModels implements Serializable {
             mcCumProbsSegmentKj[i] = logsumHelper.getStoredSegmentCumulativeProbabilities();
             
             // store the best tap pairs for the segment
-            segmentKjBestTapPairs[i] = logsumHelper.getBestTripTaps();
+            for(int j=0; j<ACC_EGR.length; j++) {
+            	if(j==WTW) {
+            		segmentKjBestTapPairs[i][j] = logsumHelper.getBestWtwTripTaps();
+            	} else if (j==WTD) {
+            		segmentKjBestTapPairs[i][j] = logsumHelper.getBestWtdTripTaps();
+            	} else {
+            		segmentKjBestTapPairs[i][j] = logsumHelper.getBestDtwTripTaps();
+            	}
+            }
 
             tripModeChoiceLogsums[i] = ikSegment + kjSegment;
         }
@@ -2705,7 +2781,7 @@ public class IntermediateStopChoiceModels implements Serializable {
         mcDmuObject.setTourModeIsS3( modelStructure.getTourModeIsS3( tourMode ) ? 1 : 0 );
         mcDmuObject.setTourModeIsWalk( modelStructure.getTourModeIsWalk( tourMode ) ? 1 : 0 );
         mcDmuObject.setTourModeIsBike( modelStructure.getTourModeIsBike( tourMode ) ? 1 : 0 );
-        mcDmuObject.setTourModeIsWTran( modelStructure.getTourModeIsWalkLocal(tourMode ) || modelStructure.getTourModeIsWalkPremium(tourMode ) ? 1 : 0 );
+        mcDmuObject.setTourModeIsWTran( modelStructure.getTourModeIsWalkTransit(tourMode) ? 1 : 0 );
         mcDmuObject.setTourModeIsPnr( modelStructure.getTourModeIsPnr( tourMode ) ? 1 : 0 );
         mcDmuObject.setTourModeIsKnr( modelStructure.getTourModeIsKnr( tourMode ) ? 1 : 0 );
         mcDmuObject.setTourModeIsSchBus( modelStructure.getTourModeIsSchoolBus( tourMode ) ? 1 : 0 );
@@ -2732,7 +2808,7 @@ public class IntermediateStopChoiceModels implements Serializable {
 
         
         int availableCount = 0;
-        int[][] bestTaps = null;
+        double[][] bestTaps = null;
         
         if ( s.isInboundStop() ) {
  
@@ -2750,34 +2826,34 @@ public class IntermediateStopChoiceModels implements Serializable {
                 //    continue;                    
 
                 boolean accessible = false;
-                for (int[] tapPair : bestTaps ) {
+                for (double[] tapPair : bestTaps ) {
                     if ( tapPair == null )
                         continue;                    
                     
                     if ( modelStructure.getTourModeIsWalkTransit(t.getTourModeChoice() ) ) {
                         // if alternative location mgra is accessible by walk to any of the best inbound boarding taps, AND it's accessible by walk to the stop origin, it's available.                    
-                        if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, tapPair[0])
+                        if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, (int)tapPair[0])
                                 && mgraManager.getMgrasAreWithinWalkDistance(s.getOrig(), alt) 
                                 && earlierTripWasLocatedInAlightingTapShed == false ) {
                             accessible = true;
                             sampleMgraInBoardingTapShed[alt] = true;
                         }
                         // if alternative location mgra is accessible by walk to any of the best inbound alighting taps, AND it's accessible by walk to the tour origin, it's available.                    
-                        else if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, tapPair[1]) && mgraManager.getMgrasAreWithinWalkDistance(alt, t.getTourOrigMgra()) ) {
+                        else if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, (int)tapPair[1]) && mgraManager.getMgrasAreWithinWalkDistance(alt, t.getTourOrigMgra()) ) {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
                         }
                     }
                     else {
                         // if alternative location mgra is accessible by walk to any of the best origin taps, AND it's accessible by walk to the stop origin, it's available.                    
-                        if (  mgraManager.getTapIsWalkAccessibleFromMgra(alt, tapPair[0])
+                        if (  mgraManager.getTapIsWalkAccessibleFromMgra(alt, (int)tapPair[0])
                                 && mgraManager.getMgrasAreWithinWalkDistance(s.getOrig(), alt)
                                 && earlierTripWasLocatedInAlightingTapShed == false ) {
                             accessible = true;
                             sampleMgraInBoardingTapShed[alt] = true;
                         }
                         // if alternative location mgra is accessible by drive to any of the best destination taps it's available.                    
-                        else if (  mgraManager.getTapIsDriveAccessibleFromMgra(alt, tapPair[1]) ) {
+                        else if (  mgraManager.getTapIsDriveAccessibleFromMgra(alt, (int)tapPair[1]) ) {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
                         }
@@ -2816,33 +2892,33 @@ public class IntermediateStopChoiceModels implements Serializable {
                 // check whether any of the outbound dtw boarding taps or best wtw alighting taps are in the set of walk accessible TAPs for the alternative mgra.
                 // if not, the alternative is not available.
                 boolean accessible = false;
-                for (int[] tapPair : bestTaps ) {
+                for (double[] tapPair : bestTaps ) {
                     if ( tapPair == null )
                         continue;
                                         
                     if ( modelStructure.getTourModeIsWalkTransit(t.getTourModeChoice() ) ) {
                         // if alternative location mgra is accessible by walk to any of the best origin taps, AND it's accessible by walk to the stop origin, it's available.                    
-                        if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, tapPair[0])
+                        if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, (int)tapPair[0])
                                 && mgraManager.getMgrasAreWithinWalkDistance(s.getOrig(), alt)
                                 && earlierTripWasLocatedInAlightingTapShed == false ) {
                             accessible = true;
                             sampleMgraInBoardingTapShed[alt] = true;
                         }
                         // if alternative location mgra is accessible by walk to any of the best destination taps, AND it's accessible by walk to the tour primary destination, it's available.                    
-                        else if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, tapPair[1]) && mgraManager.getMgrasAreWithinWalkDistance(alt, t.getTourDestMgra()) ) {
+                        else if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, (int)tapPair[1]) && mgraManager.getMgrasAreWithinWalkDistance(alt, t.getTourDestMgra()) ) {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
                         }
                     }
                     else {
                         // if alternative location mgra is accessible by drive to any of the best origin taps, it's available.                    
-                        if ( mgraManager.getTapIsDriveAccessibleFromMgra(alt, tapPair[0])
+                        if ( mgraManager.getTapIsDriveAccessibleFromMgra(alt, (int)tapPair[0])
                                 && earlierTripWasLocatedInAlightingTapShed == false ) {
                             accessible = true;
                             sampleMgraInBoardingTapShed[alt] = true;
                         }
                         // if alternative location mgra is accessible by walk to any of the best destination taps, AND it's accessible by walk to the tour primary destination, it's available.                    
-                        else if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, tapPair[1]) && mgraManager.getMgrasAreWithinWalkDistance(alt, t.getTourDestMgra()) ) {
+                        else if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, (int)tapPair[1]) && mgraManager.getMgrasAreWithinWalkDistance(alt, t.getTourDestMgra()) ) {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
                         }
@@ -3027,7 +3103,7 @@ public class IntermediateStopChoiceModels implements Serializable {
 
         if ( modelStructure.getTourModeIsDriveTransit(s.getTour().getTourModeChoice()) ) {
         	 
-			logsumHelper.setWalkTransitSkimsUnavailable( mcDmuObject );
+			logsumHelper.setWalkTransitLogSumUnavailable( mcDmuObject );
 
 			if ( s.isInboundStop() )
         		logsumHelper.setWtdTripMcDmuAttributesForBestTapPairs( mcDmuObject, s.getOrig(), altMgra, s.getStopPeriod(), s.getTour().getBestWtdTapPairsIn(), s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels() );
@@ -3037,7 +3113,7 @@ public class IntermediateStopChoiceModels implements Serializable {
         }
         else {
 
-			logsumHelper.setDriveTransitSkimsUnavailable( mcDmuObject, s.isInboundStop() );
+			logsumHelper.setDriveTransitLogSumUnavailable( mcDmuObject, s.isInboundStop() );
         	
         	if ( s.isInboundStop() )
         		logsumHelper.setWtwTripMcDmuAttributesForBestTapPairs( mcDmuObject, s.getOrig(), altMgra, s.getStopPeriod(), s.getTour().getBestWtwTapPairsIn(), s.getTour().getPersonObject().getHouseholdObject().getDebugChoiceModels() );

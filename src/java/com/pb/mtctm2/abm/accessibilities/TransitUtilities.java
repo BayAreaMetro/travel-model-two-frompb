@@ -422,12 +422,11 @@ public class TransitUtilities
             logger.info("");
             logger.info("Best Utilities for mgra pair " + oMgra + " to " + dMgra + " period "
                     + period);
-            logger.info("ModeNumber, Mode, ExpUtility, bestITap, bestJTap");
-            Modes.TransitMode[] mode = Modes.TransitMode.values();
+            logger.info("Alt, Alt, ExpUtility, bestITap, bestJTap");
             for (int i = 0; i < bestUtilities.length; ++i)
             {
-                int[] bestTaps = walkUEC[period].getBestTaps(mode[i]);
-                logger.info(i + "," + mode[i] + "," + bestUtilities[i] + "," + bestTaps[0] + ","
+                double[] bestTaps = walkUEC[period].getBestTaps(i);
+                logger.info(i + "," + i + "," + bestUtilities[i] + "," + bestTaps[0] + ","
                         + bestTaps[1]);
             }
         }
@@ -514,12 +513,11 @@ public class TransitUtilities
             logger.info("");
             logger.info("Best Utilities for mgra pair " + oTaz + " to " + dMgra + " period "
                     + period);
-            logger.info("ModeNumber, Mode, ExpUtility, bestITap, bestJTap");
-            Modes.TransitMode[] mode = Modes.TransitMode.values();
+            logger.info("Alt, Alt, ExpUtility, bestITap, bestJTap");
             for (int i = 0; i < bestUtilities.length; ++i)
             {
-                int[] bestTaps = driveUEC[period].getBestTaps(mode[i]);
-                logger.info(i + "," + mode[i] + "," + bestUtilities[i] + "," + bestTaps[0] + ","
+                double[] bestTaps = driveUEC[period].getBestTaps(i);
+                logger.info(i + "," + i + "," + bestUtilities[i] + "," + bestTaps[0] + ","
                         + bestTaps[1]);
             }
         }
@@ -530,11 +528,11 @@ public class TransitUtilities
     /**
      * Get the best walk taps for the given transit mode and period.
      * 
-     * @param transitMode The transit mode to look up.
+     * @param int The transit mode to look up.
      * @param period 0 For off-peak, 1 for peak
      * @return An array where element 0 = best pTap, and element 1 = best aTap.
      */
-    public int[] getBestWalkTaps(Modes.TransitMode transitMode, int period)
+    public double[] getBestWalkTaps(int transitMode, int period)
     {
 
         return walkUEC[period].getBestTaps(transitMode);
@@ -547,10 +545,10 @@ public class TransitUtilities
      * @param period 0 For off-peak, 1 for peak
      * @return An array where element 0 = best pTap, and element 1 = best aTap.
      */
-    public int[] getBestWalkTaps(int period)
+    public double[] getBestWalkTaps(int period)
     {
 
-        Modes.TransitMode bestMode = getBestWalkTransitMode(period);
+        int bestMode = getBestWalkTransitMode(period);
         return walkUEC[period].getBestTaps(bestMode);
 
     }
@@ -558,11 +556,11 @@ public class TransitUtilities
     /**
      * Get the best walk taps for the given transit mode and period.
      * 
-     * @param transitMode The transit mode to look up.
+     * @param int The transit mode to look up.
      * @param period 0 For off-peak, 1 for peak
      * @return An array where element 0 = best pTap, and element 1 = best aTap.
      */
-    public int[] getBestDriveTaps(Modes.TransitMode transitMode, int period)
+    public double[] getBestDriveTaps(int transitMode, int period)
     {
 
         return driveUEC[period].getBestTaps(transitMode);
@@ -575,10 +573,10 @@ public class TransitUtilities
      * @param period 0 For off-peak, 1 for peak
      * @return An array where element 0 = best pTap, and element 1 = best aTap.
      */
-    public int[] getBestDriveTaps(int period)
+    public double[] getBestDriveTaps(int period)
     {
 
-        Modes.TransitMode bestMode = getBestDriveTransitMode(period);
+        int bestMode = getBestDriveTransitMode(period);
         return driveUEC[period].getBestTaps(bestMode);
 
     }
@@ -601,10 +599,8 @@ public class TransitUtilities
      * @param period 0 For off-peak, 1 for peak
      * @return The best transit mode (highest exponentiated utility)
      */
-    public Modes.TransitMode getBestWalkTransitMode(int period)
+    public int getBestWalkTransitMode(int period)
     {
-
-        Modes.TransitMode[] tm = Modes.TransitMode.values();
 
         int bestMode = -1;
         double bestUtility = 0;
@@ -615,9 +611,9 @@ public class TransitUtilities
                 bestMode = i;
                 bestUtility = bestUtilities[i];
             }
-        if (bestMode > -1) return tm[bestMode];
+        if (bestMode > -1) return bestMode;
 
-        return null;
+        return bestMode;
     }
 
     /**
@@ -628,10 +624,8 @@ public class TransitUtilities
      * @param period 0 For off-peak, 1 for peak
      * @return The best transit mode (highest exponentiated utility)
      */
-    public Modes.TransitMode getBestDriveTransitMode(int period)
+    public int getBestDriveTransitMode(int period)
     {
-
-        Modes.TransitMode[] tm = Modes.TransitMode.values();
 
         int bestMode = -1;
         double bestUtility = 0;
@@ -642,9 +636,9 @@ public class TransitUtilities
                 bestMode = i;
                 bestUtility = bestUtilities[i];
             }
-        if (bestMode > -1) return tm[bestMode];
+        if (bestMode > -1) return bestMode;
 
-        return null;
+        return bestMode;
     }
 
     /**

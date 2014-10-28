@@ -252,6 +252,9 @@ if ERRORLEVEL 2 goto done
 runtpp %BASE_SCRIPTS%\skims\TransitSkims.job
 if ERRORLEVEL 2 goto done
 
+runtpp %BASE_SCRIPTS%\skims\SkimSetsAdjustment.job
+if ERRORLEVEL 2 goto done
+
 ::copy skims and other related ifles to remote machine
 ROBOCOPY skims %HH_SERVER_BASE_DIR%\skims *.tpp drive_maz_taz_tap.csv /NDL /NFL
 ROBOCOPY trn %HH_SERVER_BASE_DIR%\trn tapLines.csv /NDL /NFL
@@ -294,7 +297,7 @@ ping -n 10 localhost
 
 taskkill /im "java.exe" /F
 ::start CTRAMP\runtime\runDriver.cmd
-copy CTRAMP\runtime\mtctm2.properties mtctm2.properties
+copy CTRAMP\runtime\mtctm2.properties mtctm2.properties    /Y
 call CTRAMP\runtime\runMTCTM2ABM.cmd %SAMPLERATE% %ITERATION% "%JAVA_PATH%"
 del mtctm2.properties
 taskkill /im "java.exe" /F

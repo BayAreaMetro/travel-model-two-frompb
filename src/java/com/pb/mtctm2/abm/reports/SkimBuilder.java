@@ -49,28 +49,19 @@ public class SkimBuilder {
     private static final int HOV_TOLL_HOV_DIST_INDEX = 16;
     private static final int HOV_TOLL_TOLL_DIST_INDEX = 17;
 
-    private static final int TRANSIT_LOCAL_ACCESS_TIME_INDEX = 0;
-    private static final int TRANSIT_LOCAL_EGRESS_TIME_INDEX = 1;
-    private static final int TRANSIT_LOCAL_AUX_WALK_TIME_INDEX = 2;
-    private static final int TRANSIT_LOCAL_TOTTIME_INDEX = 3;
-    private static final int TRANSIT_LOCAL_FIRST_WAIT_TIME_INDEX = 4;    
-    private static final int TRANSIT_LOCAL_TRANSFER_WAIT_TIME_INDEX = 5;
-    private static final int TRANSIT_LOCAL_FARE_INDEX = 6;
-    private static final int TRANSIT_LOCAL_XFERS_INDEX = 7;
-
-    private static final int TRANSIT_PREM_ACCESS_TIME_INDEX = 0;
-    private static final int TRANSIT_PREM_EGRESS_TIME_INDEX = 1;
-    private static final int TRANSIT_PREM_AUX_WALK_TIME_INDEX = 2;
-    private static final int TRANSIT_PREM_LOCAL_BUS_TIME_INDEX = 3;
-    private static final int TRANSIT_PREM_EXPRESS_BUS_TIME_INDEX = 4;
-    private static final int TRANSIT_PREM_BRT_TIME_INDEX = 5;
-    private static final int TRANSIT_PREM_LRT_TIME_INDEX = 6;
-    private static final int TRANSIT_PREM_CR_TIME_INDEX = 7;
-    private static final int TRANSIT_PREM_FIRST_WAIT_TIME_INDEX = 8;
-    private static final int TRANSIT_PREM_TRANSFER_WAIT_TIME_INDEX = 9;
-    private static final int TRANSIT_PREM_FARE_INDEX = 10;
-    private static final int TRANSIT_MAIN_MODE_INDEX = 11;
-    private static final int TRANSIT_PREM_XFERS_INDEX = 12;
+    private static final int TRANSIT_SET_ACCESS_TIME_INDEX = 0;
+    private static final int TRANSIT_SET_EGRESS_TIME_INDEX = 1;
+    private static final int TRANSIT_SET_AUX_WALK_TIME_INDEX = 2;
+    private static final int TRANSIT_SET_LOCAL_BUS_TIME_INDEX = 3;
+    private static final int TRANSIT_SET_EXPRESS_BUS_TIME_INDEX = 4;
+    private static final int TRANSIT_SET_BRT_TIME_INDEX = 5;
+    private static final int TRANSIT_SET_LRT_TIME_INDEX = 6;
+    private static final int TRANSIT_SET_CR_TIME_INDEX = 7;
+    private static final int TRANSIT_SET_FIRST_WAIT_TIME_INDEX = 8;
+    private static final int TRANSIT_SET_TRANSFER_WAIT_TIME_INDEX = 9;
+    private static final int TRANSIT_SET_FARE_INDEX = 10;
+    private static final int TRANSIT_SET_MAIN_MODE_INDEX = 11;
+    private static final int TRANSIT_SET_XFERS_INDEX = 12;
 
     private final TapDataManager tapManager;
     private final TazDataManager tazManager;
@@ -89,7 +80,6 @@ public class SkimBuilder {
         HashMap<String,String> rbMap = new HashMap<String,String>((Map<String,String>) (Map) properties);
         startMatrixServer(properties);
 
-           
         tapManager = TapDataManager.getInstance(rbMap);
         tazManager = TazDataManager.getInstance(rbMap);
         mgraManager = MgraDataManager.getInstance(rbMap);
@@ -102,11 +92,11 @@ public class SkimBuilder {
         DEFAULT_WALK_SPEED = (float) autoNonMotSkims.getWalkSpeed();
         
         BestTransitPathCalculator bestPathUEC = new BestTransitPathCalculator(rbMap);
-        wtw = new WalkTransitWalkSkimsCalculator();
+        wtw = new WalkTransitWalkSkimsCalculator(rbMap);
         wtw.setup(rbMap,logger, bestPathUEC);
-        wtd = new WalkTransitDriveSkimsCalculator();
+        wtd = new WalkTransitDriveSkimsCalculator(rbMap);
         wtd.setup(rbMap,logger, bestPathUEC);
-        dtw = new DriveTransitWalkSkimsCalculator();
+        dtw = new DriveTransitWalkSkimsCalculator(rbMap);
         dtw.setup(rbMap,logger, bestPathUEC);
         
     }
@@ -131,37 +121,6 @@ public class SkimBuilder {
 
     }
 
-    //todo: hard coding these next two lookups because it is convenient, but probably should move to a lookup file
-    private final String[] modeNameLookup = {
-            "UNKNOWN", //ids start at one
-            "DRIVEALONEFREE", 	//1
-            "DRIVEALONEPAY",	//2
-            "SHARED2GP",		//3
-            "SHARED2HOV",		//4
-            "SHARED2PAY",		//5
-            "SHARED3GP",		//6
-            "SHARED3HOV",		//7
-            "SHARED3PAY",		//8
-            "WALK",				//9
-            "BIKE",				//10
-            "WALK_LOC",			//11
-            "WALK_EXP",			//12
-            "WALK_BRT",			//13
-            "WALK_LR",			//14
-            "WALK_CR",			//15
-            "PNR_LOC",			//16
-            "PNR_EXP",			//17
-            "PNR_BRT",			//18
-            "PNR_LR",			//19
-            "PNR_CR",			//20
-            "KNR_LOC",			//21
-            "KNR_EXP",			//22
-            "KNR_BRT",			//23
-            "KNR_LR",			//24
-            "KNR_CR",			//25
-            "SCHBUS",			//26
-    };
-
     private final TripModeChoice[] modeChoiceLookup = {
             TripModeChoice.UNKNOWN,
             TripModeChoice.DRIVE_ALONE_NO_TOLL,
@@ -174,23 +133,10 @@ public class SkimBuilder {
             TripModeChoice.HOV_TOLL,
             TripModeChoice.WALK,
             TripModeChoice.BIKE,
-            TripModeChoice.WALK_LB,
-            TripModeChoice.WALK_EB,
-            TripModeChoice.WALK_BRT,
-            TripModeChoice.WALK_LRT,
-            TripModeChoice.WALK_CR,
-            TripModeChoice.DRIVE_LB,
-            TripModeChoice.DRIVE_EB,
-            TripModeChoice.DRIVE_BRT,
-            TripModeChoice.DRIVE_LRT,
-            TripModeChoice.DRIVE_CR,
-            TripModeChoice.DRIVE_LB,
-            TripModeChoice.DRIVE_EB,
-            TripModeChoice.DRIVE_BRT,
-            TripModeChoice.DRIVE_LRT,
-            TripModeChoice.DRIVE_CR,
+            TripModeChoice.WALK_SET,           
+            TripModeChoice.DRIVE_SET,
+            TripModeChoice.DRIVE_SET,
             TripModeChoice.HOV_NO_TOLL
-
     };
 
     private int getTod(int tripTimePeriod) {
@@ -202,11 +148,10 @@ public class SkimBuilder {
         return (tripTimePeriod-1)*30 + 270; //starts at 4:30 and goes half hour intervals after that
     }
 
-    public TripAttributes getTripAttributes(int origin, int destination, int tripModeIndex, int boardTap, int alightTap, int tripTimePeriod, boolean inbound) {
+    public TripAttributes getTripAttributes(int origin, int destination, int tripModeIndex, int boardTap, int alightTap, int tripTimePeriod, boolean inbound, int set) {
         int tod = getTod(tripTimePeriod);
         TripModeChoice tripMode = modeChoiceLookup[tripModeIndex < 0 ? 0 : tripModeIndex];
-        TripAttributes attributes = getTripAttributes(tripMode,origin,destination,boardTap,alightTap,tod,inbound);
-        attributes.setTripModeName(modeNameLookup[tripModeIndex < 0 ? 0 : tripModeIndex]);
+        TripAttributes attributes = getTripAttributes(tripMode,origin,destination,boardTap,alightTap,tod,inbound,set);
         attributes.setTripStartTime(getStartTime(tripTimePeriod));
         int oTaz = -1;
         int dTaz = -1;
@@ -225,13 +170,10 @@ public class SkimBuilder {
         return baseCost;
     }
 
-    private TripAttributes getTripAttributes(TripModeChoice modeChoice, int origin, int destination, int boardTap, int alightTap, int tod, boolean inbound) {
+    private TripAttributes getTripAttributes(TripModeChoice modeChoice, int origin, int destination, int boardTap, int alightTap, int tod, boolean inbound, int set) {
         int timeIndex = -1;
         int distIndex = -1;
         int costIndex = -1;
-
-        int rideModeIndex = modeChoice.getRideModeIndex();
-        
 
         switch (modeChoice) {
             case UNKNOWN : return getTripAttributesUnknown();
@@ -283,18 +225,9 @@ public class SkimBuilder {
                 
 
             }
-            case WALK_LB : 
-            case WALK_EB :
-            case WALK_BRT :
-            case WALK_LRT :
-            case WALK_CR :
-            case DRIVE_LB :
-            case DRIVE_EB :
-            case DRIVE_BRT :
-            case DRIVE_LRT :
-            case DRIVE_CR : {
+            case WALK_SET : 
+            case DRIVE_SET : {
                 boolean isDrive = modeChoice.isDrive;
-                boolean isPremium = modeChoice.isPremium;
 
                 double[] skims;
                 int boardTaz = -1;
@@ -318,13 +251,14 @@ public class SkimBuilder {
                             logger.info("alight tap: " + alightTap);
                             logger.info("tod: " + tod);
                             logger.info("inbound: " + inbound);
+                            logger.info("set: " + set);
                             logger.info("board tap position: " + btapPosition);
                             logger.info("alight tap position: " + atapPosition);
                         } else {
                             boardAccessTime = tazManager.getTapTime(taz,btapPosition,Modes.AccessMode.PARK_N_RIDE);
                             alightAccessTime = mgraManager.getMgraToTapWalkTime(destination,atapPosition);
                         }
-                        skims = dtw.getDriveTransitWalkSkims(rideModeIndex,boardAccessTime,alightAccessTime,boardTap,alightTap,tod,false);
+                        skims = dtw.getDriveTransitWalkSkims(set,boardAccessTime,alightAccessTime,boardTap,alightTap,tod,false);
                     } else { //inbound: transit from origin to destination, then drive
                         int taz = -1;
                         try {
@@ -339,6 +273,7 @@ public class SkimBuilder {
                             logger.info("alight tap: " + alightTap);
                             logger.info("tod: " + tod);
                             logger.info("inbound: " + inbound);
+                            logger.info("set: " + set);
                             logger.info("a: " + tapManager.getTapParkingInfo());
                             logger.info("b: " + tapManager.getTapParkingInfo()[alightTap]);
                             logger.info("b: " + tapManager.getTapParkingInfo()[alightTap][1]);
@@ -355,6 +290,7 @@ public class SkimBuilder {
                             logger.info("board tap: " + boardTap);
                             logger.info("alight tap: " + alightTap);
                             logger.info("tod: " + tod);
+                            logger.info("set: " + set);
                             logger.info("inbound: " + inbound);
                             logger.info("board tap position: " + btapPosition);
                             logger.info("alight tap position: " + atapPosition);
@@ -362,7 +298,7 @@ public class SkimBuilder {
                             boardAccessTime = mgraManager.getMgraToTapWalkTime(origin,btapPosition);
                             alightAccessTime = tazManager.getTapTime(taz,atapPosition,Modes.AccessMode.PARK_N_RIDE);
                         }
-                        skims = wtd.getWalkTransitDriveSkims(rideModeIndex,boardAccessTime,alightAccessTime,boardTap,alightTap,tod,false);
+                        skims = wtd.getWalkTransitDriveSkims(set,boardAccessTime,alightAccessTime,boardTap,alightTap,tod,false);
                     }
                 } else {
                     int bt = mgraManager.getTapPosition(origin,boardTap);
@@ -376,90 +312,54 @@ public class SkimBuilder {
                         logger.info("alight tap: " + alightTap);
                         logger.info("tod: " + tod);
                         logger.info("inbound: " + inbound);
+                        logger.info("set: " + set);
                         logger.info("board tap position: " + bt);
                         logger.info("alight tap position: " + at);
                     } else {
                         boardAccessTime = mgraManager.getMgraToTapWalkTime(origin,bt);
                         alightAccessTime = mgraManager.getMgraToTapWalkTime(destination,at);
                     }
-                    skims = wtw.getWalkTransitWalkSkims(rideModeIndex,boardAccessTime,alightAccessTime,boardTap,alightTap,tod,false);
+                    skims = wtw.getWalkTransitWalkSkims(set,boardAccessTime,alightAccessTime,boardTap,alightTap,tod,false);
                 }
 
                 double time = 0.0;
-                switch (modeChoice) {
-                //Fixed so that time is not being accumulated for all modes, just one per case
-                    
-                	case DRIVE_CR 	:
-                    case WALK_CR 	: {time += skims[TRANSIT_PREM_CR_TIME_INDEX]; break;}
-                    case DRIVE_LRT 	:
-                    case WALK_LRT 	: {time += skims[TRANSIT_PREM_LRT_TIME_INDEX]; break;}   
-                    case DRIVE_BRT 	:
-                    case WALK_BRT 	: {time += skims[TRANSIT_PREM_BRT_TIME_INDEX]; break;}  
-                    case DRIVE_EB 	: 
-                    case WALK_EB 	: {time += skims[TRANSIT_PREM_EXPRESS_BUS_TIME_INDEX]; break;}
-                    case DRIVE_LB 	:
-                    case WALK_LB 	: {time += skims[isPremium ? TRANSIT_PREM_LOCAL_BUS_TIME_INDEX : TRANSIT_LOCAL_TOTTIME_INDEX]; break;}
-       
-					default			: throw new IllegalStateException("Should not be here: " + modeChoice);
-                }
-                time += skims[isPremium ? TRANSIT_PREM_ACCESS_TIME_INDEX : TRANSIT_LOCAL_ACCESS_TIME_INDEX];
-                time += skims[isPremium ? TRANSIT_PREM_EGRESS_TIME_INDEX : TRANSIT_LOCAL_EGRESS_TIME_INDEX];
-                time += skims[isPremium ? TRANSIT_PREM_AUX_WALK_TIME_INDEX : TRANSIT_LOCAL_AUX_WALK_TIME_INDEX];
-                time += skims[isPremium ? TRANSIT_PREM_FIRST_WAIT_TIME_INDEX : TRANSIT_LOCAL_FIRST_WAIT_TIME_INDEX];
-                time += skims[isPremium ? TRANSIT_PREM_TRANSFER_WAIT_TIME_INDEX : TRANSIT_LOCAL_TRANSFER_WAIT_TIME_INDEX];
+                
+                time += skims[TRANSIT_SET_CR_TIME_INDEX];
+                time += skims[TRANSIT_SET_LRT_TIME_INDEX];
+                time += skims[TRANSIT_SET_BRT_TIME_INDEX];
+                time += skims[TRANSIT_SET_EXPRESS_BUS_TIME_INDEX];
+                time += skims[TRANSIT_SET_LOCAL_BUS_TIME_INDEX];
+                
+                time += skims[TRANSIT_SET_ACCESS_TIME_INDEX];
+                time += skims[TRANSIT_SET_EGRESS_TIME_INDEX ];
+                time += skims[TRANSIT_SET_AUX_WALK_TIME_INDEX];
+                time += skims[TRANSIT_SET_FIRST_WAIT_TIME_INDEX];
+                time += skims[TRANSIT_SET_TRANSFER_WAIT_TIME_INDEX];
                 
                 double dist = autoNonMotSkims.getAutoSkims(origin,destination,tod,false,logger)[DA_DIST_INDEX];  //todo: is this correct enough?
-                return new TripAttributes(time,dist,skims[isPremium ? TRANSIT_PREM_FARE_INDEX : TRANSIT_LOCAL_FARE_INDEX],boardTaz,alightTaz);
+                return new TripAttributes(time,dist,skims[TRANSIT_SET_FARE_INDEX],boardTaz,alightTaz);
             }
             default : throw new IllegalStateException("Should not be here: " + modeChoice);
         }
     }
 
     public static enum TripModeChoice {
-        UNKNOWN(),
-        DRIVE_ALONE_NO_TOLL(false),
-        DRIVE_ALONE_TOLL(true),
-        HOV_NO_TOLL(false),
-        HOV_TOLL(true),
-        WALK(),
-        BIKE(),
-        WALK_LB(Modes.getTransitModeIndex("LB"),false,false),
-        WALK_EB(Modes.getTransitModeIndex("EB"),true,false),
-        WALK_BRT(Modes.getTransitModeIndex("BRT"),true,false),
-        WALK_LRT(Modes.getTransitModeIndex("LR"),true,false),
-        WALK_CR(Modes.getTransitModeIndex("CR"),true,false),
-        DRIVE_LB(Modes.getTransitModeIndex("LB"),false,true),
-        DRIVE_EB(Modes.getTransitModeIndex("EB"),true,true),
-        DRIVE_BRT(Modes.getTransitModeIndex("BRT"),true,true),
-        DRIVE_LRT(Modes.getTransitModeIndex("LR"),true,true),
-        DRIVE_CR(Modes.getTransitModeIndex("CR"),true,true);
-
-        private final int rideModeIndex;
-        private final boolean isPremium;
+        UNKNOWN(false,false),
+        DRIVE_ALONE_NO_TOLL(true,false),
+        DRIVE_ALONE_TOLL(true,true),
+        HOV_NO_TOLL(true,false),
+        HOV_TOLL(true,true),
+        WALK(false,false),
+        BIKE(false,false),
+        WALK_SET(false,false),
+        DRIVE_SET(true,false);
+        
         private final boolean isDrive;
         private final boolean isToll;
 
-        private TripModeChoice(int rideModeIndex, boolean premium, boolean drive, boolean toll) {
-            this.rideModeIndex = rideModeIndex;
-            isPremium = premium;
+        private TripModeChoice(boolean drive, boolean toll) {
             isDrive = drive;
             isToll = toll;
-        }
-        
-        private TripModeChoice(int rideModeIndex, boolean premium, boolean drive) {
-            this(rideModeIndex,premium,drive,false);
-        }                      
-        
-        private TripModeChoice(boolean isToll) {
-            this(-1,false,false,isToll);
-        }
-        
-        private TripModeChoice() {
-            this(-1,false,false);
-        }
-
-        private int getRideModeIndex() {
-            return rideModeIndex;
         }
     }
 
@@ -471,8 +371,6 @@ public class SkimBuilder {
         private final int tripAlightTaz;
         private int originTAZ;
         private int destinationTAZ;
-
-        private String tripModeName;
 
         public int getTripStartTime() {
             return tripStartTime;
@@ -496,10 +394,6 @@ public class SkimBuilder {
         public TripAttributes(double tripTime, double tripDistance, double tripCost) {
             this(tripTime,tripDistance,tripCost,-1,-1);
         }
-
-        public void setTripModeName(String tripModeName) {
-            this.tripModeName = tripModeName;
-        }
         
         public void setOriginTAZ(int oTaz) {
             this.originTAZ = oTaz;
@@ -519,10 +413,6 @@ public class SkimBuilder {
 
         public float getTripCost() {
             return tripCost;
-        }
-
-        public String getTripModeName() {
-            return tripModeName;
         }
 
         public int getTripBoardTaz() {

@@ -401,6 +401,7 @@ public class NonMandatoryDestChoiceModel implements Serializable {
                     mcDmuObject.setPersonObject( p );
                     mcDmuObject.setTourObject( tour );
                     mcDmuObject.setDmuIndexValues( hh.getHhId(), homeTaz, origMgra, 0, hh.getDebugChoiceModels() );
+                    mcDmuObject.setOMaz(origMgra);
                     
                     // update the DC dmuObject for this person
                     dcDmuObject.setHouseholdObject( hh );
@@ -484,6 +485,7 @@ public class NonMandatoryDestChoiceModel implements Serializable {
                 mcDmuObject.setPersonObject( null );
                 mcDmuObject.setTourObject( tour );
                 mcDmuObject.setDmuIndexValues( hh.getHhId(), homeTaz, origMgra, 0, hh.getDebugChoiceModels() );
+                mcDmuObject.setOMaz(origMgra);
                 
                 // update the DC dmuObject for this person
                 dcDmuObject.setHouseholdObject( hh );
@@ -935,6 +937,9 @@ public class NonMandatoryDestChoiceModel implements Serializable {
         
         mcDmuObject.setPTazTerminalTime(tazs.getOriginTazTerminalTime(mgraManager.getTaz(t.getTourOrigMgra())));
         mcDmuObject.setATazTerminalTime(tazs.getDestinationTazTerminalTime(mgraManager.getTaz(sampleDestMgra)));
+        
+        mcDmuObject.setOMaz(t.getTourOrigMgra());
+        mcDmuObject.setDMaz(t.getTourDestMgra());
 
     }
     

@@ -31,11 +31,13 @@ public abstract class ModelStructure
     public static final int                             LAST_TOD_INTERVAL_HOUR            = 2400;
     protected String[]                                  TOD_INTERVAL_LABELS;
     
-    public static final int      EA_SKIM_PERIOD_INDEX   = 0;
-    public static final int      AM_SKIM_PERIOD_INDEX   = 1;
-    public static final int      MD_SKIM_PERIOD_INDEX   = 2;
-    public static final int      PM_SKIM_PERIOD_INDEX   = 3;
-    public static final int      EV_SKIM_PERIOD_INDEX   = 4;
+    public static final int      EA_SKIM_PERIOD_INDEX   = TransitWalkAccessUEC.EA;
+    public static final int      AM_SKIM_PERIOD_INDEX   = TransitWalkAccessUEC.AM;
+    public static final int      MD_SKIM_PERIOD_INDEX   = TransitWalkAccessUEC.MD;
+    public static final int      PM_SKIM_PERIOD_INDEX   = TransitWalkAccessUEC.PM;
+    public static final int      EV_SKIM_PERIOD_INDEX   = TransitWalkAccessUEC.EV;
+        
+    
     public static final int[]    SKIM_PERIOD_INDICES    = {
                                         EA_SKIM_PERIOD_INDEX,
                                         AM_SKIM_PERIOD_INDEX,
@@ -306,10 +308,6 @@ public abstract class ModelStructure
 
     abstract public boolean getTourModeIsWalk(int tourMode);
 
-    abstract public boolean getTourModeIsWalkLocal(int tourMode);
-
-    abstract public boolean getTourModeIsWalkPremium(int tourMode);
-
     abstract public boolean getTourModeIsTransit(int tourMode);
 
     abstract public boolean getTourModeIsWalkTransit(int tourMode);
@@ -329,8 +327,6 @@ public abstract class ModelStructure
     abstract public boolean getTripModeIsPnrTransit(int tripMode);
     
     abstract public boolean getTripModeIsKnrTransit(int tripMode);
-    
-    abstract public int getRideModeIndexForTripMode( int tripMode );
     
     abstract public double[][] getCdap6PlusProps();
 

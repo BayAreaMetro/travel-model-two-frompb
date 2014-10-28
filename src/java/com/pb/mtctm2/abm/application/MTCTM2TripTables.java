@@ -22,6 +22,7 @@ import com.pb.mtctm2.abm.ctramp.CtrampApplication;
 import com.pb.mtctm2.abm.ctramp.MatrixDataServer;
 import com.pb.mtctm2.abm.ctramp.MatrixDataServerRmi;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
+import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.mtctm2.abm.reports.SkimBuilder;
 
 public class MTCTM2TripTables {
@@ -70,6 +71,8 @@ public class MTCTM2TripTables {
     
     public MazSets mazSets;
     
+    public int numSkimSets;
+    
     public MTCTM2TripTables(String resourceBundleName, int iteration, float sampleRate){
 
         HashMap<String,String> rbMap = ResourceUtil.getResourceBundleAsHashMap(resourceBundleName);
@@ -77,6 +80,8 @@ public class MTCTM2TripTables {
         for (String key : rbMap.keySet()) 
         	properties.put(key,rbMap.get(key));
         directory = properties.getProperty("Project.Directory");
+        
+        numSkimSets = Integer.valueOf(properties.getProperty("utility.bestTransitPath.skim.sets"));
         
 		tazManager = TazDataManager.getInstance(rbMap);
 		tapManager = TapDataManager.getInstance(rbMap);
@@ -177,10 +182,13 @@ public class MTCTM2TripTables {
 					matrix[i][j] = new Matrix(modeName+"_"+periodName,"",tazs,tazs);
 				}
 			}else if(i==2){
-				matrix[i] = new Matrix[tranModes];
+				matrix[i] = new Matrix[tranModes*numSkimSets];
 				for(int j=0;j<tranModes;++j){
-					modeName = modelStructure.getModeName(j+1+autoModes+nmotModes);
-					matrix[i][j] = new Matrix(modeName+"_"+periodName,"",taps,taps);
+					for(int k=0;k<numSkimSets;++k){
+						modeName = modelStructure.getModeName(j+1+autoModes+nmotModes);
+						String setName = String.valueOf(k+1);
+						matrix[i][(j*numSkimSets)+k] = new Matrix(modeName+"_set"+setName+"_"+periodName,"",taps,taps);
+					}
 				}
 			}else{
 				matrix[i] = new Matrix[othrModes];
@@ -312,10 +320,12 @@ public class MTCTM2TripTables {
         	int alightTap=0;
         	int parkingTaz=0;
         	int parkingMGRA=0;
+        	int set=0;
         	
         	if(modelStructure.getTourModeIsWalkTransit(tripMode)||modelStructure.getTourModeIsDriveTransit(tripMode)){
         		boardTap=(int) tripData.getValueAt(i,"trip_board_tap");
         		alightTap = (int) tripData.getValueAt(i,"trip_alight_tap");
+        		set = (int) tripData.getValueAt(i,"set");
         	}else{
         		parkingMGRA = (int) tripData.getValueAt(i,"parking_mgra");
             }
@@ -380,6 +390,8 @@ public class MTCTM2TripTables {
         		if(boardTap==0||alightTap==0)
         			continue;
         		
+        		//store transit trips in matrices
+        		mat = (matrixIndex[tripMode]*numSkimSets)+set;
         		float value = matrix[mode][mat].getValueAt(boardTap, alightTap);
         		matrix[mode][mat].setValueAt(boardTap, alightTap, (value + personTrips));
 
@@ -648,7 +660,8 @@ public class MTCTM2TripTables {
                     (int) table.getValueAt(row,"trip_board_tap"),
                     (int) table.getValueAt(row,"trip_alight_tap"),
                     (int) table.getValueAt(row,"stop_period"),
-                    ((int) table.getValueAt(row,"inbound"))==1);            
+                    ((int) table.getValueAt(row,"inbound"))==1,
+                    (int) table.getValueAt(row,"set"));            
             
             tripTime[i] = attributes.getTripTime();
             tripDistance[i] = attributes.getTripDistance();

@@ -9,7 +9,6 @@ import com.pb.common.util.ObjectUtil;
 import com.pb.mtctm2.abm.accessibilities.AccessibilitiesTable;
 import com.pb.mtctm2.abm.accessibilities.BuildAccessibilities;
 import com.pb.mtctm2.abm.accessibilities.MandatoryAccessibilitiesCalculator;
-import com.pb.mtctm2.abm.accessibilities.McLogsumsAppender;
 
 public class HouseholdChoiceModels
 {

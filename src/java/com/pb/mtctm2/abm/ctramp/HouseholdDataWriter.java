@@ -369,6 +369,9 @@ public class HouseholdDataWriter
         data.add("out_atap");
         data.add("in_btap");
         data.add("in_atap");
+        
+        data.add("out_set");
+        data.add("in_set");
 
         if (saveUtilsProbsFlag)
         {
@@ -413,6 +416,8 @@ public class HouseholdDataWriter
         data.add("in_btap");
         data.add("in_atap");
 
+        data.add("out_set");
+        data.add("in_set");
 
         if (saveUtilsProbsFlag)
         {
@@ -458,6 +463,9 @@ public class HouseholdDataWriter
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
+        
+        data.add(SqliteDataTypes.INTEGER);
+        data.add(SqliteDataTypes.INTEGER);
 
         if (saveUtilsProbsFlag)
         {
@@ -497,6 +505,9 @@ public class HouseholdDataWriter
         
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
+        data.add(SqliteDataTypes.INTEGER);
+        data.add(SqliteDataTypes.INTEGER);
+        
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
 
@@ -540,21 +551,21 @@ public class HouseholdDataWriter
         data.add(string(t.getNumInboundStops() == 0 ? 0 : t.getNumInboundStops() - 1));
 
         //get tour taps
-        int[] outTaps = new int[2];
-        int[] inTaps = new int[2];
+        double[] outTaps = new double[4];
+        double[] inTaps = new double[4];
         if ( modelStructure.getTourModeIsWalkTransit(t.getTourModeChoice())) {
-            int rideMode = modelStructure.getRideModeIndexForTripMode(t.getTourModeChoice());
-            outTaps = t.getBestWtwTapPairsOut()[rideMode];
-            inTaps = t.getBestWtwTapPairsIn()[rideMode];
+            outTaps = t.getBestWtwTapPairsOut()[(int)t.getChoosenTransitPathOut()];
+            inTaps = t.getBestWtwTapPairsIn()[(int)t.getChoosenTransitPathIn()];
         } else if ( modelStructure.getTourModeIsDriveTransit(t.getTourModeChoice())) {
-        	int rideMode = modelStructure.getRideModeIndexForTripMode(t.getTourModeChoice());
-        	outTaps = t.getBestDtwTapPairsOut()[rideMode];
-        	inTaps = t.getBestWtdTapPairsIn()[rideMode];
+        	outTaps = t.getBestDtwTapPairsOut()[(int)t.getChoosenTransitPathOut()];
+        	inTaps = t.getBestWtdTapPairsIn()[(int)t.getChoosenTransitPathIn()];
         }
         data.add(string(outTaps[0]));
         data.add(string(outTaps[1]));
         data.add(string(inTaps[0]));
         data.add(string(inTaps[1]));
+        data.add(string(outTaps[2]));
+        data.add(string(inTaps[2]));
         
         if (saveUtilsProbsFlag)
         {
@@ -600,21 +611,21 @@ public class HouseholdDataWriter
         data.add(string(t.getNumInboundStops() == 0 ? 0 : t.getNumInboundStops() - 1));
 
         //get tour taps
-        int[] outTaps = new int[2];
-        int[] inTaps = new int[2];
+        double[] outTaps = new double[4];
+        double[] inTaps = new double[4];
         if ( modelStructure.getTourModeIsWalkTransit(t.getTourModeChoice())) {
-            int rideMode = modelStructure.getRideModeIndexForTripMode(t.getTourModeChoice());
-            outTaps = t.getBestWtwTapPairsOut()[rideMode];
-            inTaps = t.getBestWtwTapPairsIn()[rideMode];
+            outTaps = t.getBestWtwTapPairsOut()[(int)t.getChoosenTransitPathOut()];
+            inTaps = t.getBestWtwTapPairsIn()[(int)t.getChoosenTransitPathIn()];
         } else if ( modelStructure.getTourModeIsDriveTransit(t.getTourModeChoice())) {
-        	int rideMode = modelStructure.getRideModeIndexForTripMode(t.getTourModeChoice());
-        	outTaps = t.getBestDtwTapPairsOut()[rideMode];
-        	inTaps = t.getBestWtdTapPairsIn()[rideMode];
+        	outTaps = t.getBestDtwTapPairsOut()[(int)t.getChoosenTransitPathOut()];
+        	inTaps = t.getBestWtdTapPairsIn()[(int)t.getChoosenTransitPathIn()];
         }
         data.add(string(outTaps[0]));
         data.add(string(outTaps[1]));
         data.add(string(inTaps[0]));
         data.add(string(inTaps[1]));
+        data.add(string(outTaps[2]));
+        data.add(string(inTaps[2]));
         
         if (saveUtilsProbsFlag)
         {
@@ -692,6 +703,9 @@ public class HouseholdDataWriter
         data.add("trip_board_tap");
         data.add("trip_alight_tap");
         data.add("tour_mode");
+        
+        data.add("set");
+        
         return data;
     }
 
@@ -714,6 +728,9 @@ public class HouseholdDataWriter
         data.add("trip_board_tap");
         data.add("trip_alight_tap");
         data.add("tour_mode");
+        
+        data.add("set");
+        
         return data;
     }
 
@@ -737,6 +754,7 @@ public class HouseholdDataWriter
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
+        data.add(SqliteDataTypes.INTEGER);
         return data;
     }
 
@@ -750,6 +768,7 @@ public class HouseholdDataWriter
         data.add(SqliteDataTypes.TEXT);
         data.add(SqliteDataTypes.TEXT);
         data.add(SqliteDataTypes.TEXT);
+        data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
@@ -840,6 +859,7 @@ public class HouseholdDataWriter
         data.add(string(s.getBoardTap()));
         data.add(string(s.getAlightTap()));
         data.add(string(t.getTourModeChoice()));
+        data.add(string(s.getSet()));
 
         return data;
     }
@@ -929,6 +949,8 @@ public class HouseholdDataWriter
         data.add(string(s.getAlightTap()));
         data.add(string(t.getTourModeChoice()));
 
+        data.add(string(s.getSet()));
+        
         return data;
     }
 

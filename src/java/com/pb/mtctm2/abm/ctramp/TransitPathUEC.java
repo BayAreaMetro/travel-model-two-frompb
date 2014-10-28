@@ -289,16 +289,15 @@ public class TransitPathUEC
      * Get the best ptap and atap in an array. Only to be called after comparePaths()
      * has been called.
      * 
-     * @param transitMode Mode to look up.
+     * @param int alt to look up.
      * @return element 0 = best ptap, element 1 = best atap
      */
-    public int[] getBestTaps(Modes.TransitMode transitMode)
+    public double[] getBestTaps(int alt)
     {
 
-        int[] bestTaps = new int[2];
-
-        bestTaps[0] = bestPTap[transitMode.ordinal()];
-        bestTaps[1] = bestATap[transitMode.ordinal()];
+    	double[] bestTaps = new double[2];
+        bestTaps[0] = bestPTap[alt];
+        bestTaps[1] = bestATap[alt];
 
         return bestTaps;
     }

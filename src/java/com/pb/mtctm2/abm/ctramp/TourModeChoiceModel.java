@@ -6,9 +6,6 @@ import java.util.Random;
 import com.pb.common.calculator.IndexValues;
 import com.pb.common.calculator.VariableTable;
 import com.pb.mtctm2.abm.accessibilities.AutoAndNonMotorizedSkimsCalculator;
-import com.pb.mtctm2.abm.accessibilities.DriveTransitWalkSkimsCalculator;
-import com.pb.mtctm2.abm.accessibilities.WalkTransitDriveSkimsCalculator;
-import com.pb.mtctm2.abm.accessibilities.WalkTransitWalkSkimsCalculator;
 
 import org.apache.log4j.Logger;
 
@@ -25,32 +22,6 @@ public class TourModeChoiceModel
     public static final String AT_WORK_SUBTOUR_MODEL_INDICATOR = ModelStructure.AT_WORK_CATEGORY;
     
     public static final boolean DEBUG_BEST_PATHS = false;
-
-    protected static final int                LB  = McLogsumsCalculator.LB;
-    protected static final int                EB  = McLogsumsCalculator.EB;
-    protected static final int                BRT = McLogsumsCalculator.BRT;
-    protected static final int                LR  = McLogsumsCalculator.LR;
-    protected static final int                CR  = McLogsumsCalculator.CR;
-    protected static final int                NUM_LOC_PREM = McLogsumsCalculator.NUM_LOC_PREM;
-
-    protected static final int                WTW = McLogsumsCalculator.WTW;
-    protected static final int                WTD = McLogsumsCalculator.WTD;
-    protected static final int                DTW = McLogsumsCalculator.DTW;
-    protected static final int                NUM_ACC_EGR = McLogsumsCalculator.NUM_ACC_EGR;
-    
-    protected static final int                LB_IVT = McLogsumsCalculator.LB_IVT;
-    protected static final int                EB_IVT = McLogsumsCalculator.EB_IVT;
-    protected static final int                BRT_IVT = McLogsumsCalculator.BRT_IVT;
-    protected static final int                LR_IVT = McLogsumsCalculator.LR_IVT;
-    protected static final int                CR_IVT = McLogsumsCalculator.CR_IVT;
-    protected static final int                ACC = McLogsumsCalculator.ACC;
-    protected static final int                EGR = McLogsumsCalculator.EGR;
-    protected static final int                AUX = McLogsumsCalculator.AUX;
-    protected static final int                FWAIT = McLogsumsCalculator.FWAIT;
-    protected static final int                XWAIT = McLogsumsCalculator.XWAIT;
-    protected static final int                FARE = McLogsumsCalculator.FARE;
-    protected static final int                XFERS = McLogsumsCalculator.XFERS;
-    protected static final int                NUM_SKIMS = McLogsumsCalculator.NUM_SKIMS;
     
     protected static final int                OUT = McLogsumsCalculator.OUT;
     protected static final int                IN = McLogsumsCalculator.IN;
@@ -252,6 +223,9 @@ public class TourModeChoiceModel
         mcDmuObject.setDmuIndexValues( household.getHhId(), household.getHhMgra(),
                 tour.getTourOrigMgra(), tour.getTourDestMgra(), household.getDebugChoiceModels());
         
+        mcDmuObject.setOMaz(tour.getTourOrigMgra());
+        mcDmuObject.setDMaz(tour.getTourDestMgra());
+        
         return getModeChoiceLogsum( mcDmuObject, tour, modelLogger, choiceModelDescription, decisionMakerLabel);
         
     }    
@@ -363,6 +337,8 @@ public class TourModeChoiceModel
         IndexValues mcDmuIndex = mcDmuObject.getDmuIndexValues();
         mcDmuIndex.setOriginZone( mgraManager.getTaz(tour.getTourOrigMgra()));
         mcDmuIndex.setDestZone( mgraManager.getTaz(tour.getTourDestMgra()));
+        mcDmuObject.setOMaz(tour.getTourOrigMgra());
+        mcDmuObject.setDMaz(tour.getTourDestMgra());
         
         mcModel[modelIndex].computeUtilities(mcDmuObject, mcDmuIndex);
         
@@ -389,6 +365,21 @@ public class TourModeChoiceModel
                 tour.setBestWtdTapPairsIn( logsumHelper.getBestWtdTapsIn() );
                 tour.setBestDtwTapPairsOut( logsumHelper.getBestDtwTapsOut() );
                 tour.setBestDtwTapPairsIn( logsumHelper.getBestDtwTapsIn() );
+                
+                float rnumOut = (float)hhRandom.nextDouble();
+                float rnumIn = (float)hhRandom.nextDouble();
+                if(modelStructure.getTourModeIsWalkTransit(chosen)) {
+                	tour.setChoosenTransitPathOut(logsumHelper.chooseTripPath((float)rnumOut, 
+                			tour.getBestWtwTapPairsOut(), household.getDebugChoiceModels(), modelLogger));
+                	tour.setChoosenTransitPathIn(logsumHelper.chooseTripPath((float)rnumIn, 
+                			tour.getBestWtwTapPairsIn(), household.getDebugChoiceModels(), modelLogger));
+                } else {
+                	tour.setChoosenTransitPathOut(logsumHelper.chooseTripPath((float)rnumOut, 
+                			tour.getBestDtwTapPairsOut(), household.getDebugChoiceModels(), modelLogger));
+                	tour.setChoosenTransitPathIn(logsumHelper.chooseTripPath((float)rnumIn, 
+                			tour.getBestWtdTapPairsIn(), household.getDebugChoiceModels(), modelLogger));
+                	
+                }
             }
             
         }

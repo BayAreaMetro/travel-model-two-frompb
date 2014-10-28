@@ -12,31 +12,10 @@ public class TripModeChoiceDMU
 
     protected transient Logger logger = Logger.getLogger(TourModeChoiceDMU.class);
     
-    protected static final int                LB  = McLogsumsCalculator.LB;
-    protected static final int                EB  = McLogsumsCalculator.EB;
-    protected static final int                BRT = McLogsumsCalculator.BRT;
-    protected static final int                LR  = McLogsumsCalculator.LR;
-    protected static final int                CR  = McLogsumsCalculator.CR;
-    protected static final int                NUM_LOC_PREM = McLogsumsCalculator.NUM_LOC_PREM;
-
     protected static final int                WTW = McLogsumsCalculator.WTW;
     protected static final int                WTD = McLogsumsCalculator.WTD;
     protected static final int                DTW = McLogsumsCalculator.DTW;
     protected static final int                NUM_ACC_EGR = McLogsumsCalculator.NUM_ACC_EGR;
-    
-    protected static final int                LB_IVT = McLogsumsCalculator.LB_IVT;
-    protected static final int                EB_IVT = McLogsumsCalculator.EB_IVT;
-    protected static final int                BRT_IVT = McLogsumsCalculator.BRT_IVT;
-    protected static final int                LR_IVT = McLogsumsCalculator.LR_IVT;
-    protected static final int                CR_IVT = McLogsumsCalculator.CR_IVT;
-    protected static final int                ACC = McLogsumsCalculator.ACC;
-    protected static final int                EGR = McLogsumsCalculator.EGR;
-    protected static final int                AUX = McLogsumsCalculator.AUX;
-    protected static final int                FWAIT = McLogsumsCalculator.FWAIT;
-    protected static final int                XWAIT = McLogsumsCalculator.XWAIT;
-    protected static final int                FARE = McLogsumsCalculator.FARE;
-    protected static final int                XFERS = McLogsumsCalculator.XFERS;
-    protected static final int                NUM_SKIMS = McLogsumsCalculator.NUM_SKIMS;
     
     protected static final int                OUT = McLogsumsCalculator.OUT;
     protected static final int                IN = McLogsumsCalculator.IN;
@@ -114,7 +93,10 @@ public class TripModeChoiceDMU
     protected boolean autoModeRequiredForDriveTransit; 
     protected boolean walkModeAllowedForDriveTransit; 
 
-    protected double[][][] transitSkim;
+    protected double[] transitLogSum;
+    
+    protected int oMaz;
+    protected int dMaz;
     
     
     public TripModeChoiceDMU(ModelStructure modelStructure)
@@ -122,7 +104,7 @@ public class TripModeChoiceDMU
         this.modelStructure = modelStructure;
         dmuIndex = new IndexValues();
         
-        transitSkim = new double[TourModeChoiceDMU.NUM_ACC_EGR][TourModeChoiceDMU.NUM_LOC_PREM][TourModeChoiceDMU.NUM_SKIMS];
+        transitLogSum = new double[McLogsumsCalculator.NUM_ACC_EGR];
     }
     
     
@@ -397,8 +379,13 @@ public class TripModeChoiceDMU
         tripDestIsTourDest = value; 
     }
     
+    public void setOMaz( int value ) {
+        oMaz = value; 
+    }
     
-    
+    public void setDMaz( int value ) {
+        dMaz = value; 
+    }
     
     public IndexValues getDmuIndexValues()
     {
@@ -429,12 +416,12 @@ public class TripModeChoiceDMU
         nmBikeTime = bikeTime;
     }
     
-    protected void setTransitSkim(int accEgr, int lbPrem, int skimIndex, double value){
-        transitSkim[accEgr][lbPrem][skimIndex] = value;
+    public void setTransitLogSum(int accEgr, double value){
+    	transitLogSum[accEgr] = value;
     }
-    
-    protected double getTransitSkim(int accEgr, int lbPrem, int skimIndex){
-        return transitSkim[accEgr][lbPrem][skimIndex];
+
+    protected double getTransitLogSum(int accEgr){
+        return transitLogSum[accEgr];
     }
     
     
@@ -485,7 +472,7 @@ public class TripModeChoiceDMU
     
     public int getTourModeIsWTran()
     {
-        boolean tourModeIsWTran = modelStructure.getTourModeIsWalkLocal(tour.getTourModeChoice()) || modelStructure.getTourModeIsWalkPremium(tour.getTourModeChoice());
+        boolean tourModeIsWTran = modelStructure.getTourModeIsWalkTransit(tour.getTourModeChoice());
         return tourModeIsWTran ? 1 : 0;
     }
     
@@ -619,11 +606,11 @@ public class TripModeChoiceDMU
     }
     
     public double getHourlyParkingCostTripOrig() {
-        return lsWgtAvgCostH[dmuIndex.getOriginZone()];
+        return lsWgtAvgCostH[oMaz];
     }
     
     public double getHourlyParkingCostTripDest() {
-        return lsWgtAvgCostH[dmuIndex.getDestZone()];
+        return lsWgtAvgCostH[dMaz];
     }
     
     public int getTripOrigIsTourDest() {

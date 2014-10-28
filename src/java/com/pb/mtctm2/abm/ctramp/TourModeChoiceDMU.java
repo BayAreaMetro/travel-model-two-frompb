@@ -10,37 +10,16 @@ public class TourModeChoiceDMU
         implements Serializable, VariableTable
 {
 
-    protected transient Logger                logger                                    = Logger.getLogger(TourModeChoiceDMU.class);
-
-    public static final int                LB  = McLogsumsCalculator.LB;
-    public static final int                EB  = McLogsumsCalculator.EB;
-    public static final int                BRT = McLogsumsCalculator.BRT;
-    public static final int                LR  = McLogsumsCalculator.LR;
-    public static final int                CR  = McLogsumsCalculator.CR;
-    protected static final int                NUM_LOC_PREM = McLogsumsCalculator.NUM_LOC_PREM;
+    protected transient Logger             logger = Logger.getLogger(TourModeChoiceDMU.class);
 
     public static final int                WTW = McLogsumsCalculator.WTW;
     public static final int                WTD = McLogsumsCalculator.WTD;
     public static final int                DTW = McLogsumsCalculator.DTW;
-    protected static final int                NUM_ACC_EGR = McLogsumsCalculator.NUM_ACC_EGR;
-    
-    public static final int                LB_IVT = McLogsumsCalculator.LB_IVT;
-    public static final int                EB_IVT = McLogsumsCalculator.EB_IVT;
-    public static final int                BRT_IVT = McLogsumsCalculator.BRT_IVT;
-    public static final int                LR_IVT = McLogsumsCalculator.LR_IVT;
-    public static final int                CR_IVT = McLogsumsCalculator.CR_IVT;
-    public static final int                ACC = McLogsumsCalculator.ACC;
-    public static final int                EGR = McLogsumsCalculator.EGR;
-    public static final int                AUX = McLogsumsCalculator.AUX;
-    public static final int                FWAIT = McLogsumsCalculator.FWAIT;
-    public static final int                XWAIT = McLogsumsCalculator.XWAIT;
-    public static final int                FARE = McLogsumsCalculator.FARE;
-    public static final int                XFERS = McLogsumsCalculator.XFERS;
-    protected static final int                NUM_SKIMS = McLogsumsCalculator.NUM_SKIMS;
-    
-    protected static final int                OUT = McLogsumsCalculator.OUT;
-    protected static final int                IN = McLogsumsCalculator.IN;
-    protected static final int                NUM_DIR = McLogsumsCalculator.NUM_DIR;
+    protected static final int             NUM_ACC_EGR = McLogsumsCalculator.NUM_ACC_EGR;
+        
+    protected static final int             OUT = McLogsumsCalculator.OUT;
+    protected static final int             IN = McLogsumsCalculator.IN;
+    protected static final int             NUM_DIR = McLogsumsCalculator.NUM_DIR;
     
     protected HashMap<String, Integer> methodIndexMap;
     protected IndexValues              dmuIndex;
@@ -75,7 +54,10 @@ public class TourModeChoiceDMU
     
     protected int                      parkingArea;
 
-    protected double[][][][] transitSkim;
+    protected double[][]                 transitLogSum;
+    
+    protected int oMaz;
+    protected int dMaz;
     
 
     public TourModeChoiceDMU(ModelStructure modelStructure)
@@ -83,7 +65,8 @@ public class TourModeChoiceDMU
         this.modelStructure = modelStructure;
         dmuIndex = new IndexValues();
         
-        transitSkim = new double[McLogsumsCalculator.NUM_ACC_EGR][McLogsumsCalculator.NUM_LOC_PREM][McLogsumsCalculator.NUM_SKIMS][McLogsumsCalculator.NUM_DIR];
+        //accEgr by in/outbound
+        transitLogSum = new double[NUM_ACC_EGR][NUM_DIR];
         
     }
 
@@ -224,13 +207,28 @@ public class TourModeChoiceDMU
         dmuIndex.setDestZone(d);
     }
 
+    public void setOMaz( int value ) {
+        oMaz = value; 
+    }
     
-    public void setTransitSkim(int accEgr, int lbPrem, int skimIndex, int dir, double value){
-        transitSkim[accEgr][lbPrem][skimIndex][dir] = value;
+    public void setDMaz( int value ) {
+        dMaz = value; 
+    } 
+    
+    public int getOMaz() {
+        return oMaz; 
+    }
+    
+    public int getDMaz() {
+        return dMaz; 
+    }
+    
+    public void setTransitLogSum(int accEgr, boolean inbound, double value){
+    	transitLogSum[accEgr][inbound == true ? 1 : 0] = value;
     }
 
-    protected double getTransitSkim(int accEgr, int lbPrem, int skimIndex, int dir){
-        return transitSkim[accEgr][lbPrem][skimIndex][dir];
+    protected double getTransitLogSum(int accEgr,boolean inbound){
+        return transitLogSum[accEgr][inbound == true ? 1 : 0];
     }
     
     

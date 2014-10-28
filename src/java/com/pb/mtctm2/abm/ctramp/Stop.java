@@ -18,6 +18,7 @@ public class Stop
     int     boardTap;
     int     alightTap;
     boolean inbound;
+    int     set;
 
     String  origPurpose;
     String  destPurpose;
@@ -63,6 +64,11 @@ public class Stop
     public void setAlightTap(int tap)
     {
         alightTap = tap;
+    }
+    
+    public void setSet(int Skimset)
+    {
+        set = Skimset;
     }
     
     public void setStopPeriod(int period)
@@ -113,6 +119,11 @@ public class Stop
     public int getAlightTap()
     {
         return alightTap;
+    }
+    
+    public int getSet()
+    {
+        return set;
     }
     
     public int getStopPeriod()

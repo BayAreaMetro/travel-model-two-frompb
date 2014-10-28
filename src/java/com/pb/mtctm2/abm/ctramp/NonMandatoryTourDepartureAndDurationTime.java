@@ -943,6 +943,9 @@ public class NonMandatoryTourDepartureAndDurationTime implements Serializable {
         
         mcDmuObject.setPTazTerminalTime(tazs.getOriginTazTerminalTime(mgraManager.getTaz(t.getTourOrigMgra())));
         mcDmuObject.setATazTerminalTime(tazs.getDestinationTazTerminalTime(mgraManager.getTaz(t.getTourDestMgra())));
+        
+        mcDmuObject.setOMaz(t.getTourOrigMgra());
+        mcDmuObject.setDMaz(t.getTourDestMgra());
 
     }
     

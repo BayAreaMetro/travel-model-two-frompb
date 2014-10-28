@@ -30,7 +30,16 @@ public class TransitDriveAccessDMU
     double                              mgraToTapWalkTime;
     double                              carToStationWalkTime;
     double                              escalatorTime;
-    int                                accessMode;
+    int                                 accessMode;
+    int 								period;
+    int 								set;
+    
+    //default values for generic application
+    int                                 applicationType = 0;
+    int                                 tourCateogryIsJoint = 0;
+    int                                 personType = 1;
+    float                               valueOfTime = (float) 10.0;
+
 
     public TransitDriveAccessDMU()
     {
@@ -216,6 +225,55 @@ public class TransitDriveAccessDMU
     {
         driveDistFromTap = driveDist;
     }
+    
+    public void setTOD(int period) {
+    	this.period = period;
+    }
+    
+    public int getTOD() {
+    	return period;
+    }
+    
+    public void setSet(int set) {
+    	this.set = set;
+    }
+    
+    public int getSet() {
+    	return set;
+    }
+    
+    
+    public void setApplicationType(int applicationType) {
+    	this.applicationType = applicationType;
+    }
+    
+    public int getApplicationType() {
+    	return applicationType;
+    }
+    
+    public void setTourCateogryIsJoint(int tourCateogryIsJoint) {
+    	this.tourCateogryIsJoint = tourCateogryIsJoint;
+    }
+    
+    public int getTourCateogryIsJoint() {
+    	return tourCateogryIsJoint;
+    }
+    
+    public void setPersonType(int personType) {
+    	this.personType = personType;
+    }
+    
+    public int getPersonType() {
+    	return personType;
+    }
+    
+    public void setValueOfTime(int valueOfTime) {
+    	this.valueOfTime = valueOfTime;
+    }
+    
+    public float getValueOfTime() {
+    	return valueOfTime;
+    }
 
     /**
      * Log the DMU values.
@@ -236,6 +294,13 @@ public class TransitDriveAccessDMU
         localLogger.info(String.format("MGRA to TAP walk time:    %9.4f", mgraToTapWalkTime));
         localLogger.info(String.format("Car to station walk time: %9.4f", carToStationWalkTime));
         localLogger.info(String.format("Escalator time:           %9.4f", escalatorTime));
+        localLogger.info(String.format("Period:                   %9s", period));
+        localLogger.info(String.format("Set:                      %9s", set));
+        localLogger.info(String.format("applicationType:          %9s", applicationType));
+        localLogger.info(String.format("tourCateogryIsJoint:      %9s", tourCateogryIsJoint));
+        localLogger.info(String.format("personType:               %9s", personType));
+        localLogger.info(String.format("valueOfTime:              %9.4f", valueOfTime));
+
 
         AccessMode[] accessModes = AccessMode.values();
         localLogger.info(String.format("Access Mode:              %5s", accessModes[accessMode]
@@ -255,6 +320,13 @@ public class TransitDriveAccessDMU
         methodIndexMap.put("getEscalatorTime", 6);
         methodIndexMap.put("getTapMgraWalkTime", 7);
         methodIndexMap.put("getMgraTapWalkTime", 8);
+        methodIndexMap.put("getTOD", 9);
+        methodIndexMap.put("getSet", 10);
+        
+        methodIndexMap.put("getApplicationType", 12);
+        methodIndexMap.put("getTourCateogryIsJoint", 13);
+        methodIndexMap.put("getPersonType", 14);
+        methodIndexMap.put("getValueOfTime", 15);
 
     }
 
@@ -281,6 +353,20 @@ public class TransitDriveAccessDMU
                 return getTapMgraWalkTime();
             case 8:
                 return getMgraTapWalkTime();
+            case 9:
+                return getTOD();
+            case 10:
+                return getSet();
+                
+            case 12:
+                return getApplicationType();
+            case 13:
+                return getTourCateogryIsJoint();
+            case 14:
+                return getPersonType();
+            case 15:
+                return getValueOfTime();
+
 
             default:
                 logger.error("method number = " + variableIndex + " not found");

@@ -299,47 +299,6 @@ public final class BuildAccessibilities
 
     }
 
-    /**
-     * Build utility components for SOV,HOV,Walk, and Walk-Transit modes.
-     * 
-     * @param rb Resourcebundle with appropriate keys.
-     */
-//    public void buildAccessibilityComponents(HashMap<String, String> rbMap)
-//    {
-//
-//        boolean logObjectSize = false;
-//
-//        if (ntUtilities == null)
-//        {
-//            ntUtilities = new NonTransitUtilities(rbMap);
-//            //ntUtilities.buildUtilities();
-//
-//            if (logObjectSize)
-//                logger.info( "ntUtilities size:     " + ObjectUtil.sizeOf(ntUtilities) );
-//
-//        }
-//
-//        if (transitUtilities == null)
-//        {
-//            transitUtilities = new TransitUtilities(rbMap);
-//            transitUtilities.calculateUtilityComponents();
-//
-//            if (logObjectSize)
-//            {
-//                try
-//                {
-//                    logger.info("transitUtilities size:     "
-//                            + ObjectUtil.checkObjectSize(transitUtilities));
-//                } catch (IOException e1)
-//                {
-//                    // TODO Auto-generated catch block
-//                    e1.printStackTrace();
-//                }
-//            }
-//
-//        }
-//
-//    }
 
     /**
      * Calculate size terms and store in sizeTerms array. This method initializes the

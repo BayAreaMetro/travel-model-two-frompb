@@ -5,6 +5,7 @@ public class StoredTransitSkimData
 {
 
     private static StoredTransitSkimData objInstance = null;
+    private int numSets;
 
     // these arrays are shared by McLogsumsAppender objects and are used by wtw, wtd, and dtw calculators.
     private double[][][][][] storedWtwDepartPeriodTapTapSkims;
@@ -13,13 +14,14 @@ public class StoredTransitSkimData
         
     
     private StoredTransitSkimData(){
+    	this.numSets = numSets;
     }
     
-    public static synchronized StoredTransitSkimData getInstance( int numServiceTypes, int numPeriods, int maxTap )
+    public static synchronized StoredTransitSkimData getInstance( int numSets, int numPeriods, int maxTap )
     {
         if (objInstance == null) {
             objInstance = new StoredTransitSkimData();
-            objInstance.setupStoredDataArrays( numServiceTypes, numPeriods, maxTap );
+            objInstance.setupStoredDataArrays(numSets, numPeriods, maxTap );
             return objInstance;
         }
         else {
@@ -27,10 +29,10 @@ public class StoredTransitSkimData
         }
     }    
     
-    private void setupStoredDataArrays( int numServiceTypes, int numPeriods, int maxTap ){        
-        storedWtwDepartPeriodTapTapSkims = new double[numServiceTypes + 1][numPeriods + 1][maxTap + 1][][];
-        storedWtdDepartPeriodTapTapSkims = new double[numServiceTypes + 1][numPeriods + 1][maxTap + 1][][];
-        storedDtwDepartPeriodTapTapSkims = new double[numServiceTypes + 1][numPeriods + 1][maxTap + 1][][];
+    private void setupStoredDataArrays(int numSets, int numPeriods, int maxTap ){        
+        storedWtwDepartPeriodTapTapSkims = new double[numSets][numPeriods + 1][maxTap + 1][][];
+        storedWtdDepartPeriodTapTapSkims = new double[numSets][numPeriods + 1][maxTap + 1][][];
+        storedDtwDepartPeriodTapTapSkims = new double[numSets][numPeriods + 1][maxTap + 1][][];
     }
     
     public double[][][][][] getStoredWtwDepartPeriodTapTapSkims() {

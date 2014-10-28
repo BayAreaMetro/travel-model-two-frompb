@@ -151,8 +151,8 @@ ENDRUN
 ;rebuild transit line file with new numbers
 *"%PYTHON_PATH%\python.exe" %BASE_SCRIPTS%\skims\build_new_transit_line.py "trn\transitLines.lin" "trn\transitLines_new_nodes.lin" "hwy\mtc_transit_network_tap_to_node.txt"
 
-;start cluster nodes - one for each mode and time period
-*Cluster.exe MTC_TRANSKIM 1-10 start exit
+;start cluster nodes - one for each skim set and time period
+*Cluster.exe MTC_TRANSKIM 1-15 start exit
 
 ;now build transit times based on congested times from loaded network
 ;loop over time period
@@ -175,7 +175,7 @@ LOOP PERIOD = 1,5
 
         ; specify SKIMSET specific stuff
         SKIMSET_NAME = 'SET' + STR(SKIMSET,1,0)
-        counter = 2*(PERIOD - 1) + SKIMSET
+        counter = 3*(PERIOD - 1) + SKIMSET
 
         ; do each time of day and SKIMSET as a separate process
         DistributeMultistep processid = 'MTC_TRANSKIM', processNum = counter
@@ -188,10 +188,10 @@ LOOP PERIOD = 1,5
                 FILEI NETI = "trn\mtc_transit_network_@TOKEN_PERIOD@_@SKIMSET_NAME@.net"
                 FILEI LINEI[1] = "trn\transitLines_new_nodes.lin"
                 FILEI FACTORI[1] = "trn\transitFactors_@SKIMSET_NAME@.fac"
-				
-				FILEI FAREMATI[1] = "trn\fareMatrix.txt"
+                
+                FILEI FAREMATI[1] = "trn\fareMatrix.txt"
                 FILEI FAREI= "trn\fares.far"
-				
+                
                 FILEO NETO = "trn\mtc_transit_network_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.net" 
                 FILEO MATO[1] = "skims\transit_skims_@TOKEN_PERIOD@_@SKIMSET_NAME@.TPP",
                                  MO=2-16, 
@@ -282,7 +282,8 @@ ENDLOOP
 
 Wait4Files files = MTC_TRANSKIM1.script.end, MTC_TRANSKIM2.script.end, MTC_TRANSKIM3.script.end, MTC_TRANSKIM4.script.end, MTC_TRANSKIM5.script.end,
                    MTC_TRANSKIM6.script.end, MTC_TRANSKIM7.script.end, MTC_TRANSKIM8.script.end, MTC_TRANSKIM9.script.end, MTC_TRANSKIM10.script.end,
+                   MTC_TRANSKIM11.script.end, MTC_TRANSKIM12.script.end, MTC_TRANSKIM13.script.end, MTC_TRANSKIM14.script.end, MTC_TRANSKIM15.script.end,
            printfiles = merge, deldistribfiles = t, CheckReturnCode = t
 
 ;stop cluster nodes
-*Cluster.exe MTC_TRANSKIM 1-10 close exit
+*Cluster.exe MTC_TRANSKIM 1-15 close exit
