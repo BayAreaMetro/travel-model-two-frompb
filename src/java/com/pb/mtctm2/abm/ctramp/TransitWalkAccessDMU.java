@@ -149,7 +149,7 @@ public class TransitWalkAccessDMU
     	return personType;
     }
     
-    public void setValueOfTime(int valueOfTime) {
+    public void setValueOfTime(float valueOfTime) {
     	this.valueOfTime = valueOfTime;
     }
     

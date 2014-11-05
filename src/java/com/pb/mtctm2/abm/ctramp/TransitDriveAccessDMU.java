@@ -251,11 +251,11 @@ public class TransitDriveAccessDMU
     	return applicationType;
     }
     
-    public void setTourCateogryIsJoint(int tourCateogryIsJoint) {
+    public void setTourCategoryIsJoint(int tourCateogryIsJoint) {
     	this.tourCateogryIsJoint = tourCateogryIsJoint;
     }
     
-    public int getTourCateogryIsJoint() {
+    public int getTourCategoryIsJoint() {
     	return tourCateogryIsJoint;
     }
     
@@ -267,7 +267,7 @@ public class TransitDriveAccessDMU
     	return personType;
     }
     
-    public void setValueOfTime(int valueOfTime) {
+    public void setValueOfTime(float valueOfTime) {
     	this.valueOfTime = valueOfTime;
     }
     
@@ -324,7 +324,7 @@ public class TransitDriveAccessDMU
         methodIndexMap.put("getSet", 10);
         
         methodIndexMap.put("getApplicationType", 12);
-        methodIndexMap.put("getTourCateogryIsJoint", 13);
+        methodIndexMap.put("getTourCategoryIsJoint", 13);
         methodIndexMap.put("getPersonType", 14);
         methodIndexMap.put("getValueOfTime", 15);
 
@@ -361,7 +361,7 @@ public class TransitDriveAccessDMU
             case 12:
                 return getApplicationType();
             case 13:
-                return getTourCateogryIsJoint();
+                return getTourCategoryIsJoint();
             case 14:
                 return getPersonType();
             case 15:

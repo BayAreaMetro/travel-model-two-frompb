@@ -367,7 +367,21 @@ public class TourModeChoiceDMU
         return aTazTerminalTime;
     }
        
-
+    public double getValueOfTime()
+    {
+        return (getTourCategoryJoint() == 1) ? getHouseholdMaxValueOfTime() : person.getValueOfTime();
+    }
+    
+    public float getHouseholdMaxValueOfTime() {
+    	
+    	float max_hh_vot = 0;
+        for (int i=1; i < hh.getPersons().length; i++){
+        	float per_vot = hh.getPersons()[i].getValueOfTime();
+        	if(per_vot > max_hh_vot) { max_hh_vot = per_vot; }
+        }
+        
+        return max_hh_vot;
+    }
         
     
     public int getIndexValue(String variableName)

@@ -3,6 +3,8 @@ package com.pb.mtctm2.abm.accessibilities;
 import com.pb.common.util.Tracer;
 import com.pb.common.calculator.IndexValues;
 import com.pb.mtctm2.abm.ctramp.MgraDataManager;
+import com.pb.mtctm2.abm.ctramp.TransitDriveAccessDMU;
+import com.pb.mtctm2.abm.ctramp.TransitWalkAccessDMU;
 import com.pb.mtctm2.abm.ctramp.TransitWalkAccessUEC;
 import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.common.newmodel.UtilityExpressionCalculator;
@@ -322,6 +324,10 @@ public class MandatoryAccessibilitiesCalculator
     {
 
         double[] accessibilities = new double[accNames.length];
+        
+        // DMUs for this UEC
+        TransitWalkAccessDMU walkDmu = new TransitWalkAccessDMU();
+        TransitDriveAccessDMU driveDmu = new TransitDriveAccessDMU();
 
         if (oMgra > 0 && dMgra > 0)
         {
@@ -375,7 +381,7 @@ public class MandatoryAccessibilitiesCalculator
             //////////////////////////////////////////////////////////////////////////
             
             // determine the best transit path, which also stores the best utilities array and the best mode
-            bestPathCalculator.findBestWalkTransitWalkTaps( TransitWalkAccessUEC.AM, oMgra, dMgra, debug, aLogger);
+            bestPathCalculator.findBestWalkTransitWalkTaps(walkDmu, TransitWalkAccessUEC.AM, oMgra, dMgra, debug, aLogger);
             
             // sum the exponentiated utilities over modes
             double sumWlkExpUtilities = 0;
@@ -448,7 +454,7 @@ public class MandatoryAccessibilitiesCalculator
             //////////////////////////////////////////////////////////////////////////
             
             // determine the best transit path, which also stores the best utilities array and the best mode
-            bestPathCalculator.findBestDriveTransitWalkTaps( TransitWalkAccessUEC.AM, oMgra, dMgra, debug, aLogger);
+            bestPathCalculator.findBestDriveTransitWalkTaps(walkDmu, driveDmu, TransitWalkAccessUEC.AM, oMgra, dMgra, debug, aLogger);
             
             // sum the exponentiated utilities over modes
             double sumDrvExpUtilities = 0;
