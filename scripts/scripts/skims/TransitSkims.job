@@ -36,9 +36,9 @@
 ;       Commuter Rail     130-139                n         y        y
 ;       Heavy Rail        120-129                n         y        y
 ;       Light Rail        110-119                n         y        y
-;       Ferry             100-103,105-109        n         y        y
+;       Ferry             100-104,105-109        n         y        y
 ;       Express Bus       58,80-99               n         y        y
-;       Local Bus         1-57,59-79,104         y         y        y
+;       Local Bus         1-57,59-79             y         y        y
 ;
 ; Each transit skim mode is controlled by a factors file, kept in the /trn/ output directory (copied from the INPUTS/trn/tansit_support/
 ; directory). Each factor file specifies penalties, available modes (including access, egress and transfer modes), and transfer limits.
@@ -77,6 +77,12 @@
 ;
 ; version:  Travel Model Zed
 ; authors:  crf (2013 08) ; bts 06/11/14
+;
+;
+; Updated to include transit system file for defining wait curves. Removed ferry (mode 104) from skim set 1 and included it 
+; in SET2 and 3. Updated parameters in transit factor files. Also, build_walk_transfer_bypass_links.py file now sets distances 
+; on walk transfer legs to eucledian distance 
+; author: sn(11/7/2014)
 ; ----------------------------------------------------------------------------------------------------------------
 
 
@@ -187,6 +193,7 @@ LOOP PERIOD = 1,5
             RUN PGM = PUBLIC TRANSPORT
                 FILEI NETI = "trn\mtc_transit_network_@TOKEN_PERIOD@_@SKIMSET_NAME@.net"
                 FILEI LINEI[1] = "trn\transitLines_new_nodes.lin"
+                FILEI SYSTEMI = "trn\transitSystem.PTS"
                 FILEI FACTORI[1] = "trn\transitFactors_@SKIMSET_NAME@.fac"
                 
                 FILEI FAREMATI[1] = "trn\fareMatrix.txt"
@@ -200,6 +207,7 @@ LOOP PERIOD = 1,5
                 FILEO LINEO = "trn\mtc_transit_lines_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.lin"
                 FILEO NTLEGO = "trn\mtc_transit_ntlegs_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.ntl"
                 FILEO ROUTEO[1] = "trn\mtc_transit_routes_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.rte"
+
                 FILEO REPORTO = "trn\mtc_transit_report_@TOKEN_PERIOD@_@SKIMSET_NAME@_with_transit.rpt"
                 
                 PARAMETERS HDWAYPERIOD=@PERIOD@
@@ -252,6 +260,7 @@ LOOP PERIOD = 1,5
                 ENDPHASE
                 
                 ;set best mode matrix; hierarchy is implied
+                ;CR > HR > LR > EB > LB :: 5 > 4 > 3 > 2 > 1
                 PHASE=MATO
                     JLOOP
                         IF (MW[7] > 0)
