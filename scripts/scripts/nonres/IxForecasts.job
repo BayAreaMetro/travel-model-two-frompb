@@ -51,7 +51,7 @@ run pgm = matrix
    
       ; Apply gateway-specific adjustments based on chats with SJCOG, SACOG, and review of counts    
       ;   - I-505, Solano/Yolo
-      if (i == 4515 || j == 4515)
+      if (i == 4694 || j == 4694)
       
          mw[1] = mi.1.IX_Daily_DA  * 1.020228
          mw[2] = mi.1.IX_Daily_SR2 * 1.020228
@@ -60,7 +60,7 @@ run pgm = matrix
       endif
       
       ;   - I-80, Solano/Yolo
-      if (i == 4517 || j == 4517)
+      if (i == 4696 || j == 4696)
       
          mw[1] = mi.1.IX_Daily_DA  * 1.242555
          mw[2] = mi.1.IX_Daily_SR2 * 1.242555
@@ -69,7 +69,7 @@ run pgm = matrix
       endif
       
       ;   - CA 12, Solano/Sacramento
-      if (i == 4518 || j == 4518)
+      if (i == 4697 || j == 4697)
       
          mw[1] = mi.1.IX_Daily_DA  * 0.848518
          mw[2] = mi.1.IX_Daily_SR2 * 0.848518
@@ -78,7 +78,7 @@ run pgm = matrix
       endif
             
       ;   - CA 4, Contra Costa/San Joaquin
-      if (i == 4520 || j == 4520)
+      if (i == 4699 || j == 4699)
       
          mw[1] = mi.1.IX_Daily_DA  * 1.673817
          mw[2] = mi.1.IX_Daily_SR2 * 1.673817
@@ -102,27 +102,27 @@ token_year = %MODEL_YEAR%
 growth_exponent = '@token_year@ - 2005'
 
 ; Set gateway-specific annual growth rates
-base_4510 = '1.005'
-base_4511 = '1.005'
-base_4512 = '1.005'
-base_4513 = '1.005'
-base_4514 = '1.005'
-base_4515 = '1.010'
-base_4516 = '1.010'
-base_4517 = '1.010'
-base_4518 = '1.010'
-base_4519 = '1.010'
-base_4520 = '1.010'
-base_4521 = '1.010'
-base_4522 = '1.015'
-base_4523 = '1.010'
-base_4524 = '1.010'
-base_4525 = '1.010'
-base_4526 = '1.005'
-base_4527 = '1.005'
-base_4528 = '1.005'
-base_4529 = '1.005'
-base_4530 = '1.005'
+base_4689 = '1.005'
+base_4690 = '1.005'
+base_4691 = '1.005'
+base_4692 = '1.005'
+base_4693 = '1.005'
+base_4694 = '1.010'
+base_4695 = '1.010'
+base_4696 = '1.010'
+base_4697 = '1.010'
+base_4698 = '1.010'
+base_4699 = '1.010'
+base_4700 = '1.010'
+base_4701 = '1.015'
+base_4702 = '1.010'
+base_4703 = '1.010'
+base_4704 = '1.010'
+base_4705 = '1.005'
+base_4706 = '1.005'
+base_4707 = '1.005'
+base_4708 = '1.005'
+base_4709 = '1.005'
 
    
 DistributeMultistep processid = 'MTC_IX', processNum = 1
@@ -141,88 +141,88 @@ run pgm = matrix
      ; Apply gateway-specific adjustment factors (no X/X trips mean the gateways act independently)
      
      ;   - CA 1, Sonoma/Mendocino
-     if (i == 4510 || j == 4510)
+     if (i == 4689 || j == 4689)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4510@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4510@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4510@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4698@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4698@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4698@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 128, Sonoma/Mendocino
-     if (i == 4511 || j == 4511)
+     if (i == 4690 || j == 4690)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4511@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4511@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4511@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4690@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4690@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4690@,@token_year@ - 2005)
      
      endif
      
      ;   - US 101, Sonoma/Mendocino
-     if (i == 4512 || j == 4512)
+     if (i == 4691 || j == 4691)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4512@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4512@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4512@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4691@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4691@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4691@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 29, Napa/Lake
-     if (i == 4513 || j == 4513)
+     if (i == 4692 || j == 4692)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4513@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4513@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4513@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4692@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4692@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4692@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 128, Napa/Yolo
-     if (i == 4514 || j == 4514)
+     if (i == 4693 || j == 4693)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4514@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4514@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4514@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4693@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4693@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4693@,@token_year@ - 2005)
      
      endif
      
      ;   - I-505, Solano/Yolo
-     if (i == 4515 || j == 4515)
+     if (i == 4694 || j == 4694)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4515@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4515@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4515@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4694@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4694@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4694@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 113, Solano/Yolo
-     if (i == 4516 || j == 4516)
+     if (i == 4695 || j == 4695)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4516@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4516@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4516@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4695@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4695@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4695@,@token_year@ - 2005)
      
      endif
      
      ;   - I-80, Solano/Yolo
-     if (i == 4517 || j == 4517)
+     if (i == 4696 || j == 4696)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4517@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4517@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4517@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4696@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4696@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4696@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 12, Solano/Sacramento
-     if (i == 4518 || j == 4518)
+     if (i == 4697 || j == 4697)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4518@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4518@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4518@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4697@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4697@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4697@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 160, Contra Costa/Sacramento (combined with CA 4, 1465)
-     if (i == 4519 || j == 4519)
+     if (i == 4698 || j == 4698)
      
         mw[1] = 0.0
         mw[2] = 0.0
@@ -231,101 +231,101 @@ run pgm = matrix
      endif
      
      ;   - CA 4, Contra Costa/San Joaquin
-     if (i == 4520 || j == 4520)
+     if (i == 4699 || j == 4699)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4520@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4520@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4520@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4699@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4699@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4699@,@token_year@ - 2005)
      
      endif
      
      ;   - County J-4, Alameda/San Joaquin
-     if (i == 4521 || j == 4521)
+     if (i == 4700 || j == 4700)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4521@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4521@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4521@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4700@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4700@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4700@,@token_year@ - 2005)
      
      endif
      
      ;   - I-580/I-205, Alameda/San Joaquin
-     if (i == 4522 || j == 4522)
+     if (i == 4701 || j == 4701)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4522@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4522@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4522@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4701@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4701@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4701@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 152, Santa Clara/Merced
-     if (i == 4523 || j == 4523)
+     if (i == 4702 || j == 4702)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4523@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4523@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4523@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4702@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4702@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4702@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 156, Santa Clara/San Benito
-     if (i == 4524 || j == 4524)
+     if (i == 4703 || j == 4703)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4524@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4524@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4524@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4703@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4703@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4703@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 25, Santa Clara/San Benito
-     if (i == 4525 || j == 4525)
+     if (i == 4704 || j == 4704)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4525@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4525@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4525@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4704@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4704@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4704@,@token_year@ - 2005)
      
      endif
      
      ;   - US 101, Santa Clara/San Benito
-     if (i == 4526 || j == 4526)
+     if (i == 4705 || j == 4705)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4526@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4526@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4526@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4705@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4705@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4705@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 152, Santa Clara/Santa Cruz
-     if (i == 4527 || j == 4527)
+     if (i == 4706 || j == 4706)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4527@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4527@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4527@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4706@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4706@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4706@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 17, Santa Clara/Santa Cruz
-     if (i == 4528 || j == 4528)
+     if (i == 4707 || j == 4707)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4528@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4528@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4528@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4707@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4707@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4707@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 9, Santa Clara/Santa Cruz
-     if (i == 4529 || j == 4529)
+     if (i == 4708 || j == 4708)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4529@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4529@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4529@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4708@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4708@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4708@,@token_year@ - 2005)
      
      endif
      
      ;   - CA 1, San Mateo/Santa Cruz
-     if (i == 4530 || j == 4530)
+     if (i == 4709 || j == 4709)
      
-        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4530@,@token_year@ - 2005)
-        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4530@,@token_year@ - 2005)
-        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4530@,@token_year@ - 2005)
+        mw[1] = mi.1.IX_Daily_DA  * pow(@base_4709@,@token_year@ - 2005)
+        mw[2] = mi.1.IX_Daily_SR2 * pow(@base_4709@,@token_year@ - 2005)
+        mw[3] = mi.1.IX_Daily_SR3 * pow(@base_4709@,@token_year@ - 2005)
      
      endif
      
