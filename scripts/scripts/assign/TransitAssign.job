@@ -36,9 +36,9 @@
 ;       Commuter Rail     130-139                n         y        y
 ;       Heavy Rail        120-129                n         y        y
 ;       Light Rail        110-119                n         y        y
-;       Ferry             100-104,105-109        n         y        y
-;       Express Bus       58,80-99               n         y        y
-;       Local Bus         1-57,59-79             y         y        y
+;       Ferry             100-109                n         y        y
+;       Express Bus       80-99                  n         y        y
+;       Local Bus         1-79                   y         y        y
 ;
 ; Each transit skim mode is controlled by a factors file, kept in the /trn/ output directory (copied from the INPUTS/trn/tansit_support/
 ; directory). Each factor file specifies penalties, available modes (including access, egress and transfer modes), and transfer limits.
@@ -173,7 +173,7 @@ ENDLOOP
 
 Wait4Files files = MTC_TRANASN1.script.end, MTC_TRANASN2.script.end, MTC_TRANASN3.script.end, MTC_TRANASN4.script.end, MTC_TRANASN5.script.end,
                    MTC_TRANASN6.script.end, MTC_TRANASN7.script.end, MTC_TRANASN8.script.end, MTC_TRANASN9.script.end, MTC_TRANASN10.script.end,
-                   MTC_TRANSKIM11.script.end, MTC_TRANSKIM12.script.end, MTC_TRANSKIM13.script.end, MTC_TRANSKIM14.script.end, MTC_TRANSKIM15.script.end,
+                   MTC_TRANASN11.script.end, MTC_TRANASN12.script.end, MTC_TRANASN13.script.end, MTC_TRANASN14.script.end, MTC_TRANASN15.script.end,
            printfiles = merge, deldistribfiles = t, CheckReturnCode = t
 
 ;stop cluster nodes

@@ -36,9 +36,9 @@
 ;       Commuter Rail     130-139                n         y        y
 ;       Heavy Rail        120-129                n         y        y
 ;       Light Rail        110-119                n         y        y
-;       Ferry             100-104,105-109        n         y        y
-;       Express Bus       58,80-99               n         y        y
-;       Local Bus         1-57,59-79             y         y        y
+;       Ferry             100-109                n         y        y
+;       Express Bus       80-99                  n         y        y
+;       Local Bus         1-79                   y         y        y
 ;
 ; Each transit skim mode is controlled by a factors file, kept in the /trn/ output directory (copied from the INPUTS/trn/tansit_support/
 ; directory). Each factor file specifies penalties, available modes (including access, egress and transfer modes), and transfer limits.
@@ -250,9 +250,9 @@ LOOP PERIOD = 1,5
                     MW[8] = FAREA(0,ALLMODES)
                     MW[9] = TIMEA(0,992)
                     MW[10] = TIMEA(0,991)
-                    MW[11] = TIMEA(0,1,-57,59,-79,104)
-                    MW[12] = TIMEA(0,80,-99,58)
-                    MW[13] = TIMEA(0,100,-103,104,-109,110,-119)
+                    MW[11] = TIMEA(0,1,-79)
+                    MW[12] = TIMEA(0,80,-99)
+                    MW[13] = TIMEA(0,100,-119)
                     MW[14] = TIMEA(0,120,-129)
                     MW[15] = TIMEA(0,130,-139)
                     MW[16] = 0
