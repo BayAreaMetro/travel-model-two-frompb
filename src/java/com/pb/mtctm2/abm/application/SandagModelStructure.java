@@ -353,6 +353,20 @@ public class SandagModelStructure
         }
         return returnValue;
     }
+    
+    public boolean getTripModeIsTransit(int tripMode)
+    {
+        boolean returnValue = false;
+        for (int i = 0; i < TRANSIT_ALTS.length; i++)
+        {
+            if (TRANSIT_ALTS[i] == tripMode)
+            {
+                returnValue = true;
+                break;
+            }
+        }
+        return returnValue;
+    }
 
     public boolean getTourModeIsWalkTransit(int tourMode)
     {

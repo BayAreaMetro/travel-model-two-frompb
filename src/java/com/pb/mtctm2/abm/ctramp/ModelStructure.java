@@ -309,6 +309,8 @@ public abstract class ModelStructure
     abstract public boolean getTourModeIsWalk(int tourMode);
 
     abstract public boolean getTourModeIsTransit(int tourMode);
+    
+    abstract public boolean getTripModeIsTransit(int tripMode);
 
     abstract public boolean getTourModeIsWalkTransit(int tourMode);
 

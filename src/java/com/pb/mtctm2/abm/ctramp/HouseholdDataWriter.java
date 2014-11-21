@@ -51,6 +51,7 @@ public class HouseholdDataWriter
     private String              stringFormat                    = fileStringFormat;
 
     private boolean             saveUtilsProbsFlag              = false;
+    private int                 setNA                           = -1;
 
     private HashMap<String,String> rbMap;
     
@@ -553,6 +554,11 @@ public class HouseholdDataWriter
         //get tour taps
         double[] outTaps = new double[4];
         double[] inTaps = new double[4];
+        for (int i = 0; i < outTaps.length; i++) {
+        	outTaps[i] = setNA;
+        	inTaps[i]  = setNA;
+        }
+        
         if ( modelStructure.getTourModeIsWalkTransit(t.getTourModeChoice())) {
             outTaps = t.getBestWtwTapPairsOut()[(int)t.getChoosenTransitPathOut()];
             inTaps = t.getBestWtwTapPairsIn()[(int)t.getChoosenTransitPathIn()];
@@ -613,6 +619,11 @@ public class HouseholdDataWriter
         //get tour taps
         double[] outTaps = new double[4];
         double[] inTaps = new double[4];
+        for (int i = 0; i < outTaps.length; i++) {
+        	outTaps[i] = setNA;
+        	inTaps[i]  = setNA;
+        }
+        
         if ( modelStructure.getTourModeIsWalkTransit(t.getTourModeChoice())) {
             outTaps = t.getBestWtwTapPairsOut()[(int)t.getChoosenTransitPathOut()];
             inTaps = t.getBestWtwTapPairsIn()[(int)t.getChoosenTransitPathIn()];
@@ -859,7 +870,12 @@ public class HouseholdDataWriter
         data.add(string(s.getBoardTap()));
         data.add(string(s.getAlightTap()));
         data.add(string(t.getTourModeChoice()));
-        data.add(string(s.getSet()));
+        
+        int set = setNA;
+        if(modelStructure.getTripModeIsTransit(s.getMode())) {
+        	set = s.getSet();
+        }
+        data.add(string(set));
 
         return data;
     }
@@ -949,7 +965,11 @@ public class HouseholdDataWriter
         data.add(string(s.getAlightTap()));
         data.add(string(t.getTourModeChoice()));
 
-        data.add(string(s.getSet()));
+        int set = setNA;
+        if(modelStructure.getTripModeIsTransit(s.getMode())) {
+        	set = s.getSet();
+        }
+        data.add(string(set));
         
         return data;
     }
