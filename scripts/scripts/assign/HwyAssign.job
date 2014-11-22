@@ -158,6 +158,10 @@ loop period = 1,5
         NETI = hwy\avgload@token_period@_taz_temp1.net
         LINKI[2] = hwy\maz_preload_@token_period@_seq_vols.csv VAR=A,B,MAZMAZVOL
         NETO = hwy\avgload@token_period@_taz_temp2.net
+		
+        PHASE=LINKMERGE
+			MAZMAZVOL=LI.2.MAZMAZVOL
+        ENDPHASE
     endrun
     
     *DEL hwy\avgload@token_period@_taz.net
