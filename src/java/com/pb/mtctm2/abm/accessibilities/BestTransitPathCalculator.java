@@ -784,12 +784,14 @@ public class BestTransitPathCalculator implements Serializable
     	
     	//re-setup model
     	tripNPaths.clear();
+    	for (int i=0; i<tripNPathAlts.length; i++) {
+        	tripNPathAlts[i].setAvailability(false);
+        }
         for (int i=0; i<bestTapPairs.length; i++) {
         	if (bestTapPairs[i] != null) {
         		tripNPathAlts[i].setAvailability(true);
         		tripNPathAlts[i].setUtility(bestTapPairs[i][3]);
         	}
-        	tripNPathAlts[i].setAvailability(false);
         }
         return(tripNPaths);
     }
