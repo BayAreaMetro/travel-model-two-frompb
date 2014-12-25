@@ -116,7 +116,12 @@ public class BestTransitPathCalculator implements Serializable
     
     private int numSkimSets;
     private int numTransitAlts;
-        
+    
+    private LogitModel tripNPaths;
+    private ConcreteAlternative[] tripNPathAlts;
+    
+    
+	
     /**
      * Constructor.
      * 
@@ -196,150 +201,16 @@ public class BestTransitPathCalculator implements Serializable
         bestPTap = new int[numTransitAlts];
         bestATap = new int[numTransitAlts];
         bestSet = new int[numTransitAlts];
-    }
-    
-    /**
-     * find the walk time from the specified mgra to tap.
-     * 
-     * @param pMgra
-     * @param pTap
-     * @return
-     */
-    public static double findWalkTransitAccessTime(int pMgra, int pTap)
-    {
-
-        double accTime = -1;
         
-        MgraDataManager mgraMgr = MgraDataManager.getInstance();
-        
-        // get taps with walk access from mgra
-        int[] pTapSet = mgraMgr.getMgraWlkTapsDistArray()[pMgra][0];
-
-        if ( pTapSet != null ) {
-            // loop through tap set until the specified tap is found, then get walk time from mgraManager
-            int pPos = -1;
-            for (int tap : pTapSet) {
-                
-                pPos++;
-
-                if ( tap == pTap ) {
-                    accTime = mgraMgr.getMgraToTapWalkTime(pMgra, pPos);
-                    break;
-                }
-            }
+        //setup logit model for transit logsum
+        tripNPaths = new LogitModel("trip-paths",0, numTransitAlts);
+        for (int i=0; i<numTransitAlts; i++) {
+        	tripNPathAlts[i] = new ConcreteAlternative(String.valueOf(i),i);
+            tripNPaths.addAlternative(tripNPathAlts[i]);
         }
-        
-        return accTime;
+    	
     }
-
     
-    /**
-    * find the drive time from the specified taz(mgra) to tap.
-    * 
-    * @param pMgra
-    * @param pTap
-    * @return
-    */
-   public static double findDriveTransitAccessTime(int pMgra, int pTap)
-   {
-
-       double accTime = -1;
-       
-       MgraDataManager mgraMgr = MgraDataManager.getInstance();
-       int pTaz = mgraMgr.getTaz(pMgra);
-
-        // get taps with walk access from mgra
-       TazDataManager tazManager = TazDataManager.getInstance();
-       int[] pTapSet = tazManager.getParkRideOrKissRideTapsForZone(pTaz, AccessMode.PARK_N_RIDE);
-
-       if ( pTapSet != null ) {
-           // loop through tap set until the specified tap is found, then get walk time from mgraManager
-           int pPos = -1;
-           for (int tap : pTapSet) {
-               
-               pPos++;
-
-               if ( tap == pTap ) {
-                   accTime = tazManager.getTapTime(pTaz, pPos, AccessMode.PARK_N_RIDE);
-                   break;
-               }
-           }
-       }
-       
-       return accTime;
-   }
-
-   
-   /**
-    * find the walk time from the specified tap to mgra.
-    * 
-    * @param aTap
-    * @param aMgra
-    * @return
-    */
-   public static double findWalkTransitEgressTime( int aMgra, int aTap )
-   {
-
-       double egrTime = -1;
-       
-       // get taps with walk egress to mgra
-       MgraDataManager mgraMgr = MgraDataManager.getInstance();
-       int[] aTapSet = mgraMgr.getMgraWlkTapsDistArray()[aMgra][0];
-
-       if ( aTapSet != null ) {
-           // loop through tap set until the specified tap is found, then get walk time from mgraManager
-           int aPos = -1;
-           for (int tap : aTapSet) {
-               
-               aPos++;
-    
-               if ( tap == aTap ) {
-                   egrTime = mgraMgr.getMgraToTapWalkTime(aMgra, aPos);
-                   break;
-               }
-           }
-       }
-       
-       return egrTime;
-   }
-
-   
-   /**
-    * find the walk time from the specified tap to mgra.
-    * 
-    * @param aTap
-    * @param aMgra
-    * @return
-    */
-   public static double findDriveTransitEgressTime( int aMgra, int aTap )
-   {
-
-       double egrTime = -1;
-       
-       MgraDataManager mgraMgr = MgraDataManager.getInstance();
-       int aTaz = mgraMgr.getTaz(aMgra);
-
-        // get taps with walk access from mgra
-       TazDataManager tazManager = TazDataManager.getInstance();
-       int[] aTapSet = tazManager.getParkRideOrKissRideTapsForZone(aTaz, AccessMode.PARK_N_RIDE);
-
-       if ( aTapSet != null ) {
-           // loop through tap set until the specified tap is found, then get walk time from mgraManager
-           int aPos = -1;
-           for (int tap : aTapSet) {
-               
-               aPos++;
-
-               if ( tap == aTap ) {
-                   egrTime = tazManager.getTapTime(aTaz, aPos, AccessMode.PARK_N_RIDE);
-                   break;
-               }
-           }
-       }
-       
-       return egrTime;
-   }
-
 
     /**
      * This is the main method that finds the best N TAP-pairs. It
@@ -408,10 +279,11 @@ public class BestTransitPathCalculator implements Serializable
                 }
                 	
                 // Calculate the pTap to aTap utility values
-        		float tapTapUtil[] = new float[numSkimSets];
+        		float tapTapUtil[];
         		if(!storedDepartPeriodTapTapUtils.get(WTW).get(period).containsKey(storedDataObject.paTapKey(pTap, aTap))) {
         			
         			//loop across number of skim sets  the pTap to aTap utility values 
+        			tapTapUtil = new float[numSkimSets];
         			for (int set=0; set<numSkimSets; set++) {
 	            		tapTapUtil[set] = calcUtilitiesForTapPair(walkDmu, period, pTap, aTap, set, writeCalculations, myLogger);
         			}
@@ -500,10 +372,11 @@ public class BestTransitPathCalculator implements Serializable
                     }
                                         
                     // Calculate the pTap to aTap utility values
-            		float tapTapUtil[] = new float[numSkimSets];
+            		float tapTapUtil[];
             		if(!storedDepartPeriodTapTapUtils.get(DTW).get(period).containsKey(storedDataObject.paTapKey(pTap, aTap))) {
             			
             			//loop across number of skim sets  the pTap to aTap utility values 
+            			tapTapUtil = new float[numSkimSets];
             			for (int set=0; set<numSkimSets; set++) {
     	            		tapTapUtil[set] = calcUtilitiesForTapPair(walkDmu, period, pTap, aTap, set, writeCalculations, myLogger);
             			}
@@ -591,10 +464,11 @@ public class BestTransitPathCalculator implements Serializable
                     }
                 	
                     // Calculate the pTap to aTap utility values
-            		float tapTapUtil[] = new float[numSkimSets];
+            		float tapTapUtil[];
             		if(!storedDepartPeriodTapTapUtils.get(WTD).get(period).containsKey(storedDataObject.paTapKey(pTap, aTap))) {
             			
-            			//loop across number of skim sets  the pTap to aTap utility values 
+            			//loop across number of skim sets  the pTap to aTap utility values
+            			tapTapUtil = new float[numSkimSets];
             			for (int set=0; set<numSkimSets; set++) {
     	            		tapTapUtil[set] = calcUtilitiesForTapPair(walkDmu, period, pTap, aTap, set, writeCalculations, myLogger);
             			}
@@ -908,25 +782,15 @@ public class BestTransitPathCalculator implements Serializable
     
     public LogitModel setupTripLogSum(double[][] bestTapPairs, boolean myTrace, Logger myLogger) {      
     	
-    	//must size logit model ahead of time
-    	int alts = 0;
-    	for (int i=0; i<bestTapPairs.length; i++) {
-        	if (bestTapPairs[i] != null) {
-        		alts = alts + 1;
-        	}
-    	}
-    	
-    	LogitModel tripNPaths = new LogitModel("trip-paths",0, alts);
+    	//re-setup model
+    	tripNPaths.clear();
         for (int i=0; i<bestTapPairs.length; i++) {
-        	
         	if (bestTapPairs[i] != null) {
-        		ConcreteAlternative alt = new ConcreteAlternative(String.valueOf(i),i);
-                alt.setUtility(bestTapPairs[i][3]);
-                tripNPaths.addAlternative(alt);
+        		tripNPathAlts[i].setAvailability(true);
+        		tripNPathAlts[i].setUtility(bestTapPairs[i][3]);
         	}
-    		
+        	tripNPathAlts[i].setAvailability(false);
         }
-
         return(tripNPaths);
     }
     
