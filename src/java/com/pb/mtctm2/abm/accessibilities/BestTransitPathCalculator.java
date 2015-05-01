@@ -49,6 +49,7 @@ public class BestTransitPathCalculator implements Serializable
 
     private transient Logger                 logger        = Logger.getLogger(BestTransitPathCalculator.class);
 
+    //TODO: combine APP_TYPE_xxx constants into a enum structure
     public static final int              APP_TYPE_GENERIC = 0;
     public static final int              APP_TYPE_TOURMC  = 1;
     public static final int              APP_TYPE_TRIPMC  = 2;
@@ -88,31 +89,24 @@ public class BestTransitPathCalculator implements Serializable
     private UtilityExpressionCalculator   driveEgressUEC;
     private UtilityExpressionCalculator   tapToTapUEC;
 
-    // these arrays are shared by the BestTransitPathCalculator objects created for each hh choice model object
-    private float[][][]                  storedWalkAccessUtils;
-    private float[][][]                  storedDriveAccessUtils;
-    private float[][][]                  storedWalkEgressUtils;
-    private float[][][]                  storedDriveEgressUtils;
-    
-    private HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>> storedDepartPeriodTapTapUtils;
-    
-    private double                        pWalkTime;
-    private double                        aWalkTime;
-    private double                        pDriveTime;
-    private double                        aDriveTime;
-
-    private double[]                      combinedUtilities;
+    // utility data cache for each transit path segment 
+    private StoredUtilityData storedDataObject; //Encapsulates data shared by the BestTransitPathCalculator objects created for each hh choice model object
+    // note that access/egress utilities are independent of transit skim set 
+    private float[][]                  storedWalkAccessUtils;	// references StoredUtilityData.storedWalkAccessUtils
+    private float[][]                  storedDriveAccessUtils;// references StoredUtilityData.storedDriveAccessUtils
+    private float[][]                  storedWalkEgressUtils;	// references StoredUtilityData.storedWalkEgressUtils
+    private float[][]                  storedDriveEgressUtils;// references StoredUtilityData.storedDriveEgressUtils    
+    private HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>> storedDepartPeriodTapTapUtils; //references StoredUtilityData.storedDepartPeriodTapTapUtils
 
     private IndexValues                   index         = new IndexValues();
 
+    // arrays storing information about the n (array length) best paths
     private double[]                      bestUtilities;
     private double[]                      bestAccessUtilities;
     private double[]                      bestEgressUtilities;
     private int[]                         bestPTap;
     private int[]                         bestATap;
-    private int[]                         bestSet;  //since two of the best paths can be in the same set, need to store set as well
-    
-    private StoredUtilityData storedDataObject;
+    private int[]                         bestSet;  //since two of the best paths can be in the same set, need to store set as well   
     
     private int numSkimSets;
     private int numTransitAlts;
@@ -252,12 +246,9 @@ public class BestTransitPathCalculator implements Serializable
         {
 
             // Calculate the pMgra to pTap walk access utility values
-            float[] accUtil = new float[numSkimSets];
-            if (storedWalkAccessUtils[pMgra][pTap] == null) {
-            	//loop across number of skim sets  the pTap to aTap utility values 
-    			for (int set=0; set<numSkimSets; set++) {
-    				accUtil[set] = calcWalkAccessUtility(walkDmu, pMgra, pTap, writeCalculations, myLogger);
-    			}
+            float accUtil; 
+            if (storedWalkAccessUtils[pMgra][pTap] == StoredUtilityData.default_utility) {
+    			accUtil = calcWalkAccessUtility(walkDmu, pMgra, pTap, writeCalculations, myLogger);
     			storedWalkAccessUtils[pMgra][pTap] = accUtil;
             } else {
             	accUtil = storedWalkAccessUtils[pMgra][pTap];
@@ -267,12 +258,9 @@ public class BestTransitPathCalculator implements Serializable
             {
                 
                 // Calculate the aTap to aMgra walk egress utility values
-                float[] egrUtil = new float[numSkimSets];
-                if (storedWalkEgressUtils[aTap][aMgra] == null) {
-                	//loop across number of skim sets  the pTap to aTap utility values 
-        			for (int set=0; set<numSkimSets; set++) {
-        				egrUtil[set] = calcWalkEgressUtility(walkDmu, aTap, aMgra, writeCalculations, myLogger);
-        			}
+                float egrUtil;
+                if (storedWalkEgressUtils[aTap][aMgra] == StoredUtilityData.default_utility) {
+                	egrUtil = calcWalkEgressUtility(walkDmu, aTap, aMgra, writeCalculations, myLogger);
         			storedWalkEgressUtils[aTap][aMgra] = egrUtil;
                 } else {
                 	egrUtil = storedWalkEgressUtils[aTap][aMgra];	
@@ -294,7 +282,7 @@ public class BestTransitPathCalculator implements Serializable
         		
         		//create path for each skim set
         		for (int set=0; set<numSkimSets; set++) {
-        			paths.add(new TransitPath(pMgra, aMgra, pTap, aTap, set, WTW, accUtil[set], tapTapUtil[set], egrUtil[set]));
+        			paths.add(new TransitPath(pMgra, aMgra, pTap, aTap, set, WTW, accUtil, tapTapUtil[set], egrUtil));
             	}
             
             }
@@ -338,12 +326,9 @@ public class BestTransitPathCalculator implements Serializable
         for ( int pTap : pTapArray )
         {
             // Calculate the pTaz to pTap drive access utility values
-            float[] accUtil = new float[numSkimSets];
-            if (storedDriveAccessUtils[pTaz][pTap] == null) {
-            	//loop across number of skim sets  the pTap to aTap utility values 
-    			for (int set=0; set<numSkimSets; set++) {
-    				accUtil[set] = calcDriveAccessUtility(driveDmu, pMgra, pTaz, pTap, accMode, writeCalculations, myLogger);
-    			}
+            float accUtil;
+            if (storedDriveAccessUtils[pTaz][pTap] == StoredUtilityData.default_utility) {
+    			accUtil = calcDriveAccessUtility(driveDmu, pMgra, pTaz, pTap, accMode, writeCalculations, myLogger);
     			storedDriveAccessUtils[pTaz][pTap] = accUtil;
             } else {
             	accUtil = storedDriveAccessUtils[pTaz][pTap];
@@ -360,12 +345,9 @@ public class BestTransitPathCalculator implements Serializable
                 {
                     
                     // Calculate the aTap to aMgra walk egress utility values
-                    float[] egrUtil = new float[numSkimSets];
-                    if (storedWalkEgressUtils[aTap][aMgra] == null) {
-                    	//loop across number of skim sets  the pTap to aTap utility values 
-            			for (int set=0; set<numSkimSets; set++) {
-            				egrUtil[set] = calcWalkEgressUtility(walkDmu, aTap, aMgra, writeCalculations, myLogger);
-            			}
+                    float egrUtil;
+                    if (storedWalkEgressUtils[aTap][aMgra] == StoredUtilityData.default_utility) {
+            			egrUtil = calcWalkEgressUtility(walkDmu, aTap, aMgra, writeCalculations, myLogger);
             			storedWalkEgressUtils[aTap][aMgra] = egrUtil;
                     } else {
                     	egrUtil = storedWalkEgressUtils[aTap][aMgra];	
@@ -387,7 +369,7 @@ public class BestTransitPathCalculator implements Serializable
             		
             		//create path for each skim set
             		for (int set=0; set<numSkimSets; set++) {
-            			paths.add(new TransitPath(pMgra, aMgra, pTap, aTap, set, DTW, accUtil[set], tapTapUtil[set], egrUtil[set]));
+            			paths.add(new TransitPath(pMgra, aMgra, pTap, aTap, set, DTW, accUtil, tapTapUtil[set], egrUtil));
                 	}
             		
                 }
@@ -429,12 +411,9 @@ public class BestTransitPathCalculator implements Serializable
         for (int pTap : mgraManager.getMgraWlkTapsDistArray()[pMgra][0])
         {
             // Calculate the pMgra to pTap walk access utility values
-            float[] accUtil = new float[numSkimSets];
-            if (storedWalkAccessUtils[pMgra][pTap] == null) {
-            	//loop across number of skim sets  the pTap to aTap utility values 
-    			for (int set=0; set<numSkimSets; set++) {
-    				accUtil[set] = calcWalkAccessUtility(walkDmu, pMgra, pTap, writeCalculations, myLogger);
-    			}
+            float accUtil;
+            if (storedWalkAccessUtils[pMgra][pTap] == StoredUtilityData.default_utility) {
+    			accUtil = calcWalkAccessUtility(walkDmu, pMgra, pTap, writeCalculations, myLogger);
     			storedWalkAccessUtils[pMgra][pTap] = accUtil;
             } else {
             	accUtil = storedWalkAccessUtils[pMgra][pTap];
@@ -452,12 +431,9 @@ public class BestTransitPathCalculator implements Serializable
                 {
 
                 	// Calculate the aTap to aMgra drive egress utility values
-                    float[] egrUtil = new float[numSkimSets];
-                    if (storedDriveEgressUtils[aTap][aTaz] == null) {
-                    	//loop across number of skim sets  the pTap to aTap utility values 
-            			for (int set=0; set<numSkimSets; set++) {
-            				egrUtil[set] = calcDriveEgressUtility(driveDmu, aTap, aTaz, aMgra, accMode, writeCalculations, myLogger);
-            			}
+                    float egrUtil;
+                    if (storedDriveEgressUtils[aTap][aTaz] == StoredUtilityData.default_utility) {
+            			egrUtil = calcDriveEgressUtility(driveDmu, aTap, aTaz, aMgra, accMode, writeCalculations, myLogger);
             			storedDriveEgressUtils[aTap][aTaz] = egrUtil;
                     } else {
                     	egrUtil = storedDriveEgressUtils[aTap][aTaz];	
@@ -479,7 +455,7 @@ public class BestTransitPathCalculator implements Serializable
             		
             		//create path for each skim set
             		for (int set=0; set<numSkimSets; set++) {
-            			paths.add(new TransitPath(pMgra, aMgra, pTap, aTap, set, WTD, accUtil[set], tapTapUtil[set], egrUtil[set]));
+            			paths.add(new TransitPath(pMgra, aMgra, pTap, aTap, set, WTD, accUtil, tapTapUtil[set], egrUtil));
                 	}
    
                 }
@@ -496,7 +472,7 @@ public class BestTransitPathCalculator implements Serializable
     public float calcWalkAccessUtility(TransitWalkAccessDMU walkDmu, int pMgra, int pTap, boolean myTrace, Logger myLogger)
     {
     	int pPos = mgraManager.getTapPosition(pMgra, pTap);
-    	pWalkTime = mgraManager.getMgraToTapWalkTime(pMgra, pPos);
+    	double pWalkTime = mgraManager.getMgraToTapWalkTime(pMgra, pPos);
         walkDmu.setMgraTapWalkTime(pWalkTime);
         float util = (float)walkAccessUEC.solve(index, walkDmu, null)[0];
         
@@ -512,7 +488,7 @@ public class BestTransitPathCalculator implements Serializable
     public float calcDriveAccessUtility(TransitDriveAccessDMU driveDmu, int pMgra, int pTaz, int pTap, AccessMode accMode, boolean myTrace, Logger myLogger)
     {
     	int pPos = tazManager.getTapPosition(pTaz, pTap, accMode);
-    	pDriveTime = tazManager.getTapTime(pTaz, pPos, accMode);
+    	double pDriveTime = tazManager.getTapTime(pTaz, pPos, accMode);
         driveDmu.setDriveDistToTap(tazManager.getTapDist(pTaz, pPos, accMode));
         driveDmu.setDriveTimeToTap(pDriveTime);
         float util = (float)driveAccessUEC.solve(index, driveDmu, null)[0];
@@ -527,7 +503,7 @@ public class BestTransitPathCalculator implements Serializable
     public float calcWalkEgressUtility(TransitWalkAccessDMU walkDmu, int aTap, int aMgra, boolean myTrace, Logger myLogger)
     {
     	int aPos = mgraManager.getTapPosition(aMgra, aTap);
-    	aWalkTime = mgraManager.getMgraToTapWalkTime(aMgra, aPos);        
+    	double aWalkTime = mgraManager.getMgraToTapWalkTime(aMgra, aPos);        
         walkDmu.setTapMgraWalkTime(aWalkTime);
         float util = (float)walkEgressUEC.solve(index, walkDmu, null)[0];
 
@@ -541,7 +517,7 @@ public class BestTransitPathCalculator implements Serializable
     public float calcDriveEgressUtility(TransitDriveAccessDMU driveDmu, int aTap, int aTaz, int aMgra, AccessMode accMode, boolean myTrace, Logger myLogger)
     {
     	int aPos = tazManager.getTapPosition(aTaz, aTap, accMode);   
-    	aDriveTime = tazManager.getTapTime(aTaz, aPos, accMode);
+    	double aDriveTime = tazManager.getTapTime(aTaz, aPos, accMode);
         driveDmu.setDriveDistToTap(tazManager.getTapDist(aTaz, aPos, accMode));
         driveDmu.setDriveTimeToTap(aDriveTime);
         float util = (float)driveEgressUEC.solve(index, driveDmu, null)[0];

@@ -8,16 +8,17 @@ public class StoredUtilityData
 {
 
     private static StoredUtilityData objInstance = null;
+    public static final float		 default_utility = -999;
 
     // these arrays are shared by multiple BestTransitPathCalculator objects in a distributed computing environment
-    private float[][][] storedWalkAccessUtils;
-    private float[][][] storedDriveAccessUtils;
-    private float[][][] storedWalkEgressUtils;
-    private float[][][] storedDriveEgressUtils;
+    private float[][] storedWalkAccessUtils;	// dim#1: MGRA id, dim#2: TAP id
+    private float[][] storedDriveAccessUtils; // dim#1: TAZ id, dim#2: TAP id
+    private float[][] storedWalkEgressUtils; 	// dim#1: TAP id, dim#2: MGRA id
+    private float[][] storedDriveEgressUtils; // dim#1: TAP id, dim#2: TAZ id
     
+    // {0:WTW, 1:WTD, 2:DTW} -> TOD period number -> pTAP*100000+aTAP -> utility
     private HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>> storedDepartPeriodTapTapUtils;
-    
-    
+       
     
     private StoredUtilityData(){
     }
@@ -35,10 +36,23 @@ public class StoredUtilityData
     }    
     
     private void setupStoredDataArrays( int maxMgra, int maxTap, int maxTaz, int[] accEgrSegments, int[] periods){        
-        storedWalkAccessUtils = new float[maxMgra + 1][maxTap + 1][];
-        storedDriveAccessUtils = new float[maxTaz + 1][maxTap + 1][];
-        storedWalkEgressUtils = new float[maxTap + 1][maxMgra + 1][];
-        storedDriveEgressUtils = new float[maxTap + 1][maxTaz + 1][];
+    	// dimension the arrays
+    	storedWalkAccessUtils = new float[maxMgra + 1][maxTap + 1];
+        storedDriveAccessUtils = new float[maxTaz + 1][maxTap + 1];
+        storedWalkEgressUtils = new float[maxTap + 1][maxMgra + 1];
+        storedDriveEgressUtils = new float[maxTap + 1][maxTaz + 1];
+        // assign default values to array elements
+        for (int i=0; i<=maxMgra; i++)
+        	for (int j=0; j<=maxTap; j++) {
+        		storedWalkAccessUtils[i][j] = default_utility;
+        		storedWalkEgressUtils[j][i] = default_utility;
+        	}
+        // assign default values to array elements
+        for (int i=0; i<=maxTaz; i++)
+        	for (int j=0; j<=maxTap; j++) {
+        		storedDriveAccessUtils[i][j] = default_utility;
+        		storedDriveEgressUtils[j][i] = default_utility;
+        	}
         
         //put into concurrent hashmap
         storedDepartPeriodTapTapUtils = new HashMap<Integer,HashMap<Integer,ConcurrentHashMap<Long,float[]>>>();
@@ -51,19 +65,19 @@ public class StoredUtilityData
     	}        
     }
     
-    public float[][][] getStoredWalkAccessUtils() {
+    public float[][] getStoredWalkAccessUtils() {
         return storedWalkAccessUtils;
     }
     
-    public float[][][] getStoredDriveAccessUtils() {
+    public float[][] getStoredDriveAccessUtils() {
         return storedDriveAccessUtils;
     }
     
-    public float[][][] getStoredWalkEgressUtils() {
+    public float[][] getStoredWalkEgressUtils() {
         return storedWalkEgressUtils;
     }
     
-    public float[][][] getStoredDriveEgressUtils() {
+    public float[][]getStoredDriveEgressUtils() {
         return storedDriveEgressUtils;
     }
     
