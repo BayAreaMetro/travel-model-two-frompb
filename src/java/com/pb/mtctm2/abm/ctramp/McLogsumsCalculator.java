@@ -376,6 +376,9 @@ public class McLogsumsCalculator implements Serializable
     	TransitWalkAccessDMU walkDmu =  new TransitWalkAccessDMU();
     	TransitDriveAccessDMU driveDmu  = new TransitDriveAccessDMU();
     	
+    	// logsum for WTD outbound is never used -> set to NA
+    	mcDmuObject.setTransitLogSum( WTD, false, bestPathUEC.NA );
+    	/* TODO: - remove this section of code after successful testing 
     	// walk access, drive egress transit, outbound
         int skimPeriodIndexOut = ModelStructure.getSkimPeriodIndex(departPeriod);
         bestWtdTapPairsOut = bestPathUEC.getBestTapPairs(walkDmu, driveDmu, WTD, origMgra, destMgra, skimPeriodIndexOut, loggingEnabled, autoSkimLogger);
@@ -400,7 +403,8 @@ public class McLogsumsCalculator implements Serializable
         	double logsumOut = bestPathUEC.calcTripLogSum(bestWtdTapPairsOut, loggingEnabled, autoSkimLogger);
         	mcDmuObject.setTransitLogSum( WTD, false, logsumOut);
         }
-        
+        */
+    	
         //setup best path dmu variables
     	walkDmu =  new TransitWalkAccessDMU();
     	driveDmu  = new TransitDriveAccessDMU();
@@ -462,6 +466,10 @@ public class McLogsumsCalculator implements Serializable
         	mcDmuObject.setTransitLogSum( DTW, false, logsumOut);
         }
         
+    	// logsum for DTW inbound is never used -> set to NA
+    	mcDmuObject.setTransitLogSum( DTW, true, bestPathUEC.NA );
+        
+    	/* TODO: remove this section of code after successful testing 
         //setup best path dmu variables
     	walkDmu =  new TransitWalkAccessDMU();
     	driveDmu  = new TransitDriveAccessDMU();
@@ -490,6 +498,7 @@ public class McLogsumsCalculator implements Serializable
         	double logsumIn = bestPathUEC.calcTripLogSum(bestDtwTapPairsIn, loggingEnabled, autoSkimLogger);
         	mcDmuObject.setTransitLogSum( DTW, true, logsumIn);
         }
+        */
     }
 
     private void setNmTripMcDmuAttributes( TripModeChoiceDMU tripMcDmuObject, int origMgra, int destMgra, int departPeriod, boolean loggingEnabled )
