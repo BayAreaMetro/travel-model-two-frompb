@@ -9,7 +9,9 @@ import com.pb.mtctm2.abm.accessibilities.BuildAccessibilities;
 
 import java.io.*;
 import java.util.*;
+
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
 
 import umontreal.iro.lecuyer.probdist.LognormalDist;
@@ -62,6 +64,7 @@ public abstract class HouseholdDataManager
     public static final String        PERSON_HOURS_WORKED_FIELD_NAME         = "WKHP";
     public static final String        PERSON_WEEKS_WORKED_FIELD_NAME         = "WKW";
     public static final String        PERSON_EMPLOYMENT_STATUS_FIELD_NAME    = "EMPLOYED";
+    public static final String        PERSON_ESR_FIELD_NAME   				 = "ESR";
     public static final String        PERSON_GRADE_ATTENDING_FIELD_NAME   	 = "SCHG";
 
     public static final String        PROPERTIES_HOUSEHOLD_TRACE_LIST                    = "Debug.Trace.HouseholdIdList";
@@ -1012,7 +1015,7 @@ public abstract class HouseholdDataManager
                     try
                     {
 
-                        occup = person.getPersPecasOccup();
+                        occup = person.getPersPecasOccup();                        
                         segmentIndex = segmentValueIndexMap.get(occup);
                         workersByHomeMgra[segmentIndex][homeMgra]++;
 

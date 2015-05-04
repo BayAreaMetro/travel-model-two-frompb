@@ -221,7 +221,7 @@ public class SandagHouseholdDataManager
                 fieldCount++;
 
                 // read fields for determining person's employment category
-                int esr = (int)personTable.getValueAt( r, personTable.getColumnPosition( PERSON_EMPLOYMENT_STATUS_FIELD_NAME ) );
+                int esr = (int)personTable.getValueAt( r, personTable.getColumnPosition( PERSON_ESR_FIELD_NAME ) );
                 int wkhp = (int)personTable.getValueAt( r, personTable.getColumnPosition( PERSON_HOURS_WORKED_FIELD_NAME ) );
                 int wkw = (int)personTable.getValueAt( r, personTable.getColumnPosition( PERSON_WEEKS_WORKED_FIELD_NAME ) );
                 // 1-employed FT, 2-employed PT, 3-not employed, 4-under age 16

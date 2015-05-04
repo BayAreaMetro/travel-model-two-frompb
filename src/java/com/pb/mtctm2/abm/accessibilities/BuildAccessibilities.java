@@ -212,12 +212,12 @@ public final class BuildAccessibilities
         hsDistrictIndexMap = new HashMap<Integer, Integer>();
         workerOccupValueSegmentIndexMap = new HashMap<Integer, Integer>();
         
-        workerOccupValueSegmentIndexMap.put(71, 0);
-        workerOccupValueSegmentIndexMap.put(72, 1);
-        workerOccupValueSegmentIndexMap.put(74, 2);
-        workerOccupValueSegmentIndexMap.put(75, 3);
-        workerOccupValueSegmentIndexMap.put(76, 4);
-        workerOccupValueSegmentIndexMap.put(77, 5);
+        workerOccupValueSegmentIndexMap.put(1, 0);
+        workerOccupValueSegmentIndexMap.put(2, 1);
+        workerOccupValueSegmentIndexMap.put(3, 2);
+        workerOccupValueSegmentIndexMap.put(4, 3);
+        workerOccupValueSegmentIndexMap.put(5, 4);
+        workerOccupValueSegmentIndexMap.put(6, 5);
 
         aDmu = new AccessibilitiesDMU();
 

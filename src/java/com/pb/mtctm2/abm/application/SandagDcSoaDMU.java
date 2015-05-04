@@ -33,6 +33,8 @@ public class SandagDcSoaDMU
         methodIndexMap.put("getHighSchoolDistrictDestAlt", 14);
         methodIndexMap.put("getHomeMgraHighSchoolDistrict", 15);
         methodIndexMap.put("getUniversityEnrollmentDestAlt", 16);
+        methodIndexMap.put("getPecasOcc", 17);
+        
 
     }
 
@@ -41,6 +43,10 @@ public class SandagDcSoaDMU
     public double getLnDcSizeAlt(int alt)
     {
         return getLnDcSize(alt);
+    }
+    
+    public int getPecasOcc() {
+    	return person.getPersPecasOccup();
     }
 
     public double getValueForIndex(int variableIndex, int arrayIndex)
@@ -78,6 +84,8 @@ public class SandagDcSoaDMU
                 return getHomeMgraHighSchoolDistrict();
             case 16:
                 return getUniversityEnrollmentDestAlt(arrayIndex);
+            case 17: 
+            	return getPecasOcc();
             default:
                 logger.error("method number = " + variableIndex + " not found");
                 throw new RuntimeException("method number = " + variableIndex + " not found");
