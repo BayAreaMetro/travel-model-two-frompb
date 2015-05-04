@@ -1538,18 +1538,18 @@ public class DataExporter {
         exportDataGeneric(outputFileBase,"Results.CBDFile",false,null,floatColumns,stringColumns,intColumns,bitColumns,FieldType.FLOAT,primaryKey,null);
     }
     
-    private void exportPecasCodes(String outputFileBase) {
-        addTable(outputFileBase);
-        String[] formats = {NUMBER_FORMAT_NAME, //occcen1
-                            NUMBER_FORMAT_NAME, //pecas_occ
-                            };
-        Set<String> intColumns = new HashSet<String>();
-        Set<String> floatColumns = new HashSet<String>();             
-        Set<String> bitColumns = new HashSet<String>();
-        Set<String> stringColumns = new HashSet<String>();
-        Set<String> primaryKey = new LinkedHashSet<String>(Arrays.asList("occcen1"));
-        exportDataGeneric(outputFileBase,"PopulationSynthesizer.OccupCodes",true,formats,floatColumns,stringColumns,intColumns,bitColumns,FieldType.INT,primaryKey,null);
-    }
+//    private void exportPecasCodes(String outputFileBase) {
+//        addTable(outputFileBase);
+//        String[] formats = {NUMBER_FORMAT_NAME, //occcen1
+//                            NUMBER_FORMAT_NAME, //pecas_occ
+//                            };
+//        Set<String> intColumns = new HashSet<String>();
+//        Set<String> floatColumns = new HashSet<String>();             
+//        Set<String> bitColumns = new HashSet<String>();
+//        Set<String> stringColumns = new HashSet<String>();
+//        Set<String> primaryKey = new LinkedHashSet<String>(Arrays.asList("occcen1"));
+//        exportDataGeneric(outputFileBase,"PopulationSynthesizer.OccupCodes",true,formats,floatColumns,stringColumns,intColumns,bitColumns,FieldType.INT,primaryKey,null);
+//    }
     
     private void exportDistrictDefinitions(String outputFileBase) {
         addTable(outputFileBase);
@@ -1756,8 +1756,8 @@ public class DataExporter {
                 dataExporter.exportPnrVehicleData("pnrvehicles");
             if (definedTables.contains("cbdvehicles"))
                 dataExporter.exportCbdVehicleData("cbdvehicles");
-            if (definedTables.contains("pecascodes"))
-                dataExporter.exportPecasCodes("pecascodes");
+//            if (definedTables.contains("pecascodes"))
+//                dataExporter.exportPecasCodes("pecascodes");
             if (definedTables.contains("districtdefinitions"))
                 dataExporter.exportDistrictDefinitions("districtdefinitions");
             

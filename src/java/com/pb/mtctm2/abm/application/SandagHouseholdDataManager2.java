@@ -35,8 +35,14 @@ public class SandagHouseholdDataManager2
     public static final String HH_DATA_SERVER_ADDRESS    = "127.0.0.1";
     public static final int    HH_DATA_SERVER_PORT       = 1139;
 
-    public static final String PROPERTIES_OCCUP_CODES    = "PopulationSynthesizer.OccupCodes";
-    public static final String PROPERTIES_INDUSTRY_CODES = "PopulationSynthesizer.IndustryCodes";
+    //public static final String PROPERTIES_OCCUP_CODES    = "PopulationSynthesizer.OccupCodes";
+    //public static final String PROPERTIES_INDUSTRY_CODES = "PopulationSynthesizer.IndustryCodes";
+    
+    public static final int MIN_EMPLOYMENT_AGE = 16;
+    public static final int MIN_SCHOOL_AGE = 6;
+    public static final int MIN_DRIVING_AGE = 16;
+    public static final int MAX_SCHOOL_AGE = 19;
+    public static final int RETIREMENT_AGE = 65;
 
     public SandagHouseholdDataManager2()
     {
@@ -60,8 +66,8 @@ public class SandagHouseholdDataManager2
         int invalidPersonTypeCount3 = 0;
 
         // read the corrrespondence files for mapping persons to occupation and
-        int[] occCodes = readOccupCorrespondenceData();
-        int[] indCodes = readIndustryCorrespondenceData();
+        //int[] occCodes = readOccupCorrespondenceData();
+        //int[] indCodes = readIndustryCorrespondenceData();
 
         // get the maximum HH id value to use to dimension the hhIndex correspondence
         // array.  The hhIndex array will store the hhArray index number for the given
@@ -167,13 +173,18 @@ public class SandagHouseholdDataManager2
                         .getColumnPosition(HH_WORKERS_FIELD_NAME));
                 hh.setHhWorkers(numWorkers);
 
-                int incomeCat = (int) hhTable.getValueAt(r, hhTable
-                        .getColumnPosition(HH_INCOME_CATEGORY_FIELD_NAME));
-                hh.setHhIncome(incomeCat);
-
                 int incomeInDollars = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_INCOME_DOLLARS_FIELD_NAME));
-                double incomeInDollarsD = incomeInDollars;
-                incomeInDollars = (int) incomeInDollarsD;
+                if(incomeInDollars >= 150000)
+                	hh.setHhIncome(5);
+                else if(incomeInDollars >= 100000)
+                	hh.setHhIncome(4);
+                else if(incomeInDollars >= 60000)
+                	hh.setHhIncome(5);
+                else if(incomeInDollars >= 30000)
+                	hh.setHhIncome(2);
+                else
+                	hh.setHhIncome(1);
+
                 hh.setHhIncomeInDollars(incomeInDollars);
 
                 // 0=Housing unit, 1=Institutional group quarters, 2=Noninstitutional
@@ -289,57 +300,32 @@ public class SandagHouseholdDataManager2
                     person.setPersGender(gender);
                     fieldCount++;
 
-                    int occcen1 = (int) personTable.getValueAt(p, personTable.getColumnPosition(PERSON_OCCCEN1_FIELD_NAME));
-                    int pecasOccup = occCodes[occcen1];
-
-                    if (pecasOccup == 0) logger.warn("pecasOccup==0 for occcen1=" + occcen1);
-
-                    int indcen = (int) personTable.getValueAt(p, personTable.getColumnPosition(PERSON_INDCEN_FIELD_NAME));
-                    int activityCode = indCodes[indcen];
-
-                    if ((pecasOccup == 71)
-                            && (activityCode == 2 || activityCode == 4 || activityCode == 6
-                                    || activityCode == 8 || activityCode == 29)) activityCode++;
-
-                    if ((pecasOccup == 76)
-                            && (activityCode == 3 || activityCode == 5 || activityCode == 7
-                                    || activityCode == 9 || activityCode == 30)) activityCode--;
-
-                    if ((pecasOccup == 76) && (activityCode == 13)) activityCode = 14;
-
-                    if ((pecasOccup == 71) && (activityCode == 14)) activityCode = 13;
-
-                    if ((pecasOccup == 75) && (activityCode == 18)) activityCode = 22;
-
-                    if ((pecasOccup == 71) && (activityCode == 22)) activityCode = 18;
-
-                    if (activityCode == 28) pecasOccup = 77;
-
-                    person.setPersActivityCode(activityCode);
+                    int pecasOcc = (int)personTable.getValueAt( p, personTable.getColumnPosition( PERSON_OCCP_FIELD_NAME ) );
+                    if (pecasOcc == 0) logger.warn("pecasOccup==0 for occ=" + pecasOcc);
+                    person.setPersPecasOccup( pecasOcc );
                     fieldCount++;
 
-                    person.setPersPecasOccup(pecasOccup);
+                    // read fields for determining person's employment category
+                    int esr = (int)personTable.getValueAt( p, personTable.getColumnPosition( PERSON_EMPLOYMENT_STATUS_FIELD_NAME ) );
+                    int wkhp = (int)personTable.getValueAt( p, personTable.getColumnPosition( PERSON_HOURS_WORKED_FIELD_NAME ) );
+                    int wkw = (int)personTable.getValueAt( p, personTable.getColumnPosition( PERSON_WEEKS_WORKED_FIELD_NAME ) );
+                    // 1-employed FT, 2-employed PT, 3-not employed, 4-under age 16
+                    int empCat = computeEmploymentCategory( age, esr, wkhp, wkw); 
+                    person.setPersEmploymentCategory( empCat );
                     fieldCount++;
 
-                    // Employment status (1-employed FT, 2-employed PT, 3-not
-                    // employed, 4-under age 16)
-                    int empCat = (int) personTable.getValueAt(p, personTable.getColumnPosition(PERSON_EMPLOYMENT_CATEGORY_FIELD_NAME));
-                    person.setPersEmploymentCategory(empCat);
+                    // determine person's student category
+                    // 1-in high school or lower, 2-in trade school, college or higher, 3-not attending school 
+                    int schg = (int)personTable.getValueAt( p, personTable.getColumnPosition(PERSON_GRADE_ATTENDING_FIELD_NAME));
+                    int studentCat = computeStudentCategory(schg, age, empCat);
+                    person.setPersStudentCategory( studentCat );
                     fieldCount++;
 
-                    // Student status (1 - student in grade or high school; 2 -
-                    // student in college or higher; 3 - not a student)
-                    int studentCat = (int) personTable.getValueAt(p, personTable.getColumnPosition(PERSON_STUDENT_CATEGORY_FIELD_NAME));
-                    person.setPersStudentCategory(studentCat);
-                    fieldCount++;
-
-                    // Person type (1-FT worker age 16+, 2-PT worker nonstudent age
-                    // 16+, 3-university student, 4-nonworker nonstudent age 16-64,
-                    // 5-nonworker nonstudent age 65+,
-                    // 6-"age 16-19 student, not FT wrkr or univ stud", 7-age 6-15
-                    // schpred, 8 under age 6 presch
-                    int personType = (int) personTable.getValueAt(p, personTable.getColumnPosition(PERSON_TYPE_CATEGORY_FIELD_NAME));
-                    person.setPersonTypeCategory(personType);
+                    // determine person's type category 
+                    // 1-FT worker age 16+, 2-PT worker nonstudent age 16+, 3-university student, 4-nonworker nonstudent age 16-64,
+                    // 5-nonworker nonstudent age 65+, 6-"age 16-19 student, not FT wrkr or univ stud", 7-age 6-15 schpred, 8  under age 6 presch
+                    int personType = computePersonType( age, empCat, studentCat );
+                    person.setPersonTypeCategory( personType );
                     fieldCount++;
 
                     // Person educational attainment level to determine high school
@@ -366,7 +352,7 @@ public class SandagHouseholdDataManager2
                     // 4-"Grade 5 to grade 8", 5-"Grade 9 to grade 12",
                     // 6-"College undergraduate", 7-"Graduate or professional school"
                     // )
-                    int grade = (int) personTable.getValueAt(p, personTable.getColumnPosition(PERSON_GRADE_ENROLLED_FIELD_NAME));
+                    int grade = (int) personTable.getValueAt(p, personTable.getColumnPosition(PERSON_GRADE_ATTENDING_FIELD_NAME));
                     person.setPersonIsGradeSchool(false);
                     person.setPersonIsHighSchool(false);
                     if (grade >= 2 && grade <= 4) {
@@ -566,6 +552,107 @@ public class SandagHouseholdDataManager2
         }
 
     }
+    
+    /* 
+     * Function determine person type. Returns:
+	  * 	1 - FT worker age 16+
+	  * 	2 - PT worker non-student age 16+
+	  * 	3 - university student
+	  * 	4 - non-worker non-student age 16-64
+	  *     5 - non-worker non-student age 65+
+	  *     6 - age 16-19 student, not FT worker or university student
+	  *     7 - age 6-15 pre-drive school student
+	  * 	8 - under age 6 children
+	  */
+    private int computePersonType(int age, int empCat, int studentCat) {
+
+    	int personType=0;
+		   
+		if (empCat==1)	// full time worker
+			personType = Person.PersonType.FT_worker_age_16plus.ordinal();
+		else 
+			if (studentCat==3) 		// not studying
+				if (empCat==2)		// part-time worker
+					personType = Person.PersonType.PT_worker_nonstudent_age_16plus.ordinal();
+				else {
+					//empCat==3, not employed and not studying
+					if (age>=RETIREMENT_AGE) 		// retired
+						personType = Person.PersonType.Nonworker_nonstudent_age_65plus.ordinal();		
+					else if (age<MIN_SCHOOL_AGE) 	// young child not studying
+						personType = Person.PersonType.Preschool_under_age_6.ordinal();		
+					else							// unemployed, non-student, age 16-64 
+						personType = Person.PersonType.Nonworker_nonstudent_age_16_64.ordinal();		
+				}
+			else if (studentCat==2)	// University/GED/Trade student either working PT or not employed
+					personType = Person.PersonType.University_student.ordinal();
+			else {
+				 // studentCat==1, student in high school or lower
+				if (age<MIN_SCHOOL_AGE)			// young children in daycare/preschool or non-student
+					personType = Person.PersonType.Preschool_under_age_6.ordinal();			
+				else if (age>=MIN_DRIVING_AGE)	// student of driving age (16-19)
+					personType = Person.PersonType.Student_age_16_19_not_FT_wrkr_or_univ_stud.ordinal();
+				else							// grade~high school student too young to drive
+					personType = Person.PersonType.Student_age_6_15_schpred.ordinal();			
+			}		
+			
+		return personType;
+	}
+
+
+	 /* 
+     * Function determine the student status of a person. Returns:
+     *		1 - student in high school or lower (including nursery and preschool)
+ 	  *     2 - student in trade school, college or higher
+     *     3 - not attending school 
+     */
+     private int computeStudentCategory(int schg, int age, int empCat) {
+		int studentCat;
+    
+		if ( (empCat==1) || (schg<1) ) {// full time workers or those with no grade-attending info cannot be students 
+			studentCat = Person.StudentStatus.NON_STUDENT.ordinal();
+			if (age<MIN_DRIVING_AGE) // but if under minimum driving age, reset to high school or lower
+					studentCat = Person.StudentStatus.STUDENT_HIGH_SCHOOL_OR_LESS.ordinal(); 				
+		}
+		else 
+			if (schg>=6) { // attending college or above
+				studentCat = Person.StudentStatus.STUDENT_COLLEGE_OR_HIGHER.ordinal();
+				if (age<MIN_DRIVING_AGE) // but if under minimum driving age, reset to high school or lower
+					studentCat = Person.StudentStatus.STUDENT_HIGH_SCHOOL_OR_LESS.ordinal();
+			}
+			else {		// attending high school or lower
+				studentCat = Person.StudentStatus.STUDENT_HIGH_SCHOOL_OR_LESS.ordinal();
+				if (age>MAX_SCHOOL_AGE)	// but if too old for school, reset to college or above
+					studentCat = Person.StudentStatus.STUDENT_COLLEGE_OR_HIGHER.ordinal();
+			}
+		
+		return studentCat;
+	}
+
+    
+    /* 
+     * Function determine the employment category of a person. Returns:
+	  * 	1 - employed fulltime
+	  * 	2 - employed parttime
+	  * 	3 - age 16 and over and not employed
+	  * 	4 - under age 16
+	  */
+	private int computeEmploymentCategory(int age, int esr, int wkhp, int wkw) {
+    	 int empCat = 0;
+     		
+    	 if (age < MIN_EMPLOYMENT_AGE )	// under employment age
+    		 empCat = Person.EmployStatus.UNDER16.ordinal();
+    	 else {
+    		 if ( (esr==3) || (esr==6) )	// over employment age and not employed
+    			 empCat = Person.EmployStatus.NOT_EMPLOYED.ordinal();
+    		 else
+    			 if ( (wkhp>=35) && (wkw>=1) && (wkw<=4) ) // over employment age, working at least 35 hrs a week and 27+weeks a year
+    				 empCat = Person.EmployStatus.FULL_TIME.ordinal();
+    			 else
+    				 empCat = Person.EmployStatus.PART_TIME.ordinal();
+    	 }
+    		 
+    	 return empCat;
+	}
 
     public static void main(String args[]) throws Exception
     {
@@ -601,90 +688,6 @@ public class SandagHouseholdDataManager2
     {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    private int[] readOccupCorrespondenceData()
-    {
-
-        TableDataSet occTable = null;
-
-        // construct input household file name from properties file values
-        String occupFileName = propertyMap.get(PROPERTIES_OCCUP_CODES);
-        String fileName = projectDirectory + "/" + occupFileName;
-
-        try
-        {
-            logger.info("reading occupation codes data file for creating occupation segments.");
-            OLD_CSVFileReader reader = new OLD_CSVFileReader();
-            reader.setDelimSet("," + reader.getDelimSet());
-            occTable = reader.readFile(new File(fileName));
-        } catch (Exception e)
-        {
-            logger.fatal(String.format(
-                    "Exception occurred occupation codes data file: %s into TableDataSet object.",
-                    fileName));
-            throw new RuntimeException(e);
-        }
-
-        // get the array of indices from the TableDataSet
-        int[] occcen1Col = occTable.getColumnAsInt("occcen1");
-        int[] occupCol = occTable.getColumnAsInt("pecas_occ");
-
-        // get the max index value, to use for array dimensions
-        int maxOcc = 0;
-        for (int occ : occcen1Col)
-            if (occ > maxOcc) maxOcc = occ;
-
-        int[] occcen1Occup = new int[maxOcc + 1];
-        for (int i = 0; i < occcen1Col.length; i++)
-        {
-            int index = occcen1Col[i];
-            int value = occupCol[i];
-            occcen1Occup[index] = value;
-        }
-
-        return occcen1Occup;
-    }
-
-    private int[] readIndustryCorrespondenceData()
-    {
-
-        TableDataSet indTable = null;
-
-        // construct input household file name from properties file values
-        String indFileName = propertyMap.get(PROPERTIES_INDUSTRY_CODES);
-        String fileName = projectDirectory + "/" + indFileName;
-
-        try
-        {
-            logger.info("reading industry codes data file for creating industry segments.");
-            OLD_CSVFileReader reader = new OLD_CSVFileReader();
-            reader.setDelimSet("," + reader.getDelimSet());
-            indTable = reader.readFile(new File(fileName));
-        } catch (Exception e)
-        {
-            logger.fatal(String.format("Exception occurred reading indistry codes data file: %s into TableDataSet object.", fileName));
-            throw new RuntimeException(e);
-        }
-
-        // get the array of indices from the TableDataSet
-        int[] indcenCol = indTable.getColumnAsInt("indcen");
-        int[] activityCol = indTable.getColumnAsInt("activity_code");
-
-        // get the max index value, to use for array dimensions
-        int maxInd = 0;
-        for (int ind : indcenCol)
-            if (ind > maxInd) maxInd = ind;
-
-        int[] indcenIndustry = new int[maxInd + 1];
-        for (int i = 0; i < indcenCol.length; i++)
-        {
-            int index = indcenCol[i];
-            int value = activityCol[i];
-            indcenIndustry[index] = value;
-        }
-
-        return indcenIndustry;
     }
 
 }
