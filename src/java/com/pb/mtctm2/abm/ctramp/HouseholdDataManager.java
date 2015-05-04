@@ -43,27 +43,26 @@ public abstract class HouseholdDataManager
     public static final String        HH_ID_FIELD_NAME                       = "HHID";
     public static final String        HH_HOME_TAZ_FIELD_NAME                 = "TAZ";
     public static final String        HH_HOME_MGRA_FIELD_NAME                = "MAZ";
-    public static final String        HH_INCOME_CATEGORY_FIELD_NAME          = "HINCCAT1";
-    public static final String        HH_INCOME_DOLLARS_FIELD_NAME           = "HINC";
-    public static final String        HH_WORKERS_FIELD_NAME                  = "HWORKERS";
-    public static final String        HH_AUTOS_FIELD_NAME                    = "VEHICL";
-    public static final String        HH_SIZE_FIELD_NAME                     = "PERSONS";
+    public static final String        HH_INCOME_DOLLARS_FIELD_NAME           = "HHINCADJ";
+    public static final String        HH_WORKERS_FIELD_NAME                  = "NWRKRS_ESR";
+    public static final String        HH_AUTOS_FIELD_NAME                    = "VEH";
+    public static final String        HH_SIZE_FIELD_NAME                     = "NP";
     public static final String        HH_TYPE_FIELD_NAME                     = "HHT";
-    public static final String        HH_BLDGSZ_FIELD_NAME                   = "BLDGSZ";
-    public static final String        HH_UNITTYPE_FIELD_NAME                 = "UNITTYPE";
+    public static final String        HH_BLDGSZ_FIELD_NAME                   = "BLD";
+    public static final String        HH_UNITTYPE_FIELD_NAME                 = "TYPE";
 
     //HHID,PERID,AGE,SEX,OCCCEN1,INDCEN,PEMPLOY,PSTUDENT,PTYPE,EDUC,GRADE
     public static final String        PERSON_HH_ID_FIELD_NAME                = "HHID";
     public static final String        PERSON_PERSON_ID_FIELD_NAME            = "PERID";
-    public static final String        PERSON_AGE_FIELD_NAME                  = "AGE";
+    public static final String        PERSON_AGE_FIELD_NAME                  = "AGEP";
     public static final String        PERSON_GENDER_FIELD_NAME               = "SEX";
-    public static final String        PERSON_EMPLOYMENT_CATEGORY_FIELD_NAME  = "PEMPLOY";
-    public static final String        PERSON_STUDENT_CATEGORY_FIELD_NAME     = "PSTUDENT";
-    public static final String        PERSON_TYPE_CATEGORY_FIELD_NAME        = "PTYPE";
-    public static final String        PERSON_EDUCATION_ATTAINMENT_FIELD_NAME = "EDUC";
-    public static final String        PERSON_GRADE_ENROLLED_FIELD_NAME       = "GRADE";
-    public static final String        PERSON_OCCCEN1_FIELD_NAME              = "OCCCEN1";
-    public static final String        PERSON_INDCEN_FIELD_NAME               = "INDCEN";
+    public static final String        PERSON_EDUCATION_ATTAINMENT_FIELD_NAME = "SCHL";
+    //public static final String        PERSON_GRADE_ENROLLED_FIELD_NAME       = "GRADE";
+    public static final String        PERSON_OCCP_FIELD_NAME            	 = "OCCP";
+    public static final String        PERSON_HOURS_WORKED_FIELD_NAME         = "WKHP";
+    public static final String        PERSON_WEEKS_WORKED_FIELD_NAME         = "WKW";
+    public static final String        PERSON_EMPLOYMENT_STATUS_FIELD_NAME    = "EMPLOYED";
+    public static final String        PERSON_GRADE_ATTENDING_FIELD_NAME   	 = "SCHG";
 
     public static final String        PROPERTIES_HOUSEHOLD_TRACE_LIST                    = "Debug.Trace.HouseholdIdList";
     public static final String        DEBUG_HHS_ONLY_KEY                                 = "Process.Debug.HHs.Only";

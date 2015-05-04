@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
+import com.pb.mtctm2.abm.application.SandagModelStructure;
 import com.pb.mtctm2.abm.ctramp.Modes;
 import com.pb.mtctm2.abm.ctramp.TapDataManager;
 import com.pb.mtctm2.abm.ctramp.TazDataManager;
@@ -110,12 +111,7 @@ public class BestTransitPathCalculator implements Serializable
     
     private int numSkimSets;
     private int numTransitAlts;
-    
-    private LogitModel tripNPaths;
-    private ConcreteAlternative[] tripNPathAlts;
-    
-    
-	
+        
     /**
      * Constructor.
      * 
@@ -195,16 +191,9 @@ public class BestTransitPathCalculator implements Serializable
         bestPTap = new int[numTransitAlts];
         bestATap = new int[numTransitAlts];
         bestSet = new int[numTransitAlts];
-        
-        //setup logit model for transit logsum
-        tripNPaths = new LogitModel("trip-paths",0, numTransitAlts);
-        for (int i=0; i<numTransitAlts; i++) {
-        	tripNPathAlts[i] = new ConcreteAlternative(String.valueOf(i),i);
-            tripNPaths.addAlternative(tripNPathAlts[i]);
-        }
-    	
     }
     
+   
 
     /**
      * This is the main method that finds the best N TAP-pairs. It
@@ -267,11 +256,10 @@ public class BestTransitPathCalculator implements Serializable
                 }
                 	
                 // Calculate the pTap to aTap utility values
-        		float tapTapUtil[];
+        		float tapTapUtil[] = new float[numSkimSets];
         		if(!storedDepartPeriodTapTapUtils.get(WTW).get(period).containsKey(storedDataObject.paTapKey(pTap, aTap))) {
         			
         			//loop across number of skim sets  the pTap to aTap utility values 
-        			tapTapUtil = new float[numSkimSets];
         			for (int set=0; set<numSkimSets; set++) {
 	            		tapTapUtil[set] = calcUtilitiesForTapPair(walkDmu, period, pTap, aTap, set, writeCalculations, myLogger);
         			}
@@ -354,11 +342,10 @@ public class BestTransitPathCalculator implements Serializable
                     }
                                         
                     // Calculate the pTap to aTap utility values
-            		float tapTapUtil[];
+            		float tapTapUtil[] = new float[numSkimSets];
             		if(!storedDepartPeriodTapTapUtils.get(DTW).get(period).containsKey(storedDataObject.paTapKey(pTap, aTap))) {
             			
             			//loop across number of skim sets  the pTap to aTap utility values 
-            			tapTapUtil = new float[numSkimSets];
             			for (int set=0; set<numSkimSets; set++) {
     	            		tapTapUtil[set] = calcUtilitiesForTapPair(walkDmu, period, pTap, aTap, set, writeCalculations, myLogger);
             			}
@@ -440,11 +427,10 @@ public class BestTransitPathCalculator implements Serializable
                     }
                 	
                     // Calculate the pTap to aTap utility values
-            		float tapTapUtil[];
+            		float tapTapUtil[] = new float[numSkimSets];
             		if(!storedDepartPeriodTapTapUtils.get(WTD).get(period).containsKey(storedDataObject.paTapKey(pTap, aTap))) {
             			
-            			//loop across number of skim sets  the pTap to aTap utility values
-            			tapTapUtil = new float[numSkimSets];
+            			//loop across number of skim sets  the pTap to aTap utility values 
             			for (int set=0; set<numSkimSets; set++) {
     	            		tapTapUtil[set] = calcUtilitiesForTapPair(walkDmu, period, pTap, aTap, set, writeCalculations, myLogger);
             			}
@@ -495,7 +481,7 @@ public class BestTransitPathCalculator implements Serializable
 
         // logging
         if (myTrace) {
-            driveAccessUEC.logAnswersArray(myLogger, "Drive Orig Taz=" + pTaz + ", to pTap=" + pTap + " Utility Piece");
+        	driveAccessUEC.logAnswersArray(myLogger, "Drive from Orig Taz=" + pTaz + ", to Dest pTap=" + pTap + " Utility Piece");
         }
         return(util);
     }
@@ -509,7 +495,7 @@ public class BestTransitPathCalculator implements Serializable
 
         // logging
         if (myTrace) {
-            walkEgressUEC.logAnswersArray(myLogger, "Walk aTap=" + aTap + ", from dest mgra=" + aMgra + " Utility Piece");
+        	walkEgressUEC.logAnswersArray(myLogger, "Walk from Orig aTap=" + aTap + ", to Dest Mgra=" + aMgra + " Utility Piece");
         }    
         return(util);
     }
@@ -524,8 +510,8 @@ public class BestTransitPathCalculator implements Serializable
 
         // logging
         if (myTrace) {
-            driveEgressUEC.logAnswersArray(myLogger, "Drive Tap to Dest Taz Utility Piece");
-            driveEgressUEC.logAnswersArray(myLogger, "Drive aTap=" + aTap + ", from dest taz=" + aTaz + " Utility Piece");
+            //driveEgressUEC.logAnswersArray(myLogger, "Drive Tap to Dest Taz Utility Piece");
+        	driveEgressUEC.logAnswersArray(myLogger, "Drive from Orig aTap=" + aTap + ", to Dest Taz=" + aTaz + " Utility Piece");
         }
         return(util);
     }
@@ -543,7 +529,8 @@ public class BestTransitPathCalculator implements Serializable
         
         // logging
         if (myTrace) {
-            tapToTapUEC.logAnswersArray(myLogger, "pTap=" + pTap + " to aTap=" + aTap + " Utility Piece");
+        	String modeName = SandagModelStructure.modeName[SandagModelStructure.TRANSIT_ALTS[set] - 1];
+            tapToTapUEC.logAnswersArray(myLogger, "Transit Mode: " + modeName + " From Orig pTap=" + pTap + " to Dest aTap=" + aTap + " Utility Piece");
             tapToTapUEC.logResultsArray(myLogger, pTap, aTap);
         }
         return(util);
@@ -758,17 +745,25 @@ public class BestTransitPathCalculator implements Serializable
     
     public LogitModel setupTripLogSum(double[][] bestTapPairs, boolean myTrace, Logger myLogger) {      
     	
-    	//re-setup model
-    	tripNPaths.clear();
-    	for (int i=0; i<tripNPathAlts.length; i++) {
-        	tripNPathAlts[i].setAvailability(false);
-        }
-        for (int i=0; i<bestTapPairs.length; i++) {
+    	//must size logit model ahead of time
+    	int alts = 0;
+    	for (int i=0; i<bestTapPairs.length; i++) {
         	if (bestTapPairs[i] != null) {
-        		tripNPathAlts[i].setAvailability(true);
-        		tripNPathAlts[i].setUtility(bestTapPairs[i][3]);
+        		alts = alts + 1;
         	}
+    	}
+    	
+    	LogitModel tripNPaths = new LogitModel("trip-paths",0, alts);
+        for (int i=0; i<bestTapPairs.length; i++) {
+        	
+        	if (bestTapPairs[i] != null) {
+        		ConcreteAlternative alt = new ConcreteAlternative(String.valueOf(i),i);
+                alt.setUtility(bestTapPairs[i][3]);
+                tripNPaths.addAlternative(alt);
+        	}
+    		
         }
+
         return(tripNPaths);
     }
     
