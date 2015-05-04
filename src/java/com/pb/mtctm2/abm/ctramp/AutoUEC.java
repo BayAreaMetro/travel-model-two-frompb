@@ -3,10 +3,13 @@ package com.pb.mtctm2.abm.ctramp;
 import com.pb.common.calculator.IndexValues;
 import com.pb.common.newmodel.LogitModel;
 import com.pb.common.util.Tracer;
+
 import org.apache.log4j.Logger;
+
 import com.pb.mtctm2.abm.ctramp.ChoiceModelApplication;
 import com.pb.mtctm2.abm.ctramp.Util;
 import com.pb.common.newmodel.UtilityExpressionCalculator;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -121,6 +124,7 @@ public class AutoUEC
         if (trace)
         {
             uec.logAnswersArray(logger, "Auto UEC");
+            modelApp.logAlternativesInfo("Auto UEC", "  ", logger);
             uec.logResultsArray(logger, pTaz, aTaz);
             modelApp.logLogitCalculations("Auto UEC", "Trace");
             logger.info("Logsum = " + utility);
