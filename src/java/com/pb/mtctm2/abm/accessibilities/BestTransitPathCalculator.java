@@ -487,7 +487,7 @@ public class BestTransitPathCalculator implements Serializable
         float util = (float)walkAccessUEC.solve(index, walkDmu, null)[0];
         
         // logging
-        if (myTrace) {
+        if (myTrace && tracer.isTraceZone(mgraManager.getTaz(pMgra))) {
             walkAccessUEC.logAnswersArray(myLogger, "Walk Orig Mgra=" + pMgra + ", to pTap=" + pTap + " Utility Piece");
         }
         
@@ -504,7 +504,7 @@ public class BestTransitPathCalculator implements Serializable
         float util = (float)driveAccessUEC.solve(index, driveDmu, null)[0];
 
         // logging
-        if (myTrace) {
+        if (myTrace && tracer.isTraceZone(mgraManager.getTaz(pMgra))) {
         	driveAccessUEC.logAnswersArray(myLogger, "Drive from Orig Taz=" + pTaz + ", to Dest pTap=" + pTap + " Utility Piece");
         }
         return(util);
@@ -518,7 +518,7 @@ public class BestTransitPathCalculator implements Serializable
         float util = (float)walkEgressUEC.solve(index, walkDmu, null)[0];
 
         // logging
-        if (myTrace) {
+        if (myTrace && tracer.isTraceZone(mgraManager.getTaz(aMgra))) {
         	walkEgressUEC.logAnswersArray(myLogger, "Walk from Orig aTap=" + aTap + ", to Dest Mgra=" + aMgra + " Utility Piece");
         }    
         return(util);
@@ -533,7 +533,7 @@ public class BestTransitPathCalculator implements Serializable
         float util = (float)driveEgressUEC.solve(index, driveDmu, null)[0];
 
         // logging
-        if (myTrace) {
+        if (myTrace && tracer.isTraceZone(mgraManager.getTaz(aMgra))) {
             //driveEgressUEC.logAnswersArray(myLogger, "Drive Tap to Dest Taz Utility Piece");
         	driveEgressUEC.logAnswersArray(myLogger, "Drive from Orig aTap=" + aTap + ", to Dest Taz=" + aTaz + " Utility Piece");
         }
@@ -552,7 +552,7 @@ public class BestTransitPathCalculator implements Serializable
         float util = (float)tapToTapUEC.solve(index, walkDmu, null)[0];  
         
         // logging
-        if (myTrace) {
+        if (myTrace && tracer.isTraceZonePair( mgraManager.getTaz(origMgra),  mgraManager.getTaz(destMgra) )) {
         	String modeName = SandagModelStructure.modeName[SandagModelStructure.TRANSIT_ALTS[set] - 1];
             tapToTapUEC.logAnswersArray(myLogger, "Transit Mode: " + modeName + " From Orig pTap=" + pTap + " (Origin MAZ:" + origMgra +") " +  " to Dest aTap=" + aTap + " (Dest MAZ:" + destMgra +") " + " Utility Piece");
             tapToTapUEC.logResultsArray(myLogger, pTap, aTap);
