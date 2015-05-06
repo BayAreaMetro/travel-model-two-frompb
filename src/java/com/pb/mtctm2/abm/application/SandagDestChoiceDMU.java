@@ -54,6 +54,7 @@ public class SandagDestChoiceDMU
         methodIndexMap.put("getToursLeft", 46);
         methodIndexMap.put("getMaxWindow", 47);
         methodIndexMap.put("getDcSizeAlt", 48);
+        methodIndexMap.put("getPecasOcc", 49);
     }
 
     public void setMcLogsum(int mgra, double logsum)
@@ -69,6 +70,10 @@ public class SandagDestChoiceDMU
     public int getPersonIsFullTimeWorker()
     {
         return person.getPersonIsFullTimeWorker();
+    }
+    
+    public int getPecasOcc() {
+    	return person.getPersPecasOccup();
     }
 
     /*
@@ -150,6 +155,8 @@ public class SandagDestChoiceDMU
                 return getMaxContinuousAvailableWindow();
             case 48:
                 return getDcSizeAlt(arrayIndex);
+            case 49: 
+            	return getPecasOcc();
 
             default:
                 logger.error("method number = " + variableIndex + " not found");
