@@ -44,9 +44,9 @@ public final class BuildAccessibilities
     protected transient Logger             logger                                           = Logger.getLogger(BuildAccessibilities.class);
 
     private static final String[]       WORK_OCCUP_SEGMENT_NAME_LIST                     = {
-    	"Management","Professional","Services","Retail","Manual","Military","NA" };
+    	"Management","Professional","Services","Retail","Manual","Military" };
     private static final int[]          WORK_OCCUP_SEGMENT_VALUE_LIST                    = {
-        1,2,3,4,5,6,999                                                              };
+        1,2,3,4,5,6                                                              };
 
     // these segment group labels and indices are used for creating all the school location choice segments 
     public static final String[]        SCHOOL_DC_SIZE_SEGMENT_NAME_LIST                 = {
@@ -218,7 +218,6 @@ public final class BuildAccessibilities
         workerOccupValueSegmentIndexMap.put(4, 3);
         workerOccupValueSegmentIndexMap.put(5, 4);
         workerOccupValueSegmentIndexMap.put(6, 5);
-        workerOccupValueSegmentIndexMap.put(999, 6);
 
         aDmu = new AccessibilitiesDMU();
 
