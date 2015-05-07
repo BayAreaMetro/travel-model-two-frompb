@@ -26,6 +26,36 @@ import java.util.*;
  *         Started 10/17/12 9:12 AM
  * @revised 5/6/2013 for SERPM (ymm)
  * @revised 5/6/2015 for MTC (ymm)
+ * 
+ *	1	Auto SOV (Free)
+	2	Auto SOV (Pay)
+	3	Auto 2 Person (GP)
+	4	Auto 2 Person (Free)
+	5	Auto 2 Person (Pay)
+	6	Auto 3+ Person (GP)
+	7	Auto 3+ Person (Free)
+	8	Auto 3+ Person (Pay)
+	9	Walk
+	10	Bike/Moped
+	11	Walk-LB
+	12	Walk-EB
+	13	Walk-FR
+	14	Walk-HR
+	15	Walk-LRT
+	16	Walk-CR
+	17	PNR-LB
+	18	PNR-EB
+	19	PNR-FR
+	20	PNR-HR
+	21	PNR-LRT
+	22	PNR-CR
+	23	KNR-LB
+	24	KNR-EB
+	25	KNR-FR
+	26	KNR-HR
+	27	KNR-LRT
+	28	KNR-CR
+	29	SCHLBS
  */
 public class SkimBuilder {
     private final static Logger logger = Logger.getLogger(SkimBuilder.class);

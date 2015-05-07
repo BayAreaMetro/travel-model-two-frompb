@@ -22,7 +22,7 @@ f = open(taps_connectors,'wb')
 finished_taps = {}
 for line in open(taps_connection):
     line = line.strip().split(',')
-    taps = (int(line[0]),int(line[0]))
+    taps = (int(line[0]),int(line[1]))
     if not taps in finished_taps:
         #tap,tap,cntype,distance
         #write both directions
