@@ -645,6 +645,7 @@ public class MTCTM2TripTables {
         float[] tripTime = new float[rowCount];
         float[] tripDistance = new float[rowCount];
         float[] tripCost = new float[rowCount];
+        int[] fullMode = new int[rowCount];
         
         //setup skim builder class
         SkimBuilder skimBuilder = new SkimBuilder(properties);
@@ -666,12 +667,14 @@ public class MTCTM2TripTables {
             tripTime[i] = attributes.getTripTime();
             tripDistance[i] = attributes.getTripDistance();
             tripCost[i] = attributes.getTripCost();
+            fullMode[i] = attributes.getFullMode();
         }
         
         //append data
         table.appendColumn(tripTime,"TRIP_TIME");
         table.appendColumn(tripDistance,"TRIP_DISTANCE");
         table.appendColumn(tripCost,"TRIP_COST");
+        table.appendColumn(fullMode,"FULL_MODE");
 	}
 	
 	public class MazSets implements Serializable
