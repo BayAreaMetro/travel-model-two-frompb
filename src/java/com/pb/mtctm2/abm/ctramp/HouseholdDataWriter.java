@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -42,6 +43,8 @@ public class HouseholdDataWriter
     private static final String PROPERTIES_JOINT_TRIP_TABLE     = "Results.JointTripTable";
 
     private static final int    NUM_WRITE_PACKETS               = 2000;
+    private static final int MAX_NUM_STOPS_ON_HALF_TOUR = 4;
+    private static String[] STOP_FIELDS = {"mode", "period", "taz", "purpose"};
 
     private final String        intFormat                       = "%d";
     private final String        floatFormat                     = "%f";
@@ -51,6 +54,7 @@ public class HouseholdDataWriter
     private String              stringFormat                    = fileStringFormat;
 
     private boolean             saveUtilsProbsFlag              = false;
+    private boolean writeStopsFlag 								= true; 
     private int                 setNA                           = -1;
 
     private HashMap<String,String> rbMap;
@@ -70,6 +74,8 @@ public class HouseholdDataWriter
         this.modelStructure = modelStructure;
         this.iteration = iteration;
         this.rbMap = rbMap;
+        
+        writeStopsFlag = Boolean.parseBoolean(rbMap.get(CtrampApplication.PROPERTIES_WRITE_STOPS_TO_TOUR_FILE));
         
         // create a UEC to get highway distance traveled for tours
         String uecFileName = rbMap.get("acc.mandatory.uec.file");
@@ -389,6 +395,11 @@ public class HouseholdDataWriter
                 data.add(colName);
             }
         }
+        
+        if ( writeStopsFlag ) {
+     	   data.addAll(formStopColumnNames("outstop"));
+     	   data.addAll(formStopColumnNames("instop"));
+        }
 
         return data;
     }
@@ -434,6 +445,11 @@ public class HouseholdDataWriter
                 String colName = String.format("prob_%d", i);
                 data.add(colName);
             }
+        }
+        
+        if ( writeStopsFlag ) {
+     	   data.addAll(formStopColumnNames("outstop"));
+     	   data.addAll(formStopColumnNames("instop"));
         }
 
         return data;
@@ -481,6 +497,11 @@ public class HouseholdDataWriter
                 data.add(SqliteDataTypes.REAL);
             }
         }
+        
+        if ( writeStopsFlag ) {
+     	   data.addAll(formStopColumnTypes());
+     	   data.addAll(formStopColumnTypes());
+        }
 
         return data;
     }
@@ -525,6 +546,11 @@ public class HouseholdDataWriter
                 data.add(SqliteDataTypes.REAL);
             }
         }
+        
+        if ( writeStopsFlag ) {
+      	   data.addAll(formStopColumnTypes());
+      	   data.addAll(formStopColumnTypes());
+         }
 
         return data;
     }
@@ -593,6 +619,12 @@ public class HouseholdDataWriter
             for (int i = probs.length; i < numModeAlts; i++)
                 data.add("0.0");
         }
+        
+        if ( writeStopsFlag ) {
+      	   
+      	   data.addAll(formStopDataEntries(t.getOutboundStops()));
+      	   data.addAll(formStopDataEntries(t.getInboundStops()));
+         }
 
         return data;
     }
@@ -658,6 +690,11 @@ public class HouseholdDataWriter
             for (int i = probs.length; i < numModeAlts; i++)
                 data.add("0.0");
         }
+        
+        if ( writeStopsFlag ) {
+       	   data.addAll(formStopDataEntries(t.getOutboundStops()));
+       	   data.addAll(formStopDataEntries(t.getInboundStops()));
+          }
 
         return data;
     }
@@ -678,7 +715,52 @@ public class HouseholdDataWriter
         }
         return participation;
     }
+    
+    private List<String> formStopColumnNames(String prefixStr) {
 
+ 	   List<String> colNames = new LinkedList<String>();
+ 	   
+ 	   for ( int i = 1; i <= MAX_NUM_STOPS_ON_HALF_TOUR; i++ )
+ 		   for ( String fieldStr : STOP_FIELDS) 
+ 			   colNames.add(prefixStr+"_"+i+"_"+fieldStr);		   
+ 			   
+ 	   return colNames;
+ }
+
+    private List<SqliteDataTypes> formStopColumnTypes() {
+
+        List<SqliteDataTypes> colTypes = new LinkedList<SqliteDataTypes>();
+        int numFields = STOP_FIELDS.length;
+
+        for ( int i = 0; i < numFields; i++ )
+     	   colTypes.add(SqliteDataTypes.INTEGER);
+        
+ 	   return null;
+ }
+
+    private List<String> formStopDataEntries( Stop[] stops) {
+
+    	List<String> stopData = new LinkedList<String>();
+    	int numStops=0;
+    	   	
+    	if ( stops !=null )
+    		numStops = stops.length - 1;
+
+    	if ( numStops > 0 )   		
+    		for ( int i = 0; i < numStops; i++ ) {
+    			stopData.add( string(stops[i].getMode()) );
+    			stopData.add( string(stops[i].getStopPeriod()) );
+    			stopData.add( string(stops[i].getDest()) );
+    			stopData.add( string(stops[i].getDestPurpose()) );
+    		}
+    	
+    	for ( int i = numStops; i < MAX_NUM_STOPS_ON_HALF_TOUR; i++ ) 
+    		for ( int j = 0; j < STOP_FIELDS.length; j++ )
+    			stopData.add (string("N.A."));
+    	
+    	return stopData;
+    }
+    
     /*
      * private int getBitMask(int number) { switch (number) { case 1 : return 1; case
      * 2 : return 2; case 3 : return 4; case 4 : return 8; case 5 : return 16; case 6
