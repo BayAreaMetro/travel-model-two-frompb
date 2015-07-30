@@ -98,6 +98,8 @@ public class CtrampApplication implements Serializable
     public static final String                         PROPERTIES_UEC_INDIV_MANDATORY_TOUR_FREQ                  = "UecFile.IndividualMandatoryTourFrequency";
     public static final String                         PROPERTIES_UEC_MAND_TOUR_DEP_TIME_AND_DUR                 = "UecFile.TourDepartureTimeAndDuration";
     public static final String                         PROPERTIES_UEC_INDIV_NON_MANDATORY_TOUR_FREQ              = "UecFile.IndividualNonMandatoryTourFrequency";
+    public static final String 						   PROPERTIES_WRITE_STOPS_TO_TOUR_FILE 						 = "Results.WriteStopsToTourFile";
+
 
     public static final String                         READ_ACCESSIBILITIES                                      = "acc.read.input.file";
 
