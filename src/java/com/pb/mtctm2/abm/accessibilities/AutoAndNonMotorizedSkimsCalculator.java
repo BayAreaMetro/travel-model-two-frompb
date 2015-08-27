@@ -41,9 +41,13 @@ public class AutoAndNonMotorizedSkimsCalculator
     private static final int              WALK_INDEX             = 0;                                                            
     private static final int              BIKE_INDEX             = 1;                                                            
                                                                                                                                  
-    private static final double           WALK_SPEED             = (1.0/Constants.walkMinutesPerFoot)*60/5280;// mph                             
-    private static final double           BIKE_SPEED             = (1.0/Constants.bikeMinutesPerFoot)*60/5280;// mph                             
-                                                                                                                                 
+    //private static final double           WALK_SPEED             = (1.0/Constants.walkMinutesPerFoot)*60/5280;// mph                             
+    //private static final double           BIKE_SPEED             = (1.0/Constants.bikeMinutesPerFoot)*60/5280;// mph                             
+    
+    // revised by AshishK - 8/12/2015
+    private static final double           WALK_SPEED             = Constants.WALK_SPEED;	// mph                             
+    private static final double           BIKE_SPEED             = Constants.BIKE_SPEED;	// mph  
+    
     // declare an array of UEC objects, 1 for each time period                                                                   
     private UtilityExpressionCalculator[] autoSkimUECs;                                                                          
     private IndexValues                   iv;                                                                                    

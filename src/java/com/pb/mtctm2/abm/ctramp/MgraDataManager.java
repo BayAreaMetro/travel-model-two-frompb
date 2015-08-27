@@ -527,7 +527,7 @@ public final class MgraDataManager
      */
     public float getMgraToTapWalkTime(int mgra, int pos)
     {
-        return ((float) mgraWlkTapsDistArray[mgra][1][pos]) * Constants.walkMinutesPerFoot;
+        return (float) (mgraWlkTapsDistArray[mgra][1][pos] * Constants.walkMinutesPerFoot);
     }
 
     /**
@@ -578,7 +578,7 @@ public final class MgraDataManager
      */
     public float getMgraToMgraWalkTime(int oMgra, int dMgra)
     {
-    	return getMgraToMgraWalkDistTo(oMgra,dMgra)*Constants.walkMinutesPerFoot;
+    	return (float) (getMgraToMgraWalkDistTo(oMgra,dMgra)*Constants.walkMinutesPerFoot);
     }
 
     /**
@@ -629,7 +629,7 @@ public final class MgraDataManager
      */
     public float getMgraToMgraBikeTime(int oMgra, int dMgra)
     {
-    	return getMgraToMgraBikeDistTo(oMgra,dMgra)*Constants.bikeMinutesPerFoot;
+    	return (float) (getMgraToMgraBikeDistTo(oMgra,dMgra)*Constants.bikeMinutesPerFoot);
     }
 
     /**
