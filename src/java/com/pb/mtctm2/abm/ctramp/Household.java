@@ -62,6 +62,8 @@ public class Household
     private int                       maxMixedOverlaps;
 
     private ModelStructure            modelStructure;
+    
+    private int 					  countyId;
 
     public Household(ModelStructure modelStructure)
     {
@@ -1220,6 +1222,11 @@ public class Household
         return jointTours;
     }
 
+    public int getCountyId()
+    {
+    	return countyId;
+    }
+    
     public void initializeForAoRestart()
     {
         jointTours = null;

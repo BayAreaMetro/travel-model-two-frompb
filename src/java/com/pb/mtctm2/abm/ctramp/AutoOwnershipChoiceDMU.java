@@ -163,6 +163,11 @@ public class AutoOwnershipChoiceDMU
     {
         return studentsRailProportion;
     }
+    
+    public int getHhCountyId()
+    {
+    	return hh.getCountyId(); 
+    }
 
     public void setUseAccessibilities(boolean flag)
     {
