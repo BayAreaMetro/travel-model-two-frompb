@@ -168,6 +168,11 @@ public class AutoOwnershipChoiceDMU
     {
     	return hh.getCountyId(); 
     }
+    
+    public int getHhType()
+    {
+    	return hh.getHhType();
+    }
 
     public void setUseAccessibilities(boolean flag)
     {

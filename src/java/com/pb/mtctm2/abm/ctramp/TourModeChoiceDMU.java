@@ -286,6 +286,11 @@ public class TourModeChoiceDMU
         return hh.getAutoOwnershipModelResult();
     }
 
+    public int getWorkers()
+    {
+        return hh.getWorkers();
+    }
+    
     public int getAge()
     {
         return person.getAge();

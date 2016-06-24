@@ -63,7 +63,7 @@ public class HouseholdDataWriter
     private UtilityExpressionCalculator autoSkimUEC;
     private IndexValues iv;
     private MgraDataManager mgraManager;
-    
+   
     private ModelStructure      modelStructure;
     private int                 iteration;
 
@@ -790,6 +790,7 @@ public class HouseholdDataWriter
         data.add("dest_purpose");
         data.add("orig_mgra");
         data.add("dest_mgra");
+        data.add("trip_dist");
         data.add("parking_mgra");
         data.add("stop_period");
         data.add("trip_mode");
@@ -814,6 +815,7 @@ public class HouseholdDataWriter
         data.add("dest_purpose");
         data.add("orig_mgra");
         data.add("dest_mgra");
+        data.add("trip_dist");
         data.add("parking_mgra");
         data.add("stop_period");
         data.add("trip_mode");
@@ -841,6 +843,7 @@ public class HouseholdDataWriter
         data.add(SqliteDataTypes.TEXT);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
+        data.add(SqliteDataTypes.REAL);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
@@ -863,6 +866,7 @@ public class HouseholdDataWriter
         data.add(SqliteDataTypes.TEXT);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
+        data.add(SqliteDataTypes.REAL);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
         data.add(SqliteDataTypes.INTEGER);
@@ -910,6 +914,7 @@ public class HouseholdDataWriter
                 data.add(string(t.getTourOrigMgra()));
                 data.add(string(s.getDest()));
             }
+            data.add(string(calculateDistancesForAllMgras(t.getTourDestMgra(), s.getDest())));
         } else if (s.isInboundStop() && s.getStopId() == t.getNumInboundStops() - 1)
         {
             // last trip on inbound half-tour with stops
@@ -924,6 +929,7 @@ public class HouseholdDataWriter
             }
             data.add(string(s.getOrig()));
             data.add(string(t.getTourOrigMgra()));
+            data.add(string(calculateDistancesForAllMgras(s.getOrig(), t.getTourOrigMgra())));
         } else if (!s.isInboundStop() && s.getStopId() == t.getNumOutboundStops() - 1)
         {
             // last trip on outbound half-tour with stops
@@ -938,12 +944,14 @@ public class HouseholdDataWriter
             }
             data.add(string(s.getOrig()));
             data.add(string(t.getTourDestMgra()));
+            data.add(string(calculateDistancesForAllMgras(s.getOrig(), t.getTourDestMgra())));
         } else
         {
             data.add(s.getOrigPurpose());
             data.add(s.getDestPurpose());
             data.add(string(s.getOrig()));
             data.add(string(s.getDest()));
+            data.add(string(calculateDistancesForAllMgras(s.getOrig(), s.getDest())));
         }
 
         data.add(string(s.getPark()));
@@ -954,12 +962,15 @@ public class HouseholdDataWriter
         data.add(string(t.getTourModeChoice()));
         
         int set = setNA;
+        
         if(modelStructure.getTripModeIsTransit(s.getMode())) {
         	set = s.getSet();
         }
         data.add(string(set));
 
         return data;
+        
+        
     }
 
     private List<String> formJointTripDataEntry(Stop s)
@@ -1024,10 +1035,11 @@ public class HouseholdDataWriter
 
         data.add(string(s.getOrig()));
         data.add(string(s.getDest()));
+        data.add(string(calculateDistancesForAllMgras(s.getOrig(), s.getDest())));
         data.add(string(s.getPark()));
         data.add(string(s.getStopPeriod()));
         data.add(string(s.getMode()));
-
+        
         int[] participants = t.getPersonNumArray();
         if (participants == null)
         {
@@ -1048,6 +1060,7 @@ public class HouseholdDataWriter
         data.add(string(t.getTourModeChoice()));
 
         int set = setNA;
+        
         if(modelStructure.getTripModeIsTransit(s.getMode())) {
         	set = s.getSet();
         }
@@ -1095,10 +1108,17 @@ public class HouseholdDataWriter
 
         data.add(string((inbound ? t.getTourDestMgra() : t.getTourOrigMgra())));
         data.add(string((inbound ? t.getTourOrigMgra() : t.getTourDestMgra())));
+        data.add(string(calculateDistancesForAllMgras(inbound ? t.getTourDestMgra() : t.getTourOrigMgra(), inbound ? t.getTourOrigMgra() : t.getTourDestMgra())));
         data.add(string(t.getTourParkMgra()));
         data.add(string(inbound ? t.getTourArrivePeriod() : t.getTourDepartPeriod()));
         data.add(string(t.getTourModeChoice()));
+        
+        data.add(string(0));							// board tap
+        data.add(string(0));							// alight tap
+        
         data.add(string(t.getTourModeChoice()));
+       
+        data.add(string(0));							// set
 
         return data;
     }
@@ -1140,10 +1160,12 @@ public class HouseholdDataWriter
 
         data.add(string((inbound ? t.getTourDestMgra() : t.getTourOrigMgra())));
         data.add(string((inbound ? t.getTourOrigMgra() : t.getTourDestMgra())));
+        data.add(string(calculateDistancesForAllMgras(inbound ? t.getTourDestMgra() : t.getTourOrigMgra(), inbound ? t.getTourOrigMgra() : t.getTourDestMgra())));
         data.add(string(t.getTourParkMgra()));
         data.add(string(inbound ? t.getTourArrivePeriod() : t.getTourDepartPeriod()));
         data.add(string(t.getTourModeChoice()));
-
+        data.add(string(t.getTourModeChoice()));
+        
         int[] participants = t.getPersonNumArray();
         if (participants == null)
         {
@@ -1159,7 +1181,13 @@ public class HouseholdDataWriter
         }
 
         data.add(string(participants.length));
+        
+        data.add(string(0));							// board tap
+        data.add(string(0));							// alight tap
+        
         data.add(string(t.getTourModeChoice()));
+       
+        data.add(string(0));							// set
 
         return data;
     }

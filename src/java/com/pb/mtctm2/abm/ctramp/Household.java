@@ -64,6 +64,7 @@ public class Household
     private ModelStructure            modelStructure;
     
     private int 					  countyId;
+ 
 
     public Household(ModelStructure modelStructure)
     {
@@ -350,6 +351,11 @@ public class Household
         unitType = type;
     }
 
+    public int getHhType()
+    {
+        return hhType;
+    }
+    
     public boolean getDebugChoiceModels()
     {
         return debugChoiceModels;
@@ -359,7 +365,7 @@ public class Household
     {
         return hhSize;
     }
-
+    
     public int getNumTotalIndivTours()
     {
         int count = 0;
@@ -1225,6 +1231,11 @@ public class Household
     public int getCountyId()
     {
     	return countyId;
+    }
+    
+    public void setCountyId(int id)
+    {
+    	countyId = id;
     }
     
     public void initializeForAoRestart()

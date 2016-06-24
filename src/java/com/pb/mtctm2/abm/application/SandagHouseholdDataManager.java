@@ -101,6 +101,9 @@ public class SandagHouseholdDataManager
                 int hmgra = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_HOME_MGRA_FIELD_NAME));
                 hh.setHhMgra(hmgra);
 
+                int countyid = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_COUNTYID_FIELD_NAME));
+                hh.setCountyId(countyid);
+                
                 double rn = hh.getHhRandom().nextDouble();
                 int origWalkSubzone = getInitialOriginWalkSegment(htaz, rn);
                 hh.setHhWalkSubzone(origWalkSubzone);

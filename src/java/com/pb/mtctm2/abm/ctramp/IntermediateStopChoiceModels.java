@@ -2775,7 +2775,8 @@ public class IntermediateStopChoiceModels implements Serializable {
         mcDmuObject.setAge( p.getAge() );
         mcDmuObject.setHhSize( hh.getHhSize() );
         mcDmuObject.setPersonIsFemale( p.getPersonIsFemale() );
-
+        mcDmuObject.setHhWorkers( hh.getWorkers() );
+        
         mcDmuObject.setTourModeIsDA( modelStructure.getTourModeIsSov( tourMode ) ? 1 : 0 );
         mcDmuObject.setTourModeIsS2( modelStructure.getTourModeIsS2( tourMode ) ? 1 : 0 );
         mcDmuObject.setTourModeIsS3( modelStructure.getTourModeIsS3( tourMode ) ? 1 : 0 );

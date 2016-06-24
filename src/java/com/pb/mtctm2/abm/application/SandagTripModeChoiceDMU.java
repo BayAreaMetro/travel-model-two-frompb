@@ -98,6 +98,11 @@ public class SandagTripModeChoiceDMU
         return hhSize;
     }
 
+    public int getWorkers()
+    {
+        return workers;
+    }
+    
     public int getFemale()
     {
         return personIsFemale;
@@ -107,6 +112,7 @@ public class SandagTripModeChoiceDMU
     {
         return incomeInDollars;
     }
+
     
     public int getTpChoice() {
     	return hh.getTpChoice();
@@ -241,7 +247,10 @@ public class SandagTripModeChoiceDMU
         methodIndexMap.put("getPnrSetLogSum", 101);
         methodIndexMap.put("getKnrSetLogSum", 102);
         
+        methodIndexMap.put("getWorkers", 200);
+        
         methodIndexMap.put("getTpChoice", 400);
+        
 
     }
 
@@ -416,7 +425,9 @@ public class SandagTripModeChoiceDMU
                 else
                     returnValue = getTransitLogSum(WTD);
                 break;
-                
+            case 200:
+                returnValue = getWorkers();
+                break;    
             case 400:
                 returnValue = getTpChoice();
                 break;

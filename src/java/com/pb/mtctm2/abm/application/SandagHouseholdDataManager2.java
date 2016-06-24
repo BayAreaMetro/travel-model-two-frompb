@@ -159,6 +159,9 @@ public class SandagHouseholdDataManager2
                 int hmgra = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_HOME_MGRA_FIELD_NAME));
                 hh.setHhMgra(hmgra);
 
+                int countyid = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_COUNTYID_FIELD_NAME));
+                hh.setCountyId(countyid);
+                
                 // autos could be modeled or from PUMA
                 int numAutos = (int) hhTable.getValueAt(r, hhTable
                         .getColumnPosition(HH_AUTOS_FIELD_NAME));

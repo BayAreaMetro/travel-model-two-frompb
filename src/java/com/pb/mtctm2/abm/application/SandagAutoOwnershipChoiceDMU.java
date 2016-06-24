@@ -38,6 +38,7 @@ public class SandagAutoOwnershipChoiceDMU
         methodIndexMap.put("getStudentsRailProportion", 18);
         methodIndexMap.put("getGq", 19);
         methodIndexMap.put("getHhCountyId", 20);
+        methodIndexMap.put("getHhType", 21);
 
     }
 
@@ -86,6 +87,8 @@ public class SandagAutoOwnershipChoiceDMU
                 return getGq();
             case 20:
             	return getHhCountyId();
+            case 21:
+            	return getHhType();
 
             default:
                 logger.error("method number = " + variableIndex + " not found");

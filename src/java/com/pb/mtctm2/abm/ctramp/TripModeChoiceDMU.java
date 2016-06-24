@@ -55,6 +55,7 @@ public class TripModeChoiceDMU
     protected int adults;
     protected int autos;
     protected int hhSize;
+    protected int workers;
     protected int personIsFemale;
 
     protected int departPeriod;
@@ -214,6 +215,11 @@ public class TripModeChoiceDMU
         hhSize = arg;
     }
 
+    public void setHhWorkers(int arg)
+    {
+        workers = arg;
+    }
+    
     public void setAge(int arg)
     {
         age = arg;

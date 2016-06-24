@@ -183,6 +183,8 @@ public class SandagTourModeChoiceDMU
         methodIndexMap.put("getPnrSetLogSum", 101);
         methodIndexMap.put("getKnrSetLogSum", 102);
                 
+        methodIndexMap.put("getWorkers", 200);
+        
         methodIndexMap.put("getTpChoice", 400);
         
         methodIndexMap.put("getOMaz", 401);
@@ -307,7 +309,9 @@ public class SandagTourModeChoiceDMU
             case 102:
                 returnValue = getTransitLogSum(WTD, true) + getTransitLogSum(DTW, false);
                 break;
-
+            case 200:
+                returnValue = getWorkers();
+                break;
             case 400:
                 returnValue = getTpChoice();
                 break;
