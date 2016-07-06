@@ -22,23 +22,19 @@
         	<include name="**/JPPF/build/*.jar"/>
         </fileset>    	
         
-	    <fileset dir="${thirdParty.dir}">
+        <fileset dir="${thirdParty.dir}">
 		    <include name="**/logging-log4j-1.2.9/*.jar"/>
         	<include name="**/cajo/*.jar"/>
         	<include name="**/jexcelapi/*.jar"/>
         	<include name="**/ssj/lib/*.jar"/>
+        	<include name="**/poi/*.jar"/>
    		</fileset>
-   		
-   		<fileset dir="${repository.dir}">
-		    <include name="**/sandag_reports/lib/poi-3.7-20101029.jar"/>
-		    <include name="**/sandag_reports/lib/poi-ooxml-3.7-20101029.jar"/>
-   		</fileset>
-
+		
     </path>
   	
 
     <!-- ********************************************************* -->
-    <!-- Compile depedencies -->
+    <!-- Compile dependencies -->
     <target name="pre-build" depends="">
         <ant dir="${common-base.dir}" target="all" inheritAll="false"/>
     </target>
